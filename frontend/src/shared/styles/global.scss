@@ -1,0 +1,41 @@
+@font-face {
+    font-family: 'NEXON Lv1 Gothic OTF';
+    src: url('/fonts/NEXON Lv1 Gothic OTF.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'NEXON Lv1 Gothic OTF Bold';
+    src: url('/fonts/NEXON Lv1 Gothic OTF Bold.otf') format('opentype');
+    font-weight: bold;
+    font-style: normal;
+}
+
+body, html {
+    margin: 0;
+    padding: 0;
+
+    min-height: 100vh;
+}
+
+* {
+    box-sizing: border-box;
+
+    user-select: none;
+}
+
+h1, h2, h3, h4, h5, h6, p, a, span, button, input, textarea, select, option {
+    margin: 0;
+    padding: 0;
+    font-family: 'NEXON Lv1 Gothic OTF', sans-serif;
+}
+
+p {
+    margin: 0;
+    padding: 0;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
