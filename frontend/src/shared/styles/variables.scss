@@ -29,6 +29,9 @@ $radius-32: 32px;
 $radius-64: 64px;
 $radius-full: 9999px;
 
+$clip-hexagon: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+$clip-turn-triangle: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+
 // Color Palette
 $color-white: #FFFFFF;
 $color-black: #000000;
@@ -38,25 +41,23 @@ $text: #fff;
 $text-subtle: #919191;
 
 // Brand Text Colors
-$text-brand: #45C1FF;
+$text-brand: #482f48;
 $text-brand-heavy: #0D8FCF;
 $text-brand-subtle: #EAF8FF;
 
 // Surface Colors
 $surface: #FFFFFF;
-$surface-subtle: #FAFAFA;
+$surface-subtle: #cccccc;
 $surface-white: #FFFFFF;
 
 // Brand Surface Colors
-$surface-brand: #45C1FF;
+$surface-brand: #7a00b3;
 $surface-brand-heavy: #0D8FCF;
-$surface-brand-subtle: #EAF8FF;
+$surface-brand-subtle: #f5d6ff;
 
 // Border Colors
 $border: #eaeaea;
-$border-subtle: #EFEFEF;
+$border-subtle: #E2E2E2;
 
 // Shadow Scale
 $shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.07);
-
-$font-gambarino: "gambarino", sans-serif;

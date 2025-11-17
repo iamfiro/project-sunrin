@@ -1,11 +1,16 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import { RouterProvider } from 'react-router-dom'
-import { router } from '@/app/router'
-import '@/shared/styles/global.scss'
+import React from "react";
+import ReactDOM from "react-dom/client";
+import { RouterProvider } from "react-router-dom";
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
+import { router } from "@/app/router";
+import { MusicProvider } from "@/shared/providers";
+
+import "@/shared/styles/global.scss";
+
+ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <MusicProvider>
+      <RouterProvider router={router} />
+    </MusicProvider>
   </React.StrictMode>,
-)
+);

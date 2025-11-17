@@ -1,0 +1,80 @@
+.header {
+    width: 100%;
+    height: 55px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    background: linear-gradient(to bottom, $surface, $surface-subtle);
+    padding: 0 $padding;
+}
+
+.logo {
+    height: 33px;
+}
+
+.userInfo {
+    span {
+        font-size: 20px;
+        font-weight: bold;
+    }
+
+    div {
+        height: 110px;
+        width: 110px;
+
+        @include Center;
+
+        background: radial-gradient(#fff 20%, $surface-brand);
+
+        clip-path: $clip-turn-triangle;
+        
+        img {
+            height: 90px;
+            aspect-ratio: 1 / 1;
+
+            clip-path: $clip-turn-triangle;
+
+            box-shadow: 0 0 10px rgba(0, 0, 0, 1);
+        }
+    }
+}
+
+@mixin statBlock($background-color) {
+    height: 100%;
+
+    span {
+        font-size: 18px;
+        font-weight: bold;
+    }
+
+    div {
+        height: 100%;
+        width: 170px;
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        background-color: $background-color;
+
+        color: $text;
+
+        clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+
+        span {
+            color: $text;
+            font-weight: bold;
+            font-size: 18px;
+        }
+    }
+}
+
+.scoreInfo {
+    @include statBlock($surface-brand);
+}
+
+.perfect {
+    @include statBlock(#57d000);
+}

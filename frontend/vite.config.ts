@@ -1,6 +1,6 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react-swc'
-import path from 'path'
+import react from "@vitejs/plugin-react-swc";
+import path from "path";
+import { defineConfig } from "vite";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -13,8 +13,8 @@ export default defineConfig({
   css: {
     preprocessorOptions: {
       scss: {
-        additionalData: `@import "@/shared/styles/variables.scss";`,
+        additionalData: `@use "@/shared/styles/variables.scss" as *; @use "@/shared/styles/mixins.scss" as *;`,
       },
     },
-  }
-})
+  },
+});

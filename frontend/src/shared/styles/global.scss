@@ -11,11 +11,19 @@
     font-style: normal;
 }
 
+@font-face {
+    font-family: 'Galmuri';
+    src: url('/fonts/Galmuri9.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
 body, html {
     margin: 0;
     padding: 0;
 
     min-height: 100vh;
+    overflow-x: hidden;
 }
 
 * {
@@ -28,6 +36,7 @@ h1, h2, h3, h4, h5, h6, p, a, span, button, input, textarea, select, option {
     margin: 0;
     padding: 0;
     font-family: 'NEXON Lv1 Gothic OTF', sans-serif;
+    color: $text-brand;
 }
 
 p {

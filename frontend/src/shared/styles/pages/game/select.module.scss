@@ -1,0 +1,58 @@
+.container {
+    width: 100%;
+    height: 100vh;
+}
+
+.video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+
+    filter: blur(30px) brightness(0.8);
+    transform: scale(1.2);
+}
+
+.main {
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.content {
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    flex-direction: row;
+}
+
+.left, .right {
+    width: 50%;
+    height: 100%;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.footer {
+    width: fit-content;
+    height: 55px;
+
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+
+    padding: 0 $padding;
+
+    background-color: $surface;
+
+    border-radius: 0 10px 0 0;
+}
