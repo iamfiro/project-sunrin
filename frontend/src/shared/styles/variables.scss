@@ -1,7 +1,5 @@
-// Padding
 $padding: 24px;
 
-// Spacing Scale
 $spacing-4: 4px;
 $spacing-6: 6px;
 $spacing-8: 8px;
@@ -17,7 +15,6 @@ $spacing-48: 48px;
 $spacing-64: 64px;
 $spacing-100: 100px;
 
-// Radius Scale
 $radius-4: 4px;
 $radius-8: 8px;
 $radius-10: 10px;
@@ -32,32 +29,33 @@ $radius-full: 9999px;
 $clip-hexagon: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
 $clip-turn-triangle: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
 
-// Color Palette
 $color-white: #FFFFFF;
 $color-black: #000000;
 
-// Text Colors
 $text: #fff;
 $text-subtle: #919191;
 
-// Brand Text Colors
 $text-brand: #482f48;
 $text-brand-heavy: #0D8FCF;
 $text-brand-subtle: #EAF8FF;
 
-// Surface Colors
 $surface: #FFFFFF;
-$surface-subtle: #cccccc;
+$surface-subtle: #e1e1e1;
 $surface-white: #FFFFFF;
 
-// Brand Surface Colors
 $surface-brand: #7a00b3;
-$surface-brand-heavy: #0D8FCF;
+$surface-brand-heavy: #482f48;
 $surface-brand-subtle: #f5d6ff;
 
-// Border Colors
+$surface-blue: #30baff;
+$surface-blue-heavy: #22a3e3;
+$surface-blue-subtle: #e6f5ff;
+
+$surface-danger: #ff0000;
+$surface-danger-heavy: #e30000;
+$surface-danger-subtle: #ffe6e6;
+
 $border: #eaeaea;
 $border-subtle: #E2E2E2;
 
-// Shadow Scale
 $shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.07);

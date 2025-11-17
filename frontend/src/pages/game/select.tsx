@@ -1,6 +1,7 @@
 import { TrackCover } from "@/components/music";
 import { Header } from "@/shared/components";
 import { FlexAlign, HStack } from "@/shared/components/stack";
+import { mockTrack } from "@/shared/mock/music";
 import { mockUser } from "@/shared/mock/user";
 
 import s from "@/shared/styles/pages/game/select.module.scss";
@@ -15,12 +16,7 @@ export default function SongSelect() {
         <Header user={mockUser} />
         <div className={s.content}>
           <div className={s.left}>
-            <TrackCover
-              title="Onward"
-              artist="Hebi"
-              coverSrc="/music/hebi - onward/cover.jpg"
-              cdSrc="/music/hebi - onward/cd.jpeg"
-            />
+            <TrackCover {...mockTrack[0]} />
           </div>
           <div className={s.right}>a</div>
         </div>

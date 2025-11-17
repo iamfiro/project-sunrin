@@ -6,7 +6,7 @@
     justify-content: space-between;
     align-items: center;
 
-    background: linear-gradient(to bottom, $surface, $surface-subtle);
+    background: linear-gradient(to bottom, $surface, #ccc);
     padding: 0 $padding;
 }
 
@@ -46,7 +46,6 @@
 
     span {
         font-size: 18px;
-        font-weight: bold;
     }
 
     div {
@@ -65,8 +64,9 @@
 
         span {
             color: $text;
+            font-weight: 'NEXON Lv1 Gothic OTF Bold';
             font-weight: bold;
-            font-size: 18px;
+            font-size: 20px;
         }
     }
 }

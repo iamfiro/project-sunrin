@@ -23,6 +23,7 @@ export enum FlexJustify {
 // 공통 Stack props
 interface StackProps {
   children: React.ReactNode;
+  onClick?: () => void;
   align?: FlexAlign;
   justify?: FlexJustify;
   gap?: number;
@@ -36,6 +37,7 @@ interface StackProps {
 // HStack 컴포넌트 (가로 배치)
 export const HStack: React.FC<StackProps> = ({
   children,
+  onClick,
   align = FlexAlign.Start,
   justify = FlexJustify.Start,
   gap = 0,
@@ -70,6 +72,7 @@ export const HStack: React.FC<StackProps> = ({
     <div
       className={combinedClassName}
       style={{ ...style, gap: gap > 0 ? `${gap}px` : undefined }}
+      onClick={onClick}
       {...props}
     >
       {children}
@@ -80,6 +83,7 @@ export const HStack: React.FC<StackProps> = ({
 // VStack 컴포넌트 (세로 배치)
 export const VStack: React.FC<StackProps> = ({
   children,
+  onClick,
   align = FlexAlign.Start,
   justify = FlexJustify.Start,
   gap = 0,
@@ -114,6 +118,7 @@ export const VStack: React.FC<StackProps> = ({
     <div
       className={combinedClassName}
       style={{ ...style, gap: gap > 0 ? `${gap}px` : undefined }}
+      onClick={onClick}
       {...props}
     >
       {children}

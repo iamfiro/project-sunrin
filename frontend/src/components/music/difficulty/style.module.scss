@@ -1,0 +1,58 @@
+.difficulty {
+    width: 100px;
+    height: 100px;
+
+    background-color: $surface-blue;
+
+    border-radius: $radius-14;
+
+    padding: $spacing-4;
+
+    &[data-difficulty="easy"] {
+        background-color: $surface-blue;
+    }
+    &[data-difficulty="normal"] {
+        background-color: $surface-brand;
+    }
+    &[data-difficulty="hard"] {
+        background-color: $surface-danger;
+    }
+
+    &[data-selected="true"] {
+        transition: all 0.3s ease-in-out;
+        transform: scale(1.1);
+    }
+
+    div {
+        width: 100%;
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        &:last-child {
+            height: 100%;
+            background-color: $surface;
+            
+            border-radius: $radius-12;
+        }
+    }
+
+    span {
+        font-size: 16px;
+        font-weight: bold;
+        color: $text;
+
+        margin-block: $spacing-8;
+    }
+
+    p {
+        font-size: 24px;
+        font-weight: 700;
+        color: $text-subtle;
+    }
+
+    svg {
+        color: $text-subtle;
+    }
+}

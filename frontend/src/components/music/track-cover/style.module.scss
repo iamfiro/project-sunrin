@@ -11,15 +11,37 @@
     position: relative;
 }
 
-.cover {
+.coverContainer:hover {
+    .coverWrapper {
+        transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);
+        transform: none;
+    }
+
+    .cd {
+        transition: all 0.3s ease-in-out;
+        left: -80px;
+    }
+}
+
+.coverWrapper {
     position: relative;
+    width: 450px;
+    height: 450px;
+    display: inline-block;
+
+    transform: perspective(1200px) rotateY(-18deg) rotateX(6deg) translateZ(40px);
+    transform-style: preserve-3d;
+    transition: transform 0.5s ease-in-out;
+
+    z-index: 2;
+}
+
+.cover {
     width: 450px;
     height: 450px;
     z-index: 2;
 
     border: 10px solid white;
-    transform: perspective(1200px) rotateY(-18deg) rotateX(6deg) translateZ(40px);
-    transform-style: preserve-3d;
     object-fit: cover;
 }
 
@@ -43,6 +65,7 @@
 
     transform: translateX(50%);
     animation: rotate 10s linear infinite;
+    transition: all 0.5s ease-in-out;
 
     &::before,
     &::after {
@@ -112,6 +135,74 @@
     }
     to {
         transform: translateX(50%) rotate(360deg);
+    }
+}
+
+.card {
+    width: 100%;
+
+    background-color: $surface;
+}
+
+.community {
+    position: absolute;
+    top: 16px;
+    left: 0px;
+    z-index: 3;
+
+    width: 240px;
+
+    background: linear-gradient(to bottom, $surface-blue, $surface-blue-heavy);
+
+    padding: $spacing-20 $spacing-16;
+
+    display: flex;
+    align-items: center;
+    gap: $spacing-8;
+
+    clip-path: polygon(100% 0, 90% 50%, 100% 100%, 0 100%, 0 0);
+
+
+    span {
+        font-size: 22px;
+        font-weight: bold;
+        color: $text;
+    }
+}
+
+.card {
+    width: 100%;
+
+    background-color: $surface;
+
+    border-radius: $radius-14;
+
+    padding: $spacing-16;
+
+    img {
+        width: 50px;
+        height: 50px;
+    }
+
+    .masteryLevel {
+        font-size: 26px;
+        font-weight: bold;
+    }
+
+    span {
+        background-color: $surface-subtle;
+
+        padding: $spacing-4 $spacing-8;
+
+        border-radius: $radius-14;
+
+        font-size: 12px;
+    }
+
+    .claimAt {
+        font-size: 14px;
+        color: $text-subtle;
+        font-weight: normal;
     }
 }
 
