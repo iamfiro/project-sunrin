@@ -1,0 +1,91 @@
+.trackCard {
+    width: 80%;
+    height: 90px;
+
+    background-color: #ffffff20;
+
+    display: flex;
+
+    border-radius: $radius-8 0 0 $radius-8;
+
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+
+    transition: all 0.3s ease-in-out;
+
+    &:hover {
+        width: 83%;
+
+        cursor: pointer;
+    }
+}
+
+.cover {
+    height: 100%;
+    aspect-ratio: 1/1;
+
+    object-fit: contain;
+
+    border-radius: $radius-8 0 0 $radius-8;
+}
+
+.community {
+    width: 35px;
+    height: 100%;
+    background-color: $surface-blue;
+
+    display: flex;
+    justify-content: right;
+
+    clip-path: polygon(100% 0, 00% 0%, 100% 40%);
+
+    svg {
+        color: $text;
+
+        width: 14px;
+        height: 14px;
+
+        margin-top: 5px;
+        margin-right: 3px;
+    }
+}
+
+.title {
+    font-size: 24px;
+    font-weight: 400;
+    color: $text;
+}
+
+.artist {
+    font-size: 18px;
+    color: $color-white;
+}
+
+.trackCard.selected {
+    width: 85%;
+    height: 110px;
+
+    background-color: $surface;
+
+    .community {
+        width: 40px;
+
+        svg {
+            width: 16px;
+            height: 16px;
+
+            margin-top: 6px;
+            margin-right: 2px;
+        }
+    }
+
+    .info {
+        .title {
+            font-size: 28px;
+            color: inherit;
+        }
+        .artist {
+            font-size: 22px;
+            color: $text-subtle;
+        }
+    }
+}

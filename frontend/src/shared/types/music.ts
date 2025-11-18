@@ -7,6 +7,9 @@ export interface Track {
   community: boolean;
 
   difficulties: TrackDifficulty[];
+
+  playTime: number;
+
   // 에셋
   coverSrc: string;
   cdSrc: string;

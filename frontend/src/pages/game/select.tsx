@@ -1,12 +1,17 @@
-import { TrackCover } from "@/components/music";
+import { Search } from "lucide-react";
+import { useState } from "react";
+
+import { TrackCard, TrackCover } from "@/components/music";
 import { Header } from "@/shared/components";
-import { FlexAlign, HStack } from "@/shared/components/stack";
+import { FlexAlign, HStack, VStack } from "@/shared/components/stack";
 import { mockTrack } from "@/shared/mock/music";
 import { mockUser } from "@/shared/mock/user";
+import { Track } from "@/shared/types/music";
 
 import s from "@/shared/styles/pages/game/select.module.scss";
 
 export default function SongSelect() {
+  const [selectedTrack, setSelectedTrack] = useState<Track>(mockTrack[0]);
   return (
     <div className={s.container}>
       <video autoPlay loop className={s.video} disablePictureInPicture={true}>
@@ -18,7 +23,30 @@ export default function SongSelect() {
           <div className={s.left}>
             <TrackCover {...mockTrack[0]} />
           </div>
-          <div className={s.right}>a</div>
+          <div className={s.right}>
+            <HStack
+              align={FlexAlign.Center}
+              gap={12}
+              className={s.searchContainer}
+            >
+              <Search className={s.searchIcon} size={20} />
+              <input type="text" placeholder="트랙 검색" className={s.search} />
+              <select name="" id="" className={s.select}>
+                <option value="1">최신순</option>
+                <option value="2">오래된 순</option>
+                <option value="3">가장 많이 한 트랙</option>
+              </select>
+            </HStack>
+            <VStack gap={14} align={FlexAlign.End} fullWidth>
+              {mockTrack.map((track) => (
+                <TrackCard
+                  key={track.title}
+                  {...track}
+                  selected={selectedTrack.title === track.title}
+                />
+              ))}
+            </VStack>
+          </div>
         </div>
         <footer className={s.footer}>
           <HStack align={FlexAlign.Center} gap={8}>
