@@ -17,6 +17,7 @@ export default function MusicAlbumCover({
   bpm,
   coverSrc,
   difficulties,
+  community,
   cdSrc,
 }: Track) {
   const [selectedDifficulty, setSelectedDifficulty] =
@@ -33,10 +34,12 @@ export default function MusicAlbumCover({
         </div>
         <div className={s.coverWrapper}>
           <img src={coverSrc} alt={`${title} cover`} className={s.cover} />
-          <HStack align={FlexAlign.Center} gap={8} className={s.community}>
-            <Globe size={22} />
-            <span>커뮤니티 음악</span>
-          </HStack>
+          {community && (
+            <HStack align={FlexAlign.Center} gap={8} className={s.community}>
+              <Globe size={22} />
+              <span>커뮤니티 음악</span>
+            </HStack>
+          )}
         </div>
       </div>
       <div className={s.info}>
