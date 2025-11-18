@@ -33,10 +33,10 @@ export default function MusicAlbumCover({
         </div>
         <div className={s.coverWrapper}>
           <img src={coverSrc} alt={`${title} cover`} className={s.cover} />
-          <div className={s.community}>
-            <Globe size={26} />
+          <HStack align={FlexAlign.Center} gap={8} className={s.community}>
+            <Globe size={22} />
             <span>커뮤니티 음악</span>
-          </div>
+          </HStack>
         </div>
       </div>
       <div className={s.info}>
