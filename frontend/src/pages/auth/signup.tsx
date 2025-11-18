@@ -122,7 +122,7 @@ export default function SignUp() {
               id="username"
               name="username"
               className={s.input}
-              placeholder="홍길동"
+              placeholder="USERNAME"
               value={formData.username}
               onChange={handleChange}
               autoComplete="username"
@@ -141,7 +141,7 @@ export default function SignUp() {
               id="email"
               name="email"
               className={s.input}
-              placeholder="example@sunrin.hs.kr"
+              placeholder="example@gmail.com"
               value={formData.email}
               onChange={handleChange}
               autoComplete="email"
