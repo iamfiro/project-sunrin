@@ -5,6 +5,7 @@ import { TrackCard, TrackCover } from "@/components/music";
 import { Header } from "@/shared/components";
 import { FlexAlign, HStack, VStack } from "@/shared/components/stack";
 import useCircularIndex from "@/shared/hook/useCircularIndex";
+import useKeyNavigationShortcuts from "@/shared/hook/useKeyNavigationShortcuts";
 import { mockTrack } from "@/shared/mock/music";
 import { mockUser } from "@/shared/mock/user";
 import { Track } from "@/shared/types/music";
@@ -17,26 +18,12 @@ export default function SongSelect() {
   });
   const trackRefs = useRef<(HTMLDivElement | null)[]>([]);
 
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.repeat) return;
-
-      console.log(event.key);
-
-      if (event.key === "w" || event.key === "W") {
-        event.preventDefault();
-        prev();
-      } else if (event.key === "s" || event.key === "S") {
-        event.preventDefault();
-        next();
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [next, prev]);
+  useKeyNavigationShortcuts({
+    onNext: next,
+    onPrev: prev,
+    nextKeyCodes: ["KeyS"],
+    prevKeyCodes: ["KeyW"],
+  });
 
   useEffect(() => {
     const target = trackRefs.current[currentIndex];
