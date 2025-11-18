@@ -1,6 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 
-import { Intro, SongSelect, Start } from "../pages";
+import { Intro, Loading, SignIn, SignUp, SongSelect, Start } from "../pages";
 
 export const router = createBrowserRouter([
   {
@@ -8,8 +8,20 @@ export const router = createBrowserRouter([
     element: <Start />,
   },
   {
+    path: "/auth/signin",
+    element: <SignIn />,
+  },
+  {
+    path: "/auth/signup",
+    element: <SignUp />,
+  },
+  {
     path: "/game/intro",
     element: <Intro />,
+  },
+  {
+    path: "/game/loading",
+    element: <Loading />,
   },
   {
     path: "/game/select",
