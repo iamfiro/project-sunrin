@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/shared/providers";
 import s from "@/shared/styles/pages/auth/signup.module.scss";
 
 export default function SignUp() {
   const navigate = useNavigate();
+  const { signup } = useAuth();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -87,14 +89,12 @@ export default function SignUp() {
     }
 
     try {
-      // TODO: API 연동
-      console.log("회원가입 시도:", {
+      await signup({
         email: formData.email,
-        password: formData.password,
         username: formData.username,
+        password: formData.password,
       });
 
-      // 임시: 회원가입 성공 후 로그인 페이지로 이동
       navigate("/auth/signin");
     } catch (error) {
       console.error("회원가입 실패:", error);

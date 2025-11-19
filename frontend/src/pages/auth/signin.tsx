@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/shared/providers";
 import s from "@/shared/styles/pages/auth/signin.module.scss";
 
 export default function SignIn() {
   const navigate = useNavigate();
+  const { signin } = useAuth();
   const [formData, setFormData] = useState({
     username: "",
     password: "",
@@ -37,7 +39,7 @@ export default function SignIn() {
     if (!formData.username) {
       newErrors.username = "사용자 이름을 입력해주세요";
       isValid = false;
-    } else if (!/\S+@\S+\.\S+/.test(formData.username)) {
+    } else if (!/.{2,}/.test(formData.username)) {
       newErrors.username = "올바른 사용자 이름 형식이 아닙니다";
       isValid = false;
     }
@@ -63,10 +65,7 @@ export default function SignIn() {
     }
 
     try {
-      // TODO: API 연동
-      console.log("로그인 시도:", formData);
-      
-      // 임시: 로그인 성공 후 게임 선택 페이지로 이동
+      await signin({ username: formData.username, password: formData.password });
       navigate("/game/select");
     } catch (error) {
       console.error("로그인 실패:", error);
