@@ -70,11 +70,7 @@ export default function MusicAlbumCover({
       </HStack>
       <VStack gap={6} fullWidth>
         {ranks?.map((rank) => (
-          <TrackRank
-            key={rank.rank}
-            rank={rank}
-            me={rank.user.id === mockUser.id}
-          />
+          <TrackRank key={rank.rank} rank={rank} />
         ))}
       </VStack>
     </div>
