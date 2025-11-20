@@ -1,15 +1,11 @@
 import s from "@/shared/styles/pages/game/main.module.scss"
 import PlayField from "@/components/game/play-field"
-import InputHandler from "@/components/game/Input-handler"
 import { useInputStore } from "@/store/inputStore"
 import { useEffect } from 'react'
 
 export default function GameMain() {
     const { 
-        keys, 
         pressedKeys, 
-        pressKey, 
-        releaseKey, 
         getPressedKeyNames 
     } = useInputStore()
 
@@ -21,13 +17,13 @@ export default function GameMain() {
 
     return (
         <div className={s.container}>
+            <div>
+                배경
+            </div>
             <PlayField />
-            <p>{getPressedKeyNames().join(', ')}</p>
-            <InputHandler
-                keys={keys}
-                onKeyPress={pressKey}
-                onKeyRelease={releaseKey}
-            />
+            <div>
+                배경
+            </div>
         </div>
     )
 }
