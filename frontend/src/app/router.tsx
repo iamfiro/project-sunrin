@@ -1,6 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 
-import { Intro, SongSelect, Start } from "../pages";
+import { Intro, SongSelect, Start, GameMain } from "../pages";
 
 export const router = createBrowserRouter([
   {
@@ -14,5 +14,9 @@ export const router = createBrowserRouter([
   {
     path: "/game/select",
     element: <SongSelect />,
+  },
+  {
+    path: "/game/main",
+    element: <GameMain />,
   },
 ]);
