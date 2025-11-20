@@ -1,11 +1,12 @@
 import { Globe } from "lucide-react";
-import { useState } from "react";
 
 import { HStack } from "@/shared/components";
 import { FlexAlign, FlexJustify, VStack } from "@/shared/components/stack";
-import { Track, TrackDifficultyEnum } from "@/shared/types/music";
+import { mockTrack } from "@/shared/mock/music";
+import { mockUser } from "@/shared/mock/user";
+import { Track } from "@/shared/types/music";
 
-import Difficulty from "../difficulty";
+import TrackRank from "../rank";
 
 import s from "./style.module.scss";
 
@@ -16,15 +17,10 @@ export default function MusicAlbumCover({
   artist,
   bpm,
   coverSrc,
-  difficulties,
   community,
   cdSrc,
+  ranks,
 }: Track) {
-  const [selectedDifficulty, setSelectedDifficulty] =
-    useState<TrackDifficultyEnum>(
-      difficulties[0]?.difficulty ?? TrackDifficultyEnum.EASY,
-    );
-
   return (
     <div className={s.music}>
       <div className={s.coverContainer}>
@@ -72,16 +68,15 @@ export default function MusicAlbumCover({
           </HStack>
         </VStack>
       </HStack>
-      <HStack gap={16}>
-        {difficulties.map((difficulty) => (
-          <Difficulty
-            key={difficulty.difficulty}
-            {...difficulty}
-            selected={selectedDifficulty}
-            setSelected={setSelectedDifficulty}
+      <VStack gap={6} fullWidth>
+        {ranks?.map((rank) => (
+          <TrackRank
+            key={rank.rank}
+            rank={rank}
+            me={rank.user.id === mockUser.id}
           />
         ))}
-      </HStack>
+      </VStack>
     </div>
   );
 }

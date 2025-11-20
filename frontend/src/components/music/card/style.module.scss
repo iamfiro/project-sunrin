@@ -12,6 +12,8 @@
 
     transition: all 0.3s ease-in-out;
 
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 2% 100%);
+
     &:hover {
         width: 83%;
 
