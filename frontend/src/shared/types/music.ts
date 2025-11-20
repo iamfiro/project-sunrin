@@ -1,3 +1,5 @@
+import { TrackRank } from "./rank";
+
 export interface Track {
   title: string;
   artist: string;
@@ -14,6 +16,8 @@ export interface Track {
   coverSrc: string;
   cdSrc: string;
   backgroundVideoSrc: string;
+
+  ranks?: TrackRank[];
 }
 
 export enum TrackDifficultyEnum {

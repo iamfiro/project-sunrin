@@ -1,0 +1,46 @@
+.trackRank {
+    width: 100%;
+
+    background-color: #00000052;
+
+    padding: $spacing-8 $spacing-16;
+
+    clip-path: polygon(5% 0, 95% 0, 100% 50%, 95% 100%, 5% 100%, 0% 50%);
+
+    &[data-me="true"] {
+        background-color: $surface;
+
+        .rank {
+            color: $text-brand;
+        }
+        
+        .score {
+            color: $text-brand;
+        }
+    }
+}
+
+.profileImage {
+    width: 45px;
+    height: 45px;
+
+    border-radius: 50%;
+}
+
+.name {
+    font-size: 14px;
+    font-weight: bold;
+    color: $color-white;
+}
+
+.score {
+    font-size: 20px;
+    color: $color-white;
+}
+
+.rank {
+    font-size: 24px;
+    color: $color-white;
+
+    margin-right: $spacing-16;
+}

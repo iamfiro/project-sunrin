@@ -1,5 +1,7 @@
 import { Track, TrackDifficultyEnum } from "../types/music";
 
+import { mockUser } from "./user";
+
 export const mockTrack: Track[] = [
   {
     title: "지금부터",
@@ -27,6 +29,23 @@ export const mockTrack: Track[] = [
     coverSrc: "/music/hebi - onward/cover.jpg",
     cdSrc: "/music/hebi - onward/cd.jpeg",
     backgroundVideoSrc: "/music/hebi - onward/background.mp4",
+    ranks: [
+      {
+        user: mockUser,
+        rank: 1,
+        score: 102022,
+      },
+      {
+        user: mockUser,
+        rank: 2,
+        score: 87482,
+      },
+      {
+        user: mockUser,
+        rank: 3,
+        score: 56727,
+      },
+    ],
   },
   {
     title: "달토끼",
@@ -53,357 +72,23 @@ export const mockTrack: Track[] = [
     ],
     coverSrc: "/music/moon bunny.jpg",
     cdSrc: "/music/hebi - onward/cd.jpeg",
-    backgroundVideoSrc: "/music/hebi - onward/background.mp4",
-  },
-  {
-    title: "달토끼",
-    artist: "꽃감이",
-    bpm: 60,
-    community: false,
-    playTime: 142,
-    difficulties: [
+    backgroundVideoSrc: "/music/moon.mp4",
+    ranks: [
       {
-        difficulty: TrackDifficultyEnum.EASY,
-        unlocked: true,
-        level: 5,
+        user: mockUser,
+        rank: 1,
+        score: 102828,
       },
       {
-        difficulty: TrackDifficultyEnum.NORMAL,
-        unlocked: false,
-        level: 23,
+        user: mockUser,
+        rank: 2,
+        score: 92827,
       },
       {
-        difficulty: TrackDifficultyEnum.HARD,
-        unlocked: false,
-        level: 72,
+        user: mockUser,
+        rank: 3,
+        score: 85709,
       },
     ],
-    coverSrc: "/music/moon bunny.jpg",
-    cdSrc: "/music/hebi - onward/cd.jpeg",
-    backgroundVideoSrc: "/music/hebi - onward/background.mp4",
-  },
-  {
-    title: "달토끼",
-    artist: "꽃감이",
-    bpm: 60,
-    community: false,
-    playTime: 142,
-    difficulties: [
-      {
-        difficulty: TrackDifficultyEnum.EASY,
-        unlocked: true,
-        level: 5,
-      },
-      {
-        difficulty: TrackDifficultyEnum.NORMAL,
-        unlocked: false,
-        level: 23,
-      },
-      {
-        difficulty: TrackDifficultyEnum.HARD,
-        unlocked: false,
-        level: 72,
-      },
-    ],
-    coverSrc: "/music/moon bunny.jpg",
-    cdSrc: "/music/hebi - onward/cd.jpeg",
-    backgroundVideoSrc: "/music/hebi - onward/background.mp4",
-  },
-  {
-    title: "달토끼",
-    artist: "꽃감이",
-    bpm: 60,
-    community: false,
-    playTime: 142,
-    difficulties: [
-      {
-        difficulty: TrackDifficultyEnum.EASY,
-        unlocked: true,
-        level: 5,
-      },
-      {
-        difficulty: TrackDifficultyEnum.NORMAL,
-        unlocked: false,
-        level: 23,
-      },
-      {
-        difficulty: TrackDifficultyEnum.HARD,
-        unlocked: false,
-        level: 72,
-      },
-    ],
-    coverSrc: "/music/moon bunny.jpg",
-    cdSrc: "/music/hebi - onward/cd.jpeg",
-    backgroundVideoSrc: "/music/hebi - onward/background.mp4",
-  },
-  {
-    title: "달토끼",
-    artist: "꽃감이",
-    bpm: 60,
-    community: false,
-    playTime: 142,
-    difficulties: [
-      {
-        difficulty: TrackDifficultyEnum.EASY,
-        unlocked: true,
-        level: 5,
-      },
-      {
-        difficulty: TrackDifficultyEnum.NORMAL,
-        unlocked: false,
-        level: 23,
-      },
-      {
-        difficulty: TrackDifficultyEnum.HARD,
-        unlocked: false,
-        level: 72,
-      },
-    ],
-    coverSrc: "/music/moon bunny.jpg",
-    cdSrc: "/music/hebi - onward/cd.jpeg",
-    backgroundVideoSrc: "/music/hebi - onward/background.mp4",
-  },
-  {
-    title: "달토끼",
-    artist: "꽃감이",
-    bpm: 60,
-    community: false,
-    playTime: 142,
-    difficulties: [
-      {
-        difficulty: TrackDifficultyEnum.EASY,
-        unlocked: true,
-        level: 5,
-      },
-      {
-        difficulty: TrackDifficultyEnum.NORMAL,
-        unlocked: false,
-        level: 23,
-      },
-      {
-        difficulty: TrackDifficultyEnum.HARD,
-        unlocked: false,
-        level: 72,
-      },
-    ],
-    coverSrc: "/music/moon bunny.jpg",
-    cdSrc: "/music/hebi - onward/cd.jpeg",
-    backgroundVideoSrc: "/music/hebi - onward/background.mp4",
-  },
-  {
-    title: "달토끼",
-    artist: "꽃감이",
-    bpm: 60,
-    community: false,
-    playTime: 142,
-    difficulties: [
-      {
-        difficulty: TrackDifficultyEnum.EASY,
-        unlocked: true,
-        level: 5,
-      },
-      {
-        difficulty: TrackDifficultyEnum.NORMAL,
-        unlocked: false,
-        level: 23,
-      },
-      {
-        difficulty: TrackDifficultyEnum.HARD,
-        unlocked: false,
-        level: 72,
-      },
-    ],
-    coverSrc: "/music/moon bunny.jpg",
-    cdSrc: "/music/hebi - onward/cd.jpeg",
-    backgroundVideoSrc: "/music/hebi - onward/background.mp4",
-  },
-  {
-    title: "달토끼",
-    artist: "꽃감이",
-    bpm: 60,
-    community: false,
-    playTime: 142,
-    difficulties: [
-      {
-        difficulty: TrackDifficultyEnum.EASY,
-        unlocked: true,
-        level: 5,
-      },
-      {
-        difficulty: TrackDifficultyEnum.NORMAL,
-        unlocked: false,
-        level: 23,
-      },
-      {
-        difficulty: TrackDifficultyEnum.HARD,
-        unlocked: false,
-        level: 72,
-      },
-    ],
-    coverSrc: "/music/moon bunny.jpg",
-    cdSrc: "/music/hebi - onward/cd.jpeg",
-    backgroundVideoSrc: "/music/hebi - onward/background.mp4",
-  },
-  {
-    title: "달토끼",
-    artist: "꽃감이",
-    bpm: 60,
-    community: false,
-    playTime: 142,
-    difficulties: [
-      {
-        difficulty: TrackDifficultyEnum.EASY,
-        unlocked: true,
-        level: 5,
-      },
-      {
-        difficulty: TrackDifficultyEnum.NORMAL,
-        unlocked: false,
-        level: 23,
-      },
-      {
-        difficulty: TrackDifficultyEnum.HARD,
-        unlocked: false,
-        level: 72,
-      },
-    ],
-    coverSrc: "/music/moon bunny.jpg",
-    cdSrc: "/music/hebi - onward/cd.jpeg",
-    backgroundVideoSrc: "/music/hebi - onward/background.mp4",
-  },
-  {
-    title: "달토끼",
-    artist: "꽃감이",
-    bpm: 60,
-    community: false,
-    playTime: 142,
-    difficulties: [
-      {
-        difficulty: TrackDifficultyEnum.EASY,
-        unlocked: true,
-        level: 5,
-      },
-      {
-        difficulty: TrackDifficultyEnum.NORMAL,
-        unlocked: false,
-        level: 23,
-      },
-      {
-        difficulty: TrackDifficultyEnum.HARD,
-        unlocked: false,
-        level: 72,
-      },
-    ],
-    coverSrc: "/music/moon bunny.jpg",
-    cdSrc: "/music/hebi - onward/cd.jpeg",
-    backgroundVideoSrc: "/music/hebi - onward/background.mp4",
-  },
-  {
-    title: "달토끼",
-    artist: "꽃감이",
-    bpm: 60,
-    community: false,
-    playTime: 142,
-    difficulties: [
-      {
-        difficulty: TrackDifficultyEnum.EASY,
-        unlocked: true,
-        level: 5,
-      },
-      {
-        difficulty: TrackDifficultyEnum.NORMAL,
-        unlocked: false,
-        level: 23,
-      },
-      {
-        difficulty: TrackDifficultyEnum.HARD,
-        unlocked: false,
-        level: 72,
-      },
-    ],
-    coverSrc: "/music/moon bunny.jpg",
-    cdSrc: "/music/hebi - onward/cd.jpeg",
-    backgroundVideoSrc: "/music/hebi - onward/background.mp4",
-  },
-  {
-    title: "달토끼",
-    artist: "꽃감이",
-    bpm: 60,
-    community: false,
-    playTime: 142,
-    difficulties: [
-      {
-        difficulty: TrackDifficultyEnum.EASY,
-        unlocked: true,
-        level: 5,
-      },
-      {
-        difficulty: TrackDifficultyEnum.NORMAL,
-        unlocked: false,
-        level: 23,
-      },
-      {
-        difficulty: TrackDifficultyEnum.HARD,
-        unlocked: false,
-        level: 72,
-      },
-    ],
-    coverSrc: "/music/moon bunny.jpg",
-    cdSrc: "/music/hebi - onward/cd.jpeg",
-    backgroundVideoSrc: "/music/hebi - onward/background.mp4",
-  },
-  {
-    title: "달토끼",
-    artist: "꽃감이",
-    bpm: 60,
-    community: false,
-    playTime: 142,
-    difficulties: [
-      {
-        difficulty: TrackDifficultyEnum.EASY,
-        unlocked: true,
-        level: 5,
-      },
-      {
-        difficulty: TrackDifficultyEnum.NORMAL,
-        unlocked: false,
-        level: 23,
-      },
-      {
-        difficulty: TrackDifficultyEnum.HARD,
-        unlocked: false,
-        level: 72,
-      },
-    ],
-    coverSrc: "/music/moon bunny.jpg",
-    cdSrc: "/music/hebi - onward/cd.jpeg",
-    backgroundVideoSrc: "/music/hebi - onward/background.mp4",
-  },
-  {
-    title: "달토끼",
-    artist: "꽃감이",
-    bpm: 60,
-    community: false,
-    playTime: 142,
-    difficulties: [
-      {
-        difficulty: TrackDifficultyEnum.EASY,
-        unlocked: true,
-        level: 5,
-      },
-      {
-        difficulty: TrackDifficultyEnum.NORMAL,
-        unlocked: false,
-        level: 23,
-      },
-      {
-        difficulty: TrackDifficultyEnum.HARD,
-        unlocked: false,
-        level: 72,
-      },
-    ],
-    coverSrc: "/music/moon bunny.jpg",
-    cdSrc: "/music/hebi - onward/cd.jpeg",
-    backgroundVideoSrc: "/music/hebi - onward/background.mp4",
   },
 ];

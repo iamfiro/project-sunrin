@@ -17,6 +17,7 @@ export default function SongSelect() {
     initialIndex: 0,
   });
   const trackRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
   useKeyNavigationShortcuts({
     onNext: next,
@@ -36,10 +37,33 @@ export default function SongSelect() {
     });
   }, [currentIndex]);
 
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    video.load();
+    const playPromise = video.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(() => {
+        // ignore autoplay restrictions
+      });
+    }
+  }, [currentIndex]);
+
   return (
     <div className={s.container}>
-      <video autoPlay loop className={s.video} disablePictureInPicture={true}>
-        <source src="/music/hebi - onward/background.mp4" type="video/mp4" />
+      <video
+        autoPlay
+        loop
+        className={s.video}
+        disablePictureInPicture={true}
+        ref={videoRef}
+      >
+        <source
+          key={mockTrack[currentIndex].backgroundVideoSrc}
+          src={mockTrack[currentIndex].backgroundVideoSrc}
+          type="video/mp4"
+        />
       </video>
       <main className={s.main}>
         <Header user={mockUser} />
