@@ -18,24 +18,26 @@ export default function TrackCard({
   selected = false,
 }: TrackCardProps) {
   return (
-    <HStack
-      align={FlexAlign.Center}
-      justify={FlexJustify.Between}
-      className={`${s.trackCard} ${selected ? s.selected : ""}`}
-      aria-selected={selected}
-    >
-      <HStack align={FlexAlign.Center} fullHeight gap={24}>
-        <img src={coverSrc} alt={`${title} cover`} className={s.cover} />
-        <VStack gap={6} className={s.info}>
-          <h2 className={s.title}>{title}</h2>
-          <p className={s.artist}>{artist}</p>
-        </VStack>
+    <a href="/game/main">
+      <HStack
+        align={FlexAlign.Center}
+        justify={FlexJustify.Between}
+        className={`${s.trackCard} ${selected ? s.selected : ""}`}
+        aria-selected={selected}
+      >
+        <HStack align={FlexAlign.Center} fullHeight gap={24}>
+          <img src={coverSrc} alt={`${title} cover`} className={s.cover} />
+          <VStack gap={6} className={s.info}>
+            <h2 className={s.title}>{title}</h2>
+            <p className={s.artist}>{artist}</p>
+          </VStack>
+        </HStack>
+        {community && (
+          <div className={s.community}>
+            <Globe />
+          </div>
+        )}
       </HStack>
-      {community && (
-        <div className={s.community}>
-          <Globe />
-        </div>
-      )}
-    </HStack>
+    </a>
   );
 }

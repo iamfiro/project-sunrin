@@ -1,4 +1,4 @@
-import s from './style.module.scss';
+import s from "./style.module.scss";
 
 interface JudgementProps {
   judgement: string | null;
@@ -7,9 +7,5 @@ interface JudgementProps {
 export default function Judgement({ judgement }: JudgementProps) {
   if (!judgement) return null;
 
-  return (
-    <div className={s.judgement}>
-      {judgement}
-    </div>
-  );
+  return <div className={s.judgement}>{judgement}</div>;
 }

@@ -1,0 +1,13 @@
+.video {
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+
+    filter: blur(30px) brightness(0.8);
+    transform: scale(1.2);
+
+    position: fixed;
+    top: 0; left: 0;
+    z-index: 1;
+}
+
