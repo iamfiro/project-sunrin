@@ -2,6 +2,7 @@ import { Search } from "lucide-react";
 import { useEffect, useRef } from "react";
 
 import { TrackCard, TrackCover } from "@/components/music";
+import AddTrackModal from "@/components/music/add-track-modal";
 import { Header } from "@/shared/components";
 import { FlexAlign, HStack, VStack } from "@/shared/components/stack";
 import useCircularIndex from "@/shared/hook/useCircularIndex";
@@ -116,8 +117,17 @@ export default function SongSelect() {
             />
             <span>Change Music</span>
           </HStack>
+          <HStack align={FlexAlign.Center} gap={8}>
+            <img
+              src="/images/keyboard/keyboard_tab.svg"
+              alt="updown"
+              height={22}
+            />
+            <span>Add Track</span>
+          </HStack>
         </footer>
       </main>
+      {/* <AddTrackModal /> */}
     </div>
   );
 }
