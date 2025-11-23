@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
+
 import * as authService from "@/shared/api/authService";
 import { User } from "@/shared/types/user";
 
@@ -7,13 +8,19 @@ interface AuthContextValue {
   loading: boolean;
   refreshUser: () => Promise<void>;
   signin: (payload: { username: string; password: string }) => Promise<void>;
-  signup: (payload: { email: string; username: string; password: string }) => Promise<void>;
+  signup: (payload: {
+    email: string;
+    username: string;
+    password: string;
+  }) => Promise<void>;
   signout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -21,9 +28,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Enabled when VITE_DEV_AUTH === 'true' OR when running in Vite development mode.
   // Default dev credentials requested: username `dev`, password `qwer1234@`.
   const DEV_AUTH_ENABLED =
-    ((import.meta.env.VITE_DEV_AUTH as string) === "true") || import.meta.env.MODE === "development";
+    (import.meta.env.VITE_DEV_AUTH as string) === "true" ||
+    import.meta.env.MODE === "development";
   const DEV_USERNAME = (import.meta.env.VITE_DEV_USERNAME as string) || "dev";
-  const DEV_PASSWORD = (import.meta.env.VITE_DEV_PASSWORD as string) || "qwer1234@";
+  const DEV_PASSWORD =
+    (import.meta.env.VITE_DEV_PASSWORD as string) || "qwer1234@";
   const DEV_USER: User = {
     id: (import.meta.env.VITE_DEV_USER_ID as string) || "dev-id",
     name: (import.meta.env.VITE_DEV_USER_NAME as string) || "Developer",
@@ -50,7 +59,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signin = async (payload: { username: string; password: string }) => {
     // If dev auth is enabled and credentials match, short-circuit to a fake user
-    if (DEV_AUTH_ENABLED && payload.username === DEV_USERNAME && payload.password === DEV_PASSWORD) {
+    if (
+      DEV_AUTH_ENABLED &&
+      payload.username === DEV_USERNAME &&
+      payload.password === DEV_PASSWORD
+    ) {
       setUser(DEV_USER);
       setLoading(false);
       return;
@@ -60,7 +73,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     await refreshUser();
   };
 
-  const signup = async (payload: { email: string; username: string; password: string }) => {
+  const signup = async (payload: {
+    email: string;
+    username: string;
+    password: string;
+  }) => {
     await authService.signup(payload);
   };
 
@@ -70,7 +87,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, refreshUser, signin, signup, signout }}>
+    <AuthContext.Provider
+      value={{ user, loading, refreshUser, signin, signup, signout }}
+    >
       {children}
     </AuthContext.Provider>
   );

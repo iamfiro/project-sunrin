@@ -15,8 +15,8 @@ export default function Intro() {
     }, 5000);
 
     const gameCompositionTimer = setTimeout(() => {
-      // After intro, go to signup page so user can sign up or sign in
-      window.location.href = "/auth/signup";
+      // After intro, go to auth page so user can choose sign up or sign in
+      window.location.href = "/auth";
     }, 7000);
 
     return () => {

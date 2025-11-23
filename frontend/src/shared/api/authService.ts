@@ -1,5 +1,6 @@
-import request from "./client";
 import { User } from "@/shared/types/user";
+
+import request from "./client";
 
 export interface SignUpPayload {
   email: string;

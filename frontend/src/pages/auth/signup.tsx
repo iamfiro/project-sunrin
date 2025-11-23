@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+
 import { useAuth } from "@/shared/providers";
+
 import s from "@/shared/styles/pages/auth/signup.module.scss";
 
 export default function SignUp() {

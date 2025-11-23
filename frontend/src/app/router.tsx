@@ -1,8 +1,10 @@
-import { Suspense, lazy } from "react";
+import { lazy, Suspense } from "react";
 import { createBrowserRouter } from "react-router-dom";
+
 import { Loading } from "../pages";
 
 const Start = lazy(() => import("../pages/start"));
+const Auth = lazy(() => import("../pages/auth"));
 const SignIn = lazy(() => import("../pages/auth/signin"));
 const SignUp = lazy(() => import("../pages/auth/signup"));
 const Intro = lazy(() => import("../pages/intro"));
@@ -16,6 +18,10 @@ export const router = createBrowserRouter([
   {
     path: "/",
     element: withFallback(<Start />),
+  },
+  {
+    path: "/auth",
+    element: withFallback(<Auth />),
   },
   {
     path: "/auth/signin",

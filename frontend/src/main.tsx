@@ -3,7 +3,7 @@ import ReactDOM from "react-dom/client";
 import { RouterProvider } from "react-router-dom";
 
 import { router } from "@/app/router";
-import { MusicProvider, AuthProvider } from "@/shared/providers";
+import { AuthProvider, MusicProvider } from "@/shared/providers";
 
 import "@/shared/styles/global.scss";
 

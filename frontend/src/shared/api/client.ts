@@ -18,7 +18,8 @@ async function request<T = any>(path: string, init: RequestInit = {}) {
   if (!res.ok) {
     let errorBody: any = null;
     try {
-      if (contentType.includes("application/json")) errorBody = await res.json();
+      if (contentType.includes("application/json"))
+        errorBody = await res.json();
       else errorBody = await res.text();
     } catch (err) {
       errorBody = null;

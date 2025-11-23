@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+
 import { useAuth } from "@/shared/providers";
+
 import s from "@/shared/styles/pages/auth/signin.module.scss";
 
 export default function SignIn() {
@@ -65,7 +67,10 @@ export default function SignIn() {
     }
 
     try {
-      await signin({ username: formData.username, password: formData.password });
+      await signin({
+        username: formData.username,
+        password: formData.password,
+      });
       navigate("/game/select");
     } catch (error) {
       console.error("로그인 실패:", error);
@@ -98,7 +103,9 @@ export default function SignIn() {
               onChange={handleChange}
               autoComplete="username"
             />
-            {errors.username && <span className={s.error}>{errors.username}</span>}
+            {errors.username && (
+              <span className={s.error}>{errors.username}</span>
+            )}
           </div>
 
           <div className={s.inputGroup}>
