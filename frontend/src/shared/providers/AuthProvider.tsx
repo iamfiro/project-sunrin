@@ -17,6 +17,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Development convenience: allow a local dev-login shortcut.
+  // Enabled when VITE_DEV_AUTH === 'true' OR when running in Vite development mode.
+  // Default dev credentials requested: username `dev`, password `qwer1234@`.
+  const DEV_AUTH_ENABLED =
+    ((import.meta.env.VITE_DEV_AUTH as string) === "true") || import.meta.env.MODE === "development";
+  const DEV_USERNAME = (import.meta.env.VITE_DEV_USERNAME as string) || "dev";
+  const DEV_PASSWORD = (import.meta.env.VITE_DEV_PASSWORD as string) || "qwer1234@";
+  const DEV_USER: User = {
+    id: (import.meta.env.VITE_DEV_USER_ID as string) || "dev-id",
+    name: (import.meta.env.VITE_DEV_USER_NAME as string) || "Developer",
+    profileImage: "",
+    stats: { perfectCount: 0, highestScore: 0 },
+  };
+
   const refreshUser = async () => {
     try {
       const u = await authService.me();
@@ -35,6 +49,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const signin = async (payload: { username: string; password: string }) => {
+    // If dev auth is enabled and credentials match, short-circuit to a fake user
+    if (DEV_AUTH_ENABLED && payload.username === DEV_USERNAME && payload.password === DEV_PASSWORD) {
+      setUser(DEV_USER);
+      setLoading(false);
+      return;
+    }
+
     await authService.signin(payload);
     await refreshUser();
   };
