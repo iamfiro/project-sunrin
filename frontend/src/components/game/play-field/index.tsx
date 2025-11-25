@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { Note } from "@/shared/types/game/note";
 import { useInputStore } from "@/store/inputStore";
+import { useResultStore } from "@/store/useResultStore";
 
 import Judgement from "../judgement";
 import NoteField from "../note-field";
@@ -39,9 +40,7 @@ export default function PlayField() {
   const startTimeRef = useRef<number>(0);
   const [judgement, setJudgement] = useState<string | null>(null);
   const judgementTimeoutRef = useRef<number | null>(null);
-  const [score, setScore] = useState(0);
-  const [combo, setCombo] = useState(0);
-
+  const { setResult, getResult } = useResultStore();
   const { keys, pressedKeys, pressKey, releaseKey } = useInputStore();
 
   const showJudgement = (judgement: string) => {
@@ -76,16 +75,33 @@ export default function PlayField() {
         const timeDiff = Math.abs(closestNote.time - currentTime);
         if (timeDiff <= JUDGEMENT_WINDOWS.perfect) {
           showJudgement("Perfect");
-          setScore((s) => s + 100);
-          setCombo((c) => c + 1);
+          const current = getResult();
+          setResult({
+            score: current.score + 100,
+            combo: current.combo + 1,
+            great:
+              current.great +
+              (current.great ? "," : "") +
+              currentTime.toString(),
+          });
         } else if (timeDiff <= JUDGEMENT_WINDOWS.great) {
           showJudgement("Great");
-          setScore((s) => s + 50);
-          setCombo((c) => c + 1);
+          const current = getResult();
+          setResult({
+            score: current.score + 50,
+            combo: current.combo + 1,
+            good:
+              current.good + (current.good ? "," : "") + currentTime.toString(),
+          });
         } else if (timeDiff <= JUDGEMENT_WINDOWS.good) {
           showJudgement("Good");
-          setScore((s) => s + 20);
-          setCombo((c) => c + 1);
+          const current = getResult();
+          setResult({
+            score: current.score + 20,
+            combo: current.combo + 1,
+            bad:
+              current.bad + (current.bad ? "," : "") + currentTime.toString(),
+          });
         } else {
           // Don't judge as miss here, let the miss check handle it
         }
@@ -149,7 +165,14 @@ export default function PlayField() {
     );
     if (missedNotes.length > 0) {
       showJudgement("Miss");
-      setCombo(0);
+      const current = getResult();
+      setResult({
+        combo: 0,
+        miss:
+          current.miss +
+          (current.miss ? "," : "") +
+          missedNotes.map((n) => n.time).join(","),
+      });
       setNotes((notes) =>
         notes.filter(
           (note) => !missedNotes.some((missed) => missed.id === note.id),
