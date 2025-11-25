@@ -1,0 +1,85 @@
+.container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: $spacing-24;
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url('/images/background.png');
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    filter: blur(8px);
+    transform: scale(1.03);
+    z-index: 0;
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3));
+    z-index: 1;
+  }
+
+  & > * {
+    position: relative;
+    z-index: 2;
+  }
+}
+
+.formWrapper {
+  width: 100%;
+  max-width: 440px;
+  padding: $spacing-48 $spacing-40;
+  background: $surface-white;
+  border-radius: $radius-20;
+  background-color: rgba(255, 255, 255, 0.0);
+}
+
+.formLogo {
+  display: flex;
+  justify-content: center;
+  margin-top: -$spacing-12;
+  margin-bottom: $spacing-32;
+
+  img {
+    height: 80px;
+  }
+}
+
+.buttonGroup {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-16;
+}
+
+.button {
+  width: 100%;
+  padding: $spacing-16;
+  font-size: 16px;
+  font-weight: 700;
+  color: black;
+  background-color: rgba(255, 255, 255, 0.7);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  text-align: center;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}

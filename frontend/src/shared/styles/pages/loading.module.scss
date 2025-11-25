@@ -1,0 +1,44 @@
+.container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: $spacing-64;
+
+    background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('/images/background.png');
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+
+    & > .logo {
+        animation: scaleUpDown 2s ease-in-out infinite;
+    }
+}
+
+.logo {
+    height: 150px;
+}
+
+.text {
+    font-size: 24px;
+    font-weight: bold;
+    color: $text;
+}
+
+@keyframes scaleUpDown {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.08);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
