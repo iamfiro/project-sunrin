@@ -73,7 +73,7 @@ export default function SuspendFallback() {
       {showingContainer === "gameComposition" && (
         <div className={s.blackContainer}>
           <span>노래 제공</span>
-          <span className={s.creditText}>황동화</span>
+          <span className={s.creditText}>황동화, Daru</span>
         </div>
       )}
       <div className={s.container}>

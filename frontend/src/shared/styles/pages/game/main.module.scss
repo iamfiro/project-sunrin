@@ -1,0 +1,16 @@
+.container{
+    width: 100%;
+    min-height: 100vh;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+
+    position: relative;
+    z-index: 2;
+    
+    /* 3D 원근감을 위한 perspective 설정 */
+    perspective: 800px;
+    perspective-origin: center top;
+    transform-style: preserve-3d;
+}
