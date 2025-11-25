@@ -2,6 +2,7 @@ import { Search } from "lucide-react";
 import { useEffect, useRef } from "react";
 
 import { TrackCard, TrackCover } from "@/components/music";
+import AddTrackModal from "@/components/music/add-track-modal";
 import { BackgroundVideo, Header } from "@/shared/components";
 import { FlexAlign, HStack, VStack } from "@/shared/components/stack";
 import useCircularIndex from "@/shared/hook/useCircularIndex";
