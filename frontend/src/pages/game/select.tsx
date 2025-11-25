@@ -1,9 +1,11 @@
 import { Search } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef } from "react";
 
 import { TrackCard, TrackCover } from "@/components/music";
 import { BackgroundVideo, Header } from "@/shared/components";
 import { FlexAlign, HStack, VStack } from "@/shared/components/stack";
+import useCircularIndex from "@/shared/hook/useCircularIndex";
+import useKeyNavigationShortcuts from "@/shared/hook/useKeyNavigationShortcuts";
 import { mockTrack } from "@/shared/mock/music";
 import { mockUser } from "@/shared/mock/user";
 import { Track } from "@/shared/types/music";
@@ -11,7 +13,43 @@ import { Track } from "@/shared/types/music";
 import s from "@/shared/styles/pages/game/select.module.scss";
 
 export default function SongSelect() {
-  const [selectedTrack, setSelectedTrack] = useState<Track>(mockTrack[0]);
+  const { currentIndex, next, prev } = useCircularIndex<Track>(mockTrack, {
+    initialIndex: 0,
+  });
+  const trackRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+
+  useKeyNavigationShortcuts({
+    onNext: next,
+    onPrev: prev,
+    nextKeyCodes: ["KeyS"],
+    prevKeyCodes: ["KeyW"],
+  });
+
+  useEffect(() => {
+    const target = trackRefs.current[currentIndex];
+    if (!target) return;
+
+    target.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+      inline: "nearest",
+    });
+  }, [currentIndex]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    video.load();
+    const playPromise = video.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(() => {
+        // ignore autoplay restrictions
+      });
+    }
+  }, [currentIndex]);
+
   return (
     <>
       <div className={s.container}>

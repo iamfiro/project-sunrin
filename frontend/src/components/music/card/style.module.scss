@@ -12,6 +12,8 @@
 
     transition: all 0.3s ease-in-out;
 
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 2% 100%);
+
     &:hover {
         width: 83%;
 
@@ -53,6 +55,8 @@
     font-size: 24px;
     font-weight: 400;
     color: $text;
+
+    transition: all 0.3s ease-in-out;
 }
 
 .artist {
@@ -61,8 +65,8 @@
 }
 
 .trackCard.selected {
-    width: 85%;
-    height: 110px;
+    width: 95%;
+    height: 130px;
 
     background-color: $surface;
 
@@ -80,11 +84,11 @@
 
     .info {
         .title {
-            font-size: 28px;
+            font-size: 32px;
             color: inherit;
         }
         .artist {
-            font-size: 22px;
+            font-size: 24px;
             color: $text-subtle;
         }
     }
