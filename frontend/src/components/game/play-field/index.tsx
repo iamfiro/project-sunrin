@@ -27,12 +27,26 @@ const calculateAccuracy = (
 };
 
 // 랭크 계산 함수
-const calculateRank = (accuracy: number): string => {
+const calculateRank = (
+  accuracy: number,
+  perfect: number,
+  totalNotes: number,
+): "F" | "D" | "C" | "B" | "A" | "S" | "SS" | undefined => {
+  // Special conditions first
+  const isAllPerfect = perfect === totalNotes && totalNotes > 0;
+
+  if (isAllPerfect) return "SS"; // Changed from "SSS" to "SS"
+
+  // Regular rank calculation based on accuracy
+  if (accuracy >= 98) return "SS";
   if (accuracy >= 95) return "S";
   if (accuracy >= 90) return "A";
+  if (accuracy >= 85) return "A";
   if (accuracy >= 80) return "B";
+  if (accuracy >= 75) return "B";
   if (accuracy >= 70) return "C";
-  if (accuracy >= 60) return "D";
+  if (accuracy >= 60) return "C";
+  if (accuracy >= 50) return "D";
   return "F";
 };
 
@@ -176,7 +190,8 @@ export default function PlayField() {
 
         // 정확도 및 랭크 계산
         const accuracy = calculateAccuracy(perfect, great, good, 0, miss);
-        const rank = calculateRank(accuracy);
+        const totalNotes = perfect + great + good + miss; // 총 노트 수 계산
+        const rank = calculateRank(accuracy, perfect, totalNotes);
 
         // 정상 판정 반영
         setResult({
@@ -263,7 +278,27 @@ export default function PlayField() {
         0,
         newMissCount,
       );
-      const rank = calculateRank(accuracy);
+      const totalNotes =
+        current.perfect + current.great + current.good + newMissCount;
+      let rank = calculateRank(accuracy, current.perfect, totalNotes);
+
+      if (accuracy >= 99.5) {
+        if (current.perfect === totalNotes) {
+          rank = "SS";
+        } else if (current.perfect >= totalNotes * 0.95) {
+          rank = "SS";
+        } else {
+          rank = "S";
+        }
+      } else if (accuracy >= 95) {
+        rank = "A";
+      } else if (accuracy >= 90) {
+        rank = "B";
+      } else if (accuracy >= 85) {
+        rank = "C";
+      } else {
+        rank = "D";
+      }
 
       setResult({
         miss: newMissCount,
