@@ -3,6 +3,7 @@ import { createBrowserRouter } from "react-router-dom";
 import {
   Auth,
   GameMain,
+  GameResult,
   Intro,
   Loading,
   SignIn,
@@ -43,5 +44,9 @@ export const router = createBrowserRouter([
   {
     path: "/game/main",
     element: <GameMain />,
+  },
+  {
+    path: "/game/result",
+    element: <GameResult />,
   },
 ]);

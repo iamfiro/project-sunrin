@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import { Note } from "@/shared/types/game/note";
 import { useInputStore } from "@/store/inputStore";
@@ -8,6 +9,32 @@ import Judgement from "../judgement";
 import NoteField from "../note-field";
 
 import s from "./style.module.scss";
+
+// 정확도 계산 함수
+const calculateAccuracy = (
+  perfect: number,
+  great: number,
+  good: number,
+  bad: number,
+  miss: number,
+): number => {
+  const total = perfect + great + good + bad + miss;
+  if (total === 0) return 0;
+
+  const weightedSum =
+    (perfect * 1.0 + great * 0.8 + good * 0.5 + bad * 0.2) * 100;
+  return Math.round(weightedSum / total);
+};
+
+// 랭크 계산 함수
+const calculateRank = (accuracy: number): string => {
+  if (accuracy >= 95) return "S";
+  if (accuracy >= 90) return "A";
+  if (accuracy >= 80) return "B";
+  if (accuracy >= 70) return "C";
+  if (accuracy >= 60) return "D";
+  return "F";
+};
 
 const basicChartNotes: Note[] = [
   { id: "n1", time: 1000, lane: 0, type: "tap" },
@@ -57,11 +84,15 @@ const updateCombo = (
 };
 
 export default function PlayField() {
+  const navigate = useNavigate();
   const [notes, setNotes] = useState<Note[]>(basicChartNotes);
   const [scroll, setScroll] = useState(0);
   const startTimeRef = useRef<number>(0);
+  const hasGameEnded = useRef(false); // ⭐ navigate 여러 번 실행 방지
+
   const [judgement, setJudgement] = useState<string | null>(null);
   const judgementTimeoutRef = useRef<number | null>(null);
+
   const { setResult, getResult } = useResultStore();
   const { keys, pressedKeys, pressKey, releaseKey } = useInputStore();
 
@@ -105,7 +136,7 @@ export default function PlayField() {
         let earlyCount = current.earlyCount;
         let lateCount = current.lateCount;
 
-        // 빠르게/늦게 친 경우 체크
+        // Early / Late 측정
         const isEarly = currentTime < closestNote.time;
         if (isEarly) earlyCount++;
         else lateCount++;
@@ -126,7 +157,7 @@ export default function PlayField() {
           good++;
           combo = updateCombo(combo, currentTime, false);
         } else {
-          // 미스 처리 (good 판정보다 나쁜 경우)
+          // Miss 판정
           showJudgement("Miss");
           miss++;
           combo = updateCombo(combo, currentTime, true);
@@ -139,10 +170,15 @@ export default function PlayField() {
             isFullCombo: false,
             isAllPerfect: false,
           });
+
           return;
         }
 
-        // 정상적인 판정 처리
+        // 정확도 및 랭크 계산
+        const accuracy = calculateAccuracy(perfect, great, good, 0, miss);
+        const rank = calculateRank(accuracy);
+
+        // 정상 판정 반영
         setResult({
           score,
           perfect,
@@ -152,6 +188,8 @@ export default function PlayField() {
           combo,
           earlyCount,
           lateCount,
+          accuracy,
+          rank,
           isFullCombo: miss === 0,
           isAllPerfect: miss === 0 && great === 0 && good === 0,
         });
@@ -205,15 +243,27 @@ export default function PlayField() {
     };
   }, []);
 
+  // ⭐ Miss 처리
   useEffect(() => {
-    // Miss check
     const missedNotes = notes.filter(
       (note) => scroll > note.time + JUDGEMENT_WINDOWS.miss,
     );
+
     if (missedNotes.length > 0) {
       showJudgement("Miss");
+
       const current = getResult();
       const newMissCount = current.miss + missedNotes.length;
+
+      // 정확도 및 랭크 재계산
+      const accuracy = calculateAccuracy(
+        current.perfect,
+        current.great,
+        current.good,
+        0,
+        newMissCount,
+      );
+      const rank = calculateRank(accuracy);
 
       setResult({
         miss: newMissCount,
@@ -222,18 +272,31 @@ export default function PlayField() {
           performance.now() - startTimeRef.current,
           true,
         ),
+        accuracy,
+        rank,
         isFullCombo: false,
         isAllPerfect: false,
       });
 
-      // 놓친 노트 제거
+      // Miss 난 노트 제거
       setNotes((notes) =>
-        notes.filter(
-          (note) => !missedNotes.some((missed) => missed.id === note.id),
-        ),
+        notes.filter((note) => !missedNotes.some((m) => m.id === note.id)),
       );
     }
   }, [scroll, notes, getResult, setResult]);
+
+  // ⭐ 모든 노트가 처리되면 결과 페이지 이동 (navigate 1회 보장)
+  useEffect(() => {
+    if (!hasGameEnded.current && notes.length === 0) {
+      hasGameEnded.current = true;
+
+      const timer = setTimeout(() => {
+        navigate("/game/result");
+      }, 1000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [notes, navigate]);
 
   return (
     <div className={s.container}>
