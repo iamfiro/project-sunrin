@@ -18,7 +18,10 @@ export default function TrackCard({
   selected = false,
 }: TrackCardProps) {
   return (
-    <a href="/game/main" className={s.trackCard}>
+    <a
+      href="/game/main"
+      className={`${s.container} ${selected ? s.selected : ""}`}
+    >
       <HStack
         align={FlexAlign.Center}
         justify={FlexJustify.Between}
