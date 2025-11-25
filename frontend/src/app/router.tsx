@@ -1,18 +1,7 @@
 import { lazy, Suspense } from "react";
 import { createBrowserRouter } from "react-router-dom";
 
-import { Loading } from "../pages";
-
-const Start = lazy(() => import("../pages/start"));
-const Auth = lazy(() => import("../pages/auth"));
-const SignIn = lazy(() => import("../pages/auth/signin"));
-const SignUp = lazy(() => import("../pages/auth/signup"));
-const Intro = lazy(() => import("../pages/intro"));
-const SongSelect = lazy(() => import("../pages/game/select"));
-
-const withFallback = (element: JSX.Element) => (
-  <Suspense fallback={<Loading />}>{element}</Suspense>
-);
+import { Intro, SongSelect, Start, GameMain } from "../pages";
 
 export const router = createBrowserRouter([
   {
@@ -42,5 +31,9 @@ export const router = createBrowserRouter([
   {
     path: "/game/select",
     element: withFallback(<SongSelect />),
+  },
+  {
+    path: "/game/main",
+    element: <GameMain />,
   },
 ]);

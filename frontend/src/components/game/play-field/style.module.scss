@@ -1,0 +1,20 @@
+.container{
+    width: 100%;
+    height: 700vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 5px;
+    gap: 12px;
+
+    background-color: #00000094;
+    backdrop-filter: blur(10px);
+
+    position: fixed;
+    bottom: 0; left: 0;
+    
+    transform: rotateX(81deg);
+    transform-origin: center bottom;
+    transform-style: preserve-3d;
+}

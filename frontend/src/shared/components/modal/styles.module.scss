@@ -1,0 +1,140 @@
+$overlay-padding: clamp($spacing-16, 4vw, $spacing-48);
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $overlay-padding;
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(6px);
+  z-index: 1000;
+  animation: fadeIn 160ms ease-out;
+}
+
+.container {
+  position: relative;
+  width: 100%;
+  max-height: calc(100vh - ($overlay-padding * 2));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-16;
+  background: rgba(255, 255, 255, 0.9);
+  color: $text;
+  overflow: hidden;
+  animation: popIn 200ms cubic-bezier(0.18, 0.89, 0.32, 1.28);
+  clip-path: polygon(10% 0%, 100% 0, 90% 100%, 0% 100%);
+
+}
+
+.sizeSm {
+  max-width: 420px;
+}
+
+.sizeMd {
+  max-width: 560px;
+}
+
+.sizeLg {
+  max-width: 720px;
+}
+
+.sizeFull {
+  height: calc(100vh - ($overlay-padding * 2));
+  max-width: 960px;
+}
+
+.header {
+  padding: $spacing-24 $spacing-32 0;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.description {
+  margin: $spacing-8 0 0;
+  color: $text-subtle;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.content {
+  padding: $spacing-32 $spacing-24;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: $radius-20;
+  }
+}
+
+.footer {
+  padding: 0 $spacing-32 $spacing-32;
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-12;
+  justify-content: flex-end;
+}
+
+.closeButton {
+  position: absolute;
+  top: $spacing-16;
+  right: $spacing-16;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: $radius-20;
+  background: rgba(255, 255, 255, 0.08);
+  color: $color-black;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: background 120ms ease, transform 120ms ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.18);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
