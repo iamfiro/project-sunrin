@@ -11,3 +11,35 @@
 
     padding-top: 55px;
 }
+
+.playFieldWrap {
+    height: 100vh;
+
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+
+    padding-inline: 3px;
+    background-color: #3F6898;
+}
+
+.playFieldContainer {
+    height: 100%;
+
+    background: linear-gradient(to bottom, #CBC8C8, #E2E0E0);
+    padding: $spacing-16;
+    padding-top: 0;
+
+    border: 2px solid #ffffff;
+}
+
+.playFieldInfo {
+    width: 100%;
+    height: 100px;
+
+    padding: $spacing-12;
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

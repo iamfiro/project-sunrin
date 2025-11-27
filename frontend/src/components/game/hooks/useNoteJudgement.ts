@@ -2,6 +2,7 @@ import { useCallback } from "react";
 
 import { Note } from "@/shared/types/game/note";
 import { useResultStore } from "@/store/useResultStore";
+import { useJudgementLineStore, TimingType } from "@/store/useJudgementLineStore";
 
 const JUDGEMENT_WINDOWS = {
   perfect: 30,
@@ -77,6 +78,7 @@ export const useNoteJudgement = (
   setNotes: React.Dispatch<React.SetStateAction<Note[]>>,
 ) => {
   const { setResult, getResult } = useResultStore();
+  const { addIndicator } = useJudgementLineStore();
 
   const handleKeyPress = useCallback(
     (keyIndex: number) => {
@@ -128,6 +130,7 @@ export const useNoteJudgement = (
 
       if (closestNote) {
         const timeDiff = Math.abs(closestNote.time - currentTime);
+        const rawTimeDiff = closestNote.time - currentTime; // 음수면 late, 양수면 early
 
         let score = current.score;
         let perfect = current.perfect;
@@ -154,8 +157,24 @@ export const useNoteJudgement = (
         const comboBonus = Math.floor(currentComboCount / 20) * 0.05; // 20콤보마다 5% 추가
         const comboMultiplier = Math.min(1 + comboBonus, 1.5); // 최대 1.5배
 
+        // 판정선에 표시할 타이밍 계산 (-1 ~ 1)
+        // rawTimeDiff가 양수면 early (왼쪽), 음수면 late (오른쪽)
+        const normalizedTiming = Math.max(-1, Math.min(1, 
+          rawTimeDiff / JUDGEMENT_WINDOWS.miss
+        ));
+
+        let timingType: TimingType;
+        if (Math.abs(normalizedTiming) < 0.3) {
+          timingType = "perfect";
+        } else if (normalizedTiming > 0) {
+          timingType = "early";
+        } else {
+          timingType = "late";
+        }
+
         if (timeDiff <= JUDGEMENT_WINDOWS.perfect) {
           showJudgement("Perfect");
+          addIndicator(normalizedTiming, timingType);
           const baseScore = 500;
           score += Math.floor(
             baseScore * baseScoreMultiplier * comboMultiplier,
@@ -164,6 +183,7 @@ export const useNoteJudgement = (
           combo = updateCombo(combo, currentTime, false);
         } else if (timeDiff <= JUDGEMENT_WINDOWS.great) {
           showJudgement("Great");
+          addIndicator(normalizedTiming, timingType);
           const baseScore = 300;
           score += Math.floor(
             baseScore * baseScoreMultiplier * comboMultiplier,
@@ -172,6 +192,7 @@ export const useNoteJudgement = (
           combo = updateCombo(combo, currentTime, false);
         } else if (timeDiff <= JUDGEMENT_WINDOWS.good) {
           showJudgement("Good");
+          addIndicator(normalizedTiming, timingType);
           const baseScore = 100;
           score += Math.floor(
             baseScore * baseScoreMultiplier * comboMultiplier,
@@ -218,7 +239,7 @@ export const useNoteJudgement = (
         setNotes((notes) => notes.filter((n) => n.id !== closestNote!.id));
       }
     },
-    [notes, getResult, setResult, startTimeRef, showJudgement, setNotes],
+    [notes, getResult, setResult, startTimeRef, showJudgement, setNotes, addIndicator],
   );
 
   return { handleKeyPress };

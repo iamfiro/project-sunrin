@@ -1,22 +1,11 @@
-import { useEffect } from "react";
-
-import { GameInfo, GameStats } from "@/components/game";
+import { GameInfo, GameStats, JudgementLine } from "@/components/game";
 import PlayField from "@/components/game/play-field";
 import { BackgroundVideo } from "@/shared/components";
 import { mockTrack } from "@/shared/mock/music";
-import { useInputStore } from "@/store/inputStore";
 
 import s from "@/shared/styles/pages/game/main.module.scss";
 
 export default function GameMain() {
-  const { pressedKeys, getPressedKeyCodes } = useInputStore();
-
-  // Log when pressed keys change
-  useEffect(() => {
-    const keyCodes = getPressedKeyCodes();
-    console.log(`Pressed keys: ${keyCodes.join(", ") || "None"}`);
-  }, [pressedKeys, getPressedKeyCodes]);
-
   return (
     <>
       <div className={s.container}>
@@ -27,7 +16,14 @@ export default function GameMain() {
           bpm={120}
         />
         <GameStats />
-        <PlayField />
+        <div className={s.playFieldWrap}>
+          <div className={s.playFieldContainer}>
+            <PlayField />
+            <div className={s.playFieldInfo}>
+              <JudgementLine />
+            </div>
+          </div>
+        </div>
       </div>
       <BackgroundVideo src="/music/hebi - onward/background.mp4" />
     </>
