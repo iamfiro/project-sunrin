@@ -15,24 +15,26 @@
 .info {
     background-color: $surface-white;
 
-    padding: $spacing-20 $spacing-40;
+    padding: $spacing-16 $spacing-24;
+    padding-right: $spacing-48;
 
     border-left: 6px solid $surface-brand;
 
-    transform: rotateY(40deg) rotateX(10deg);
+    clip-path: polygon(0 0, 100% 0, 90% 100%, 0% 100%);
 
     span {
         color: $text-subtle;
-        font-size: 20px;
+        font-size: 18px;
     }
+
     p {
-        font-size: 24px;
+        font-size: 22px;
         font-weight: 700;
     }
 }
 
 .cover {
-    width: 55px;
+    width: 70px;
     aspect-ratio: 1/1;
     object-fit: cover;
 

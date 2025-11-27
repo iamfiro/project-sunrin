@@ -14,11 +14,17 @@ interface Props {
 export default function GameInfo({ name, artist, coverUrl, bpm }: Props) {
   return (
     <div className={s.container}>
-      <HStack className={s.info} gap={24}>
+      <HStack className={s.info} gap={20} align={FlexAlign.Start}>
         <img src={coverUrl} alt={`${name} cover`} className={s.cover} />
-        <VStack gap={4}>
-          <span>{artist}</span>
-          <p>{name}</p>
+        <VStack gap={16}>
+          <VStack gap={4}>
+            <span>{artist}</span>
+            <p>{name}</p>
+          </VStack>
+          <VStack gap={4}>
+            <span>내 최고 기록</span>
+            <p>2823829</p>
+          </VStack>
         </VStack>
       </HStack>
       <VStack align={FlexAlign.Start} gap={4} className={s.bpm}>
