@@ -15,7 +15,6 @@ export default function JudgementLine() {
       <div className={s.timingBar}>
         {/* Early 영역 (왼쪽) */}
         <div className={s.earlyZone}>
-          <span className={s.label}>EARLY</span>
         </div>
 
         {/* Perfect 영역 (가운데) - 기준선 */}
@@ -24,9 +23,7 @@ export default function JudgementLine() {
         </div>
 
         {/* Late 영역 (오른쪽) */}
-        <div className={s.lateZone}>
-          <span className={s.label}>LATE</span>
-        </div>
+        <div className={s.lateZone}></div>
       </div>
 
       {/* 움직이는 타이밍 인디케이터 */}

@@ -13,34 +13,22 @@
   height: 40px;
   display: flex;
   align-items: center;
-  background: linear-gradient(
-    90deg,
-    rgba(255, 87, 87, 0.2) 0%,
-    rgba(255, 235, 87, 0.2) 25%,
-    rgba(144, 238, 144, 0.3) 45%,
-    rgba(144, 238, 144, 0.3) 55%,
-    rgba(255, 235, 87, 0.2) 75%,
-    rgba(255, 165, 87, 0.2) 100%
-  );
   border-radius: 20px;
   border: 2px solid rgba(255, 255, 255, 0.2);
   overflow: hidden;
-
-  &::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(
-      90deg,
-      transparent 0%,
-      rgba(255, 255, 255, 0.1) 50%,
-      transparent 100%
+  background: 
+    linear-gradient(90deg, 
+      rgba(255, 87, 87, 0.35) 0%,
+      rgba(255, 87, 87, 0.35) 12.5%,
+      rgba(255, 235, 87, 0.35) 12.5%,
+      rgba(255, 235, 87, 0.35) 37.5%,
+      rgba(144, 238, 144, 0.45) 37.5%,
+      rgba(144, 238, 144, 0.45) 62.5%,
+      rgba(255, 235, 87, 0.35) 62.5%,
+      rgba(255, 235, 87, 0.35) 87.5%,
+      rgba(255, 165, 87, 0.35) 87.5%,
+      rgba(255, 165, 87, 0.35) 100%
     );
-    pointer-events: none;
-  }
 }
 
 .earlyZone,
@@ -50,6 +38,7 @@
   align-items: center;
   height: 100%;
   position: relative;
+  z-index: 1;
 }
 
 .earlyZone {
