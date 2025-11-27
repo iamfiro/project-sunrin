@@ -7,33 +7,24 @@ export default function JudgementLine() {
 
   // timing: -1 (왼쪽 끝) ~ 0 (중앙) ~ 1 (오른쪽 끝)
   // 판정 윈도우에 맞춰 position 계산
-  // perfect: ±30ms (±0.2) → 41% ~ 59%
-  // great: ±60ms (±0.4) → 32% ~ 68%
-  // good: ±100ms (±0.667) → 20% ~ 80%
-  // miss: ±150ms (±1.0) → 5% ~ 95%
-  const position = 50 + currentTiming * 45; // 50% ± 45%
+  // perfect: ±30ms (±0.2) → 40% ~ 60%
+  // great: ±60ms (±0.4) → 20% ~ 80%
+  // good: ±100ms (±0.667) → 0% ~ 100%
+  // miss: 맨 왼쪽(0%) 또는 맨 오른쪽(100%)
+  const position = 50 + currentTiming * 50;
 
   return (
     <div className={s.container}>
-      {/* 타이밍 바 배경 */}
       <div className={s.timingBar}>
-        {/* Early 영역 (왼쪽) */}
-        <div className={s.earlyZone}>
-          <span className={s.label}>EARLY</span>
-        </div>
+        <div className={s.earlyZone} />
 
-        {/* Perfect 영역 (가운데) - 기준선 */}
         <div className={s.perfectZone}>
           <div className={s.centerLine} />
         </div>
 
-        {/* Late 영역 (오른쪽) */}
-        <div className={s.lateZone}>
-          <span className={s.label}>LATE</span>
-        </div>
+        <div className={s.lateZone} />
       </div>
 
-      {/* 움직이는 타이밍 인디케이터 */}
       <div className={s.indicatorWrapper}>
         <div
           className={`${s.movingIndicator} ${s[currentType]} ${isAnimating ? s.active : ""}`}

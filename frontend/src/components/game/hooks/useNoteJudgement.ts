@@ -106,16 +106,14 @@ export const useNoteJudgement = (
       // 노트가 없거나 판정 범위 밖일 때 Miss 처리
       if (!closestNote || minTimeDiff > JUDGEMENT_WINDOWS.miss) {
         showJudgement("Miss");
-        
-        // 허공에 누른 Miss도 판정선에 표시 (극단적인 위치로)
-        // 노트가 아예 없으면 중앙에서 약간 벗어난 위치, 있으면 실제 위치
+
         let missPosition = 0;
         if (closestNote) {
           const rawTimeDiff = closestNote.time - currentTime;
-          missPosition = Math.max(-1, Math.min(1, rawTimeDiff / JUDGEMENT_WINDOWS.miss));
+          missPosition = rawTimeDiff > 0 ? -1 : 1;
         }
-        updateTiming(missPosition, missPosition < 0 ? "late" : "early");
-        
+        updateTiming(missPosition, "miss");
+
         const miss = current.miss + 1;
         const combo = updateCombo([...current.combo], currentTime, true);
         const accuracy = calculateAccuracy(

@@ -20,7 +20,9 @@ export default function GameMain() {
           <div className={s.playFieldContainer}>
             <PlayField />
             <div className={s.playFieldInfo}>
-              <JudgementLine />
+              <div className={s.judgementLine}>
+                <JudgementLine />
+              </div>
             </div>
           </div>
         </div>
