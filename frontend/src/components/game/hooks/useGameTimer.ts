@@ -26,3 +26,4 @@ export const useGameTimer = () => {
 
   return { scroll, startTimeRef };
 };
+

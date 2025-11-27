@@ -5,10 +5,12 @@ import { useRef, useState } from "react";
  */
 export const useJudgement = () => {
   const [judgement, setJudgement] = useState<string | null>(null);
+  const [judgementId, setJudgementId] = useState(0);
   const judgementTimeoutRef = useRef<number | null>(null);
 
   const showJudgement = (judgement: string) => {
     setJudgement(judgement);
+    setJudgementId((prev) => prev + 1); // 매번 고유한 ID 생성
     if (judgementTimeoutRef.current) {
       clearTimeout(judgementTimeoutRef.current);
     }
@@ -17,5 +19,5 @@ export const useJudgement = () => {
     }, 1000);
   };
 
-  return { judgement, showJudgement };
+  return { judgement, judgementId, showJudgement };
 };

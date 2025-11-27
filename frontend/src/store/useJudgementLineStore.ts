@@ -39,3 +39,4 @@ export const useJudgementLineStore = create<JudgementLineStore>((set) => ({
       isAnimating: false,
     }),
 }));
+

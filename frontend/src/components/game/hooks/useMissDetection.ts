@@ -80,7 +80,8 @@ export const useMissDetection = (
     );
 
     if (missedNotes.length > 0) {
-      showJudgement("Miss");
+      // 자동 감지된 Miss는 판정 표시하지 않음 (사용자가 키를 눌렀을 때만 표시)
+      // showJudgement("Miss");
 
       const current = getResult();
       const newMissCount = current.miss + missedNotes.length;

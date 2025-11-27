@@ -46,7 +46,7 @@ function useCountAnimation(target: number, duration: number = 300) {
 }
 
 export default function GameStats() {
-  const { perfect, great, good, miss, score } = useResultStore();
+  const { perfect, great, good, miss, score, accuracy } = useResultStore();
   const [scoreKey, setScoreKey] = useState(0);
 
   const animatedPerfect = useCountAnimation(perfect, 300);
@@ -54,6 +54,7 @@ export default function GameStats() {
   const animatedGood = useCountAnimation(good, 300);
   const animatedMiss = useCountAnimation(miss, 300);
   const animatedScore = useCountAnimation(score, 800); // 더 긴 애니메이션
+  const animatedAccuracy = useCountAnimation(accuracy, 300);
 
   // score가 변경될 때마다 애니메이션 재시작
   useEffect(() => {
@@ -99,6 +100,10 @@ export default function GameStats() {
           <span className={s.masteryValue} key={scoreKey}>
             {animatedScore.toLocaleString()}
           </span>
+        </div>
+        <div className={s.statRow}>
+          <span className={s.masteryLabel}>ACCURACY</span>
+          <span className={s.accuracyValue}>{animatedAccuracy}%</span>
         </div>
       </div>
     </div>

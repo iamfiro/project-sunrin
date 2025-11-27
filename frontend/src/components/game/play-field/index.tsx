@@ -24,7 +24,7 @@ export default function PlayField() {
   const { notes, setNotes, noteDisplayTime } = useNoteGeneration(scroll);
 
   // 판정 표시
-  const { judgement, showJudgement } = useJudgement();
+  const { judgement, judgementId, showJudgement } = useJudgement();
 
   // 노트 판정 처리
   const { handleKeyPress } = useNoteJudgement(
@@ -45,7 +45,7 @@ export default function PlayField() {
 
   return (
     <div className={s.container}>
-      <Judgement judgement={judgement} />
+      <Judgement judgement={judgement} judgementId={judgementId} />
       <NoteField
         notes={notes}
         scroll={scroll}
