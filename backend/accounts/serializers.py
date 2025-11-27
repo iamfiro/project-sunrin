@@ -16,19 +16,12 @@ class RegisterSerializer(serializers.ModelSerializer):
     """회원가입 직렬화"""
     name = serializers.CharField(source='username')
     password = serializers.CharField(write_only=True, min_length=8)
-    password_confirm = serializers.CharField(write_only=True)
 
     class Meta:
         model = User
-        fields = ('name', 'email', 'password', 'password_confirm')
-
-    def validate(self, data):
-        if data['password'] != data['password_confirm']:
-            raise serializers.ValidationError("비밀번호가 일치하지 않습니다.")
-        return data
+        fields = ('name', 'email', 'password')  # 회원가입 시 필요한 필드만
 
     def create(self, validated_data):
-        validated_data.pop('password_confirm')
         user = User.objects.create_user(
             username=validated_data['name'],
             password=validated_data['password'],
