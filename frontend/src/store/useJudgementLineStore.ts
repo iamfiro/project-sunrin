@@ -2,48 +2,40 @@ import { create } from "zustand";
 
 export type TimingType = "early" | "perfect" | "late";
 
-interface JudgementIndicator {
-  id: string;
-  timing: number; // -1 (early) ~ 0 (perfect) ~ 1 (late)
-  type: TimingType;
-  timestamp: number;
-}
-
 interface JudgementLineStore {
-  indicators: JudgementIndicator[];
-  addIndicator: (timing: number, type: TimingType) => void;
-  removeIndicator: (id: string) => void;
-  clearIndicators: () => void;
+  currentTiming: number; // -1 (early) ~ 0 (perfect) ~ 1 (late)
+  currentType: TimingType;
+  isAnimating: boolean;
+  updateTiming: (timing: number, type: TimingType) => void;
+  resetTiming: () => void;
 }
 
 export const useJudgementLineStore = create<JudgementLineStore>((set) => ({
-  indicators: [],
+  currentTiming: 0,
+  currentType: "perfect",
+  isAnimating: false,
 
-  addIndicator: (timing, type) => {
-    const id = `${Date.now()}-${Math.random()}`;
-    const indicator: JudgementIndicator = {
-      id,
-      timing,
-      type,
-      timestamp: Date.now(),
-    };
+  updateTiming: (timing, type) => {
+    set({
+      currentTiming: timing,
+      currentType: type,
+      isAnimating: true,
+    });
 
-    set((state) => ({
-      indicators: [...state.indicators, indicator],
-    }));
-
-    // 애니메이션 후 자동 제거 (1초)
+    // 애니메이션 후 중앙으로 복귀
     setTimeout(() => {
-      set((state) => ({
-        indicators: state.indicators.filter((ind) => ind.id !== id),
-      }));
-    }, 1000);
+      set({
+        currentTiming: 0,
+        currentType: "perfect",
+        isAnimating: false,
+      });
+    }, 300);
   },
 
-  removeIndicator: (id) =>
-    set((state) => ({
-      indicators: state.indicators.filter((ind) => ind.id !== id),
-    })),
-
-  clearIndicators: () => set({ indicators: [] }),
+  resetTiming: () =>
+    set({
+      currentTiming: 0,
+      currentType: "perfect",
+      isAnimating: false,
+    }),
 }));

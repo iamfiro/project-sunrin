@@ -3,7 +3,11 @@ import { useJudgementLineStore } from "@/store/useJudgementLineStore";
 import s from "./style.module.scss";
 
 export default function JudgementLine() {
-  const { indicators } = useJudgementLineStore();
+  const { currentTiming, currentType, isAnimating } = useJudgementLineStore();
+
+  // timing: -1 (왼쪽 끝) ~ 0 (중앙) ~ 1 (오른쪽 끝)
+  // 50% 기준으로 변환
+  const position = 50 + currentTiming * 45; // -45% ~ 0 ~ +45%
 
   return (
     <div className={s.container}>
@@ -14,9 +18,9 @@ export default function JudgementLine() {
           <span className={s.label}>EARLY</span>
         </div>
 
-        {/* Perfect 영역 (가운데) */}
+        {/* Perfect 영역 (가운데) - 기준선 */}
         <div className={s.perfectZone}>
-          <div className={s.perfectIndicator} />
+          <div className={s.centerLine} />
         </div>
 
         {/* Late 영역 (오른쪽) */}
@@ -25,23 +29,14 @@ export default function JudgementLine() {
         </div>
       </div>
 
-      {/* 타이밍 인디케이터들 */}
-      <div className={s.indicators}>
-        {indicators.map((indicator) => {
-          // timing: -1 (왼쪽 끝) ~ 0 (중앙) ~ 1 (오른쪽 끝)
-          // 50% 기준으로 변환
-          const position = 50 + indicator.timing * 45; // -45% ~ 0 ~ +45%
-
-          return (
-            <div
-              key={indicator.id}
-              className={`${s.indicator} ${s[indicator.type]}`}
-              style={{
-                left: `${position}%`,
-              }}
-            />
-          );
-        })}
+      {/* 움직이는 타이밍 인디케이터 */}
+      <div className={s.indicatorWrapper}>
+        <div
+          className={`${s.movingIndicator} ${s[currentType]} ${isAnimating ? s.active : ""}`}
+          style={{
+            left: `${position}%`,
+          }}
+        />
       </div>
     </div>
   );

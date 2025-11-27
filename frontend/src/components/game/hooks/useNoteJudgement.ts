@@ -1,8 +1,11 @@
 import { useCallback } from "react";
 
 import { Note } from "@/shared/types/game/note";
+import {
+  TimingType,
+  useJudgementLineStore,
+} from "@/store/useJudgementLineStore";
 import { useResultStore } from "@/store/useResultStore";
-import { useJudgementLineStore, TimingType } from "@/store/useJudgementLineStore";
 
 const JUDGEMENT_WINDOWS = {
   perfect: 30,
@@ -78,7 +81,7 @@ export const useNoteJudgement = (
   setNotes: React.Dispatch<React.SetStateAction<Note[]>>,
 ) => {
   const { setResult, getResult } = useResultStore();
-  const { addIndicator } = useJudgementLineStore();
+  const { updateTiming } = useJudgementLineStore();
 
   const handleKeyPress = useCallback(
     (keyIndex: number) => {
@@ -159,9 +162,10 @@ export const useNoteJudgement = (
 
         // 판정선에 표시할 타이밍 계산 (-1 ~ 1)
         // rawTimeDiff가 양수면 early (왼쪽), 음수면 late (오른쪽)
-        const normalizedTiming = Math.max(-1, Math.min(1, 
-          rawTimeDiff / JUDGEMENT_WINDOWS.miss
-        ));
+        const normalizedTiming = Math.max(
+          -1,
+          Math.min(1, rawTimeDiff / JUDGEMENT_WINDOWS.miss),
+        );
 
         let timingType: TimingType;
         if (Math.abs(normalizedTiming) < 0.3) {
@@ -174,7 +178,7 @@ export const useNoteJudgement = (
 
         if (timeDiff <= JUDGEMENT_WINDOWS.perfect) {
           showJudgement("Perfect");
-          addIndicator(normalizedTiming, timingType);
+          updateTiming(normalizedTiming, timingType);
           const baseScore = 500;
           score += Math.floor(
             baseScore * baseScoreMultiplier * comboMultiplier,
@@ -183,7 +187,7 @@ export const useNoteJudgement = (
           combo = updateCombo(combo, currentTime, false);
         } else if (timeDiff <= JUDGEMENT_WINDOWS.great) {
           showJudgement("Great");
-          addIndicator(normalizedTiming, timingType);
+          updateTiming(normalizedTiming, timingType);
           const baseScore = 300;
           score += Math.floor(
             baseScore * baseScoreMultiplier * comboMultiplier,
@@ -192,7 +196,7 @@ export const useNoteJudgement = (
           combo = updateCombo(combo, currentTime, false);
         } else if (timeDiff <= JUDGEMENT_WINDOWS.good) {
           showJudgement("Good");
-          addIndicator(normalizedTiming, timingType);
+          updateTiming(normalizedTiming, timingType);
           const baseScore = 100;
           score += Math.floor(
             baseScore * baseScoreMultiplier * comboMultiplier,
@@ -239,7 +243,15 @@ export const useNoteJudgement = (
         setNotes((notes) => notes.filter((n) => n.id !== closestNote!.id));
       }
     },
-    [notes, getResult, setResult, startTimeRef, showJudgement, setNotes, addIndicator],
+    [
+      notes,
+      getResult,
+      setResult,
+      startTimeRef,
+      showJudgement,
+      setNotes,
+      updateTiming,
+    ],
   );
 
   return { handleKeyPress };
