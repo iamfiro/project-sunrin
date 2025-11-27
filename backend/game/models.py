@@ -9,6 +9,7 @@ class Note(models.Model):
     ]
 
     id = models.CharField(max_length=100, primary_key=True, help_text="노트 ID")
+    chart = models.ForeignKey('Chart', on_delete=models.CASCADE, related_name='notes', null=True, blank=True, help_text="노트가 속한 차트")
     time = models.IntegerField(help_text="노트가 내려올 시간 (ms 단위)")
     lane = models.IntegerField(help_text="노트의 라인 위치")
     type = models.CharField(max_length=10, choices=NOTE_TYPES, help_text="노트 타입")
@@ -27,7 +28,6 @@ class Chart(models.Model):
     isCommunitySong = models.BooleanField(default=False, help_text="커뮤니티 곡 여부")
     artist = models.CharField(max_length=200, help_text="아티스트명")
     difficulty = models.IntegerField(help_text="난이도 (1~15)")
-    notes = models.ManyToManyField(Note, related_name='charts', help_text="차트에 포함된 노트들")
 
     def __str__(self):
         return f"{self.title} by {self.artist} (ID: {self.musicId})"

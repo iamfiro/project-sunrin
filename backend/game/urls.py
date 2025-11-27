@@ -1,12 +1,13 @@
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
+from django.urls import path
 from . import views
 
-router = DefaultRouter()
-router.register(r'charts', views.ChartViewSet)
-router.register(r'results', views.ResultViewSet)
-router.register(r'ranks', views.RankViewSet)
-
 urlpatterns = [
-    path('', include(router.urls)),
+    path('', views.ChartViewSet.as_view({'get': 'list'}), name='chart-list'),
+    path('<str:musicId>/', views.ChartViewSet.as_view({
+        'get': 'retrieve',
+        'put': 'update',
+        'patch': 'partial_update',
+        'delete': 'destroy',
+        'post': 'create'
+    }), name='chart-detail'),
 ]
