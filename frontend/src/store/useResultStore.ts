@@ -20,7 +20,6 @@ const initialState: GameResult = {
   isAllPerfect: false,
   earlyCount: 0,
   lateCount: 0,
-  perfectHigh: 0,
   perfect: 0,
   great: 0,
   good: 0,

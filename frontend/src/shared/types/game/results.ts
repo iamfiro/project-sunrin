@@ -13,7 +13,6 @@ export interface GameResult {
   earlyCount: number; // 빠르게 친 판정
   lateCount: number; // 느리게 친 판정 수
 
-  perfectHigh: number; // 완벽한 퍼펙 (Perfect·High)
   perfect: number; // 퍼펙
   great: number; // 좋음
   good: number; // 중간

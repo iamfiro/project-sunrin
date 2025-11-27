@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-import { GameInfo, GameStats } from "@/components/game";
+import { GameInfo } from "@/components/game";
 import PlayField from "@/components/game/play-field";
 import { BackgroundVideo } from "@/shared/components";
 import { mockTrack } from "@/shared/mock/music";
@@ -26,7 +26,6 @@ export default function GameMain() {
           coverUrl={mockTrack[0].coverSrc}
           bpm={120}
         />
-        <GameStats />
         {/* <Header user={mockUser} /> */}
         <PlayField />
       </div>
