@@ -1,6 +1,5 @@
 import { useInputStore } from "@/store/inputStore";
 
-import GameInfo from "../game-info";
 import {
   useGameEnd,
   useGameTimer,

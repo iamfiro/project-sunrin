@@ -1,7 +1,8 @@
 .container {
     width: 100%;
 
-    padding-block: $spacing-40;
+    padding: $spacing-40;
+
     position:fixed;
     top: 0;
     left: 0;
@@ -9,18 +10,18 @@
 
     display: flex;
     justify-content: space-between;
-    align-items: center;
 }
 
 .info {
     background-color: $surface-white;
 
+    min-width: 300px;
+    height: fit-content;
+
+    clip-path: polygon(0 0, 100% 0, 95% 100%, 0% 100%);
+
     padding: $spacing-16 $spacing-24;
     padding-right: $spacing-48;
-
-    border-left: 6px solid $surface-brand;
-
-    clip-path: polygon(0 0, 100% 0, 90% 100%, 0% 100%);
 
     span {
         color: $text-subtle;
@@ -29,12 +30,12 @@
 
     p {
         font-size: 22px;
-        font-weight: 700;
+        font-weight: 500;
     }
 }
 
 .cover {
-    width: 70px;
+    width: 50px;
     aspect-ratio: 1/1;
     object-fit: cover;
 
@@ -42,8 +43,6 @@
 }
 
 .bpm {
-    margin-right: $spacing-40;
-
     color: $text;
 
     opacity: 0.3;
