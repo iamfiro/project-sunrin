@@ -96,15 +96,39 @@ export const useNoteJudgement = (
         }
       }
 
+      const current = getResult();
+
+      // 노트가 없거나 판정 범위 밖일 때 Miss 처리
+      if (!closestNote || minTimeDiff > JUDGEMENT_WINDOWS.miss) {
+        showJudgement("Miss");
+        const miss = current.miss + 1;
+        const combo = updateCombo([...current.combo], currentTime, true);
+        const accuracy = calculateAccuracy(
+          current.perfect,
+          current.great,
+          current.good,
+          0,
+          miss,
+        );
+        const totalNotes =
+          current.perfect + current.great + current.good + miss;
+        const rank = calculateRank(accuracy, current.perfect, totalNotes);
+
+        setResult({
+          ...current,
+          miss,
+          combo,
+          accuracy,
+          rank,
+          isFullCombo: false,
+          isAllPerfect: false,
+        });
+        return;
+      }
+
       if (closestNote) {
         const timeDiff = Math.abs(closestNote.time - currentTime);
 
-        // 판정 범위 밖이면 무시
-        if (timeDiff > JUDGEMENT_WINDOWS.miss) {
-          return;
-        }
-
-        const current = getResult();
         let score = current.score;
         let perfect = current.perfect;
         let great = current.great;
@@ -118,19 +142,40 @@ export const useNoteJudgement = (
         if (isEarly) earlyCount++;
         else lateCount++;
 
+        // 노트 타입에 따른 점수 배율
+        const isLongNote = closestNote.type === "hold";
+        const baseScoreMultiplier = isLongNote ? 1.5 : 1; // 롱노트는 1.5배
+
+        // 콤보 보너스 계산 (현재 콤보 수에 따라)
+        const currentComboCount =
+          combo.length > 0
+            ? parseInt(combo[combo.length - 1].split("-")[2])
+            : 0;
+        const comboBonus = Math.floor(currentComboCount / 20) * 0.05; // 20콤보마다 5% 추가
+        const comboMultiplier = Math.min(1 + comboBonus, 1.5); // 최대 1.5배
+
         if (timeDiff <= JUDGEMENT_WINDOWS.perfect) {
           showJudgement("Perfect");
-          score += 100;
+          const baseScore = 500;
+          score += Math.floor(
+            baseScore * baseScoreMultiplier * comboMultiplier,
+          );
           perfect++;
           combo = updateCombo(combo, currentTime, false);
         } else if (timeDiff <= JUDGEMENT_WINDOWS.great) {
           showJudgement("Great");
-          score += 50;
+          const baseScore = 300;
+          score += Math.floor(
+            baseScore * baseScoreMultiplier * comboMultiplier,
+          );
           great++;
           combo = updateCombo(combo, currentTime, false);
         } else if (timeDiff <= JUDGEMENT_WINDOWS.good) {
           showJudgement("Good");
-          score += 20;
+          const baseScore = 100;
+          score += Math.floor(
+            baseScore * baseScoreMultiplier * comboMultiplier,
+          );
           good++;
           combo = updateCombo(combo, currentTime, false);
         } else {

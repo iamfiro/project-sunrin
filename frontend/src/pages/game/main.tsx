@@ -27,7 +27,6 @@ export default function GameMain() {
           bpm={120}
         />
         <GameStats />
-        {/* <Header user={mockUser} /> */}
         <PlayField />
       </div>
       <BackgroundVideo src="/music/hebi - onward/background.mp4" />

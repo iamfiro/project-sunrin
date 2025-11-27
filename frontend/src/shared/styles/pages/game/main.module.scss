@@ -8,9 +8,6 @@
 
     position: relative;
     z-index: 2;
-    
-    /* 3D 원근감을 위한 perspective 설정 */
-    perspective: 800px;
-    perspective-origin: center top;
-    transform-style: preserve-3d;
+
+    padding-top: 55px;
 }

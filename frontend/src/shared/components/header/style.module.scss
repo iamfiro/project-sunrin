@@ -8,6 +8,8 @@
 
     background: linear-gradient(to bottom, $surface, #ccc);
     padding: 0 $padding;
+
+    z-index: 1000;
 }
 
 .logo {
