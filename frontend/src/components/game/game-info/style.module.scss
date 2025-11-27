@@ -1,0 +1,58 @@
+.container {
+    width: 100%;
+
+    padding-block: $spacing-40;
+    position:fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.info {
+    background-color: $surface-white;
+
+    padding: $spacing-20 $spacing-40;
+
+    border-left: 6px solid $surface-brand;
+
+    transform: rotateY(40deg) rotateX(10deg);
+
+    span {
+        color: $text-subtle;
+        font-size: 20px;
+    }
+    p {
+        font-size: 24px;
+        font-weight: 700;
+    }
+}
+
+.cover {
+    width: 55px;
+    aspect-ratio: 1/1;
+    object-fit: cover;
+
+    border-radius: $radius-8;
+}
+
+.bpm {
+    margin-right: $spacing-40;
+
+    color: $text;
+
+    opacity: 0.3;
+
+    span {
+        font-size: 32px;
+        color: inherit;
+    }
+    p {
+        font-size: 52px;
+        font-weight: 700;
+        color: inherit;
+    }
+}

@@ -12,11 +12,11 @@
     &::after {
         content: '';
         position: absolute;
-        bottom: 200px;
+        bottom: 0px;
         left: 0;
         width: 100%;
-        height: 2px;
-        background-color: #ff00ff;
+        height: 10px;
+        background-color: #ff51518c;
     }
 
     &.keyPressed {

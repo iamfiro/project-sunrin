@@ -1,8 +1,9 @@
+import cn from "classnames";
+import { memo } from "react";
+
+import { Note as NoteType } from "@/shared/types/game/note";
 
 import s from "./style.module.scss";
-import { Note as NoteType } from "@/shared/types/game/note";
-import { memo } from "react";
-import cn from "classnames";
 
 interface NoteProps {
   note: NoteType;
@@ -15,16 +16,16 @@ const NoteComponent = ({ note, position, noteDisplayTime }: NoteProps) => {
     top: `${position * 100}%`,
   };
 
-  if (note.type === 'hold' && note.duration) {
+  if (note.type === "hold" && note.duration) {
     const height = (note.duration / noteDisplayTime) * 100;
     const tailStyle = {
-        height: `${height}%`,
-    }
+      height: `${height}%`,
+    };
     return (
-        <div className={cn(s.note, s.hold)} style={style}>
-            <div className={s.tail} style={tailStyle}></div>
-        </div>
-    )
+      <div className={cn(s.note, s.hold)} style={style}>
+        <div className={s.tail} style={tailStyle}></div>
+      </div>
+    );
   }
 
   return <div className={s.note} style={style} />;
