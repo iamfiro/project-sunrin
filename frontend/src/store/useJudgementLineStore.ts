@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-export type TimingType = "early" | "perfect" | "late";
+export type TimingType = "early" | "perfect" | "late" | "miss";
 
 interface JudgementLineStore {
   currentTiming: number; // -1 (early) ~ 0 (perfect) ~ 1 (late)

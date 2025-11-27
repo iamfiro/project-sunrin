@@ -139,6 +139,22 @@
     }
   }
 
+  &.miss {
+    background: linear-gradient(
+      180deg,
+      rgba(150, 50, 50, 0.8) 0%,
+      rgba(200, 50, 50, 1) 50%,
+      rgba(150, 50, 50, 0.8) 100%
+    );
+    box-shadow: 0 0 15px rgba(200, 50, 50, 0.9), 0 0 25px rgba(200, 50, 50, 0.5);
+
+    &::before {
+      background: rgba(200, 50, 50, 0.4);
+      box-shadow: 0 0 30px rgba(200, 50, 50, 0.6);
+      width: 200%;
+    }
+  }
+
   &.perfect {
     background: linear-gradient(
       180deg,
