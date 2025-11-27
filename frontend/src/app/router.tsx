@@ -2,6 +2,7 @@ import { createBrowserRouter } from "react-router-dom";
 
 import {
   Auth,
+  Editor,
   GameMain,
   Intro,
   Loading,
@@ -43,5 +44,9 @@ export const router = createBrowserRouter([
   {
     path: "/game/main",
     element: <GameMain />,
+  },
+  {
+    path: "/game/editor",
+    element: <Editor />,
   },
 ]);
