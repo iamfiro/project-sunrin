@@ -1,6 +1,8 @@
-import { X } from "lucide-react";
+import { ChevronFirst, ChevronLast, Pause, Play, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import WaveSurfer from "wavesurfer.js";
+
+import { useEditorStore } from "@/store/useEditorStore";
 
 import s from "./style.module.scss";
 
@@ -9,19 +11,13 @@ interface Props {
   onNext: () => void;
 }
 export default function EditorCard({ title, onNext }: Props) {
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const waveformRef = useRef<HTMLDivElement>(null);
   const wavesurferRef = useRef<WaveSurfer | null>(null);
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      setSelectedFile(file);
-    }
-  };
+  const [isPlaying, setIsPlaying] = useState(false);
+  const { setEditTitle, editMusic, setEditMusic } = useEditorStore();
 
   useEffect(() => {
-    if (title === "edit" && selectedFile && waveformRef.current) {
+    if (title === "edit" && editMusic && waveformRef.current) {
       // 기존 wavesurfer 파괴
       if (wavesurferRef.current) {
         wavesurferRef.current.destroy();
@@ -33,9 +29,44 @@ export default function EditorCard({ title, onNext }: Props) {
         progressColor: "#b0b0b0",
         height: 80,
       });
-      wavesurferRef.current.loadBlob(selectedFile);
+      wavesurferRef.current.loadBlob(editMusic);
+
+      wavesurferRef.current.on("play", () => {
+        setIsPlaying(true);
+      });
+      wavesurferRef.current.on("pause", () => {
+        setIsPlaying(false);
+      });
+      wavesurferRef.current.on("finish", () => {
+        setIsPlaying(false);
+      });
     }
-  }, [title, selectedFile]);
+  }, [title, editMusic]);
+
+  const handlePlayPause = () => {
+    if (wavesurferRef.current) {
+      if (isPlaying) {
+        wavesurferRef.current.pause();
+      } else {
+        wavesurferRef.current.play();
+      }
+      setIsPlaying(!isPlaying);
+    }
+  };
+
+  const handleSeek = (seconds: number) => {
+    if (wavesurferRef.current) {
+      wavesurferRef.current.skip(seconds);
+    }
+  };
+
+  const onTitleSave = (text: string) => {
+    setEditTitle(text);
+  };
+
+  const onMusicSave = (file: File) => {
+    setEditMusic(file);
+  };
 
   useEffect(() => {
     return () => {
@@ -53,7 +84,11 @@ export default function EditorCard({ title, onNext }: Props) {
           <X scale={24} color="#8E8E8E" />
         </div>
         <div className={s.body}>
-          <input type="text" placeholder="제목을 입력하세요" />
+          <input
+            type="text"
+            placeholder="제목을 입력하세요"
+            onChange={(e) => onTitleSave(e.target.value)}
+          />
           <button onClick={onNext}>다음으로</button>
         </div>
       </div>
@@ -67,7 +102,16 @@ export default function EditorCard({ title, onNext }: Props) {
           <X scale={24} color="#8E8E8E" />
         </div>
         <div className={s.body}>
-          <input type="file" accept="audio/*" onChange={handleFileChange} />
+          <input
+            type="file"
+            accept="audio/*"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                onMusicSave(file);
+              }
+            }}
+          />
           <button onClick={onNext}>다음으로</button>
         </div>
       </div>
@@ -86,8 +130,19 @@ export default function EditorCard({ title, onNext }: Props) {
           </div>
         </div>
         <div className={s.musicInfo}>
-          <div className={s.bpm}></div>
-          <div className={s.musicTitle}></div>
+          <div className={s.bpm}>pp</div>
+          <div className={s.control}>
+            <button onClick={() => handleSeek(-5)}>
+              <ChevronFirst />
+            </button>
+            <button className={s.startButton} onClick={handlePlayPause}>
+              {isPlaying ? <Pause /> : <Play />}
+            </button>
+            <button onClick={() => handleSeek(5)}>
+              <ChevronLast />
+            </button>
+          </div>
+          <div className={s.musicTitle}>title</div>
         </div>
         <div className={s.noteContainer}></div>
         <div className={s.waveform} ref={waveformRef}></div>
