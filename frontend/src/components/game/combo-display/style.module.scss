@@ -1,0 +1,46 @@
+.container {
+  position: absolute;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-16;
+  
+  animation: scaleUp 0.15s ease-out forwards;
+}
+
+.label {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: #ffffff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  font-family: "Galmuri9", monospace;
+}
+
+.count {
+  font-size: 80px;
+  font-weight: 900;
+  color: #ffffff;
+  line-height: 1;
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  font-family: "Galmuri9", monospace;
+}
+
+@keyframes scaleUp {
+  0% {
+    transform: translateX(-50%) scale(0.5);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-50%) scale(1);
+    opacity: 1;
+  }
+}

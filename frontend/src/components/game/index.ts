@@ -1,3 +1,4 @@
+export { default as ComboDisplay } from "./combo-display";
 export { default as GameInfo } from "./game-info";
 export { default as GameStats } from "./game-stats";
 export { default as Judgement } from "./judgement";

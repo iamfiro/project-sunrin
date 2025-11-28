@@ -3,9 +3,6 @@ import { useNavigate } from "react-router-dom";
 
 import { Note } from "@/shared/types/game/note";
 
-/**
- * 게임 종료 처리
- */
 export const useGameEnd = (notes: Note[]) => {
   const navigate = useNavigate();
   const hasGameEnded = useRef(false);
@@ -22,4 +19,5 @@ export const useGameEnd = (notes: Note[]) => {
     }
   }, [notes, navigate]);
 };
+
 

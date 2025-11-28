@@ -73,9 +73,6 @@ const createRandomNotesBatch = (startTime: number, count: number): Note[] => {
   return notes;
 };
 
-/**
- * 노트 생성 및 관리
- */
 export const useNoteGeneration = (scroll: number) => {
   const initialNotes = useMemo<Note[]>(
     () => createRandomNotesBatch(NOTE_INITIAL_DELAY, NOTE_BATCH_SIZE),

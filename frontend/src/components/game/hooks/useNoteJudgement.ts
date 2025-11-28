@@ -6,13 +6,7 @@ import {
   useJudgementLineStore,
 } from "@/store/useJudgementLineStore";
 import { useResultStore } from "@/store/useResultStore";
-
-const JUDGEMENT_WINDOWS = {
-  perfect: 30,
-  great: 60,
-  good: 100,
-  miss: 150,
-};
+import { JUDGEMENT_WINDOWS } from "./useMissDetection";
 
 const calculateAccuracy = (
   perfect: number,

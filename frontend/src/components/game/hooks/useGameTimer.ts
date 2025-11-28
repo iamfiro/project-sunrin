@@ -1,8 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 
-/**
- * 게임 타이머 및 스크롤 관리
- */
 export const useGameTimer = () => {
   const [scroll, setScroll] = useState(0);
   const startTimeRef = useRef<number>(0);
@@ -26,4 +23,5 @@ export const useGameTimer = () => {
 
   return { scroll, startTimeRef };
 };
+
 

@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { Note } from "@/shared/types/game/note";
 import { useResultStore } from "@/store/useResultStore";
 
-const JUDGEMENT_WINDOWS = {
+export const JUDGEMENT_WINDOWS = {
   perfect: 30,
   great: 60,
   good: 100,
@@ -62,9 +62,6 @@ const updateCombo = (
   return updatedCombo;
 };
 
-/**
- * Miss 노트 자동 감지 및 처리
- */
 export const useMissDetection = (
   scroll: number,
   notes: Note[],
@@ -80,9 +77,6 @@ export const useMissDetection = (
     );
 
     if (missedNotes.length > 0) {
-      // 자동 감지된 Miss는 판정 표시하지 않음 (사용자가 키를 눌렀을 때만 표시)
-      // showJudgement("Miss");
-
       const current = getResult();
       const newMissCount = current.miss + missedNotes.length;
 

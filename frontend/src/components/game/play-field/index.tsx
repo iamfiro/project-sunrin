@@ -9,6 +9,7 @@ import {
   useNoteGeneration,
   useNoteJudgement,
 } from "../hooks";
+import ComboDisplay from "../combo-display";
 import Judgement from "../judgement";
 import NoteField from "../note-field";
 
@@ -45,6 +46,7 @@ export default function PlayField() {
 
   return (
     <div className={s.container}>
+      <ComboDisplay />
       <Judgement judgement={judgement} judgementId={judgementId} />
       <NoteField
         notes={notes}
