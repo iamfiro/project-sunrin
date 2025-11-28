@@ -83,6 +83,8 @@
 .musicInfo{
     padding: 16px;
     background: rgba(255, 255, 255, 0.1);
+    border-top: solid 2px #8e8e8e;
+    border-bottom: solid 2px #8e8e8e;
     color: #fdfdfe;
 }
 .waveform{
@@ -91,7 +93,7 @@
     background: #FDFDFE66;
     padding: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    border-top: 1px solid #8e8e8e;
+    border-top: 2px solid #8e8e8e;
 }
 .editContainer{
     width: 100%;
@@ -104,7 +106,6 @@
     box-sizing: border-box;
 }
 .editor{
-    background: rgba(168, 168, 168, 0.8);
     padding: 20px;
     color: #fdfdfe;
     display: grid;
