@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import EditorCard from "@/components/game/editor-card";
+import EditorCard from "@/components/edit/editor-card";
 
 import s from "@/shared/styles/pages/game/editor.module.scss";
 

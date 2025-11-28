@@ -3,7 +3,10 @@ import MusicTempo from "music-tempo";
 import { useEffect, useRef, useState } from "react";
 import WaveSurfer from "wavesurfer.js";
 
+import { Chart } from "@/shared/types/game/chart";
 import { useEditorStore } from "@/store/useEditorStore";
+
+import LineSection from "../line-section";
 
 import s from "./style.module.scss";
 
@@ -13,8 +16,57 @@ interface Props {
 }
 export default function EditorCard({ title, onNext }: Props) {
   const waveformRef = useRef<HTMLDivElement>(null);
+  const editorRef = useRef<HTMLDivElement>(null);
   const wavesurferRef = useRef<WaveSurfer | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [totalSections, setTotalSections] = useState(16); // Add state for total sections
+
+  const dummyChart: Chart = {
+    id: "chart_001",
+    title: "Test Song",
+    artist: "Test Artist",
+    difficulty: 5,
+    notes: [
+      {
+        id: "n1",
+        time: 1000, // 1초
+        lane: 1,
+        type: "tap",
+      },
+      {
+        id: "n2",
+        time: 1500,
+        lane: 2,
+        type: "tap",
+      },
+      {
+        id: "n3",
+        time: 2000,
+        lane: 3,
+        type: "hold",
+        duration: 800, // 0.8초
+      },
+      {
+        id: "n4",
+        time: 3000,
+        lane: 1,
+        type: "tap",
+      },
+      {
+        id: "n5",
+        time: 3500,
+        lane: 2,
+        type: "tap",
+      },
+      {
+        id: "n6",
+        time: 4000,
+        lane: 4,
+        type: "hold",
+        duration: 1200,
+      },
+    ],
+  };
 
   const { editTitle, setEditTitle, editMusic, setEditMusic, bpm, setBpm } =
     useEditorStore();
@@ -37,12 +89,34 @@ export default function EditorCard({ title, onNext }: Props) {
       wavesurferRef.current.on("pause", () => setIsPlaying(false));
       wavesurferRef.current.on("finish", () => setIsPlaying(false));
       wavesurferRef.current.on("ready", () => {
-        const audioBuffer = wavesurferRef.current?.getDecodedData();
-        if (audioBuffer) {
-          // Get the first channel's audio data as Float32Array
-          const audioData = audioBuffer.getChannelData(0);
-          const musicTempo = new MusicTempo(audioData);
-          setBpm(Math.round(musicTempo.tempo));
+        if (wavesurferRef.current) {
+          // Set total sections based on music duration
+          const duration = wavesurferRef.current.getDuration();
+          const sections = Math.ceil(duration / 0.5);
+          setTotalSections(sections > 0 ? sections : 16); // Fallback to 16 if calculation fails
+
+          // BPM calculation
+          const audioBuffer = wavesurferRef.current.getDecodedData();
+          if (audioBuffer) {
+            const audioData = audioBuffer.getChannelData(0);
+            const musicTempo = new MusicTempo(audioData);
+            setBpm(Math.round(musicTempo.tempo));
+          }
+        }
+      });
+
+      const handleTimeUpdate = (currentTime: number) => {
+        if (editorRef.current) {
+          const pixelsPerSecond = 400 / 0.5; // 400px per 500ms section
+          editorRef.current.scrollLeft = currentTime * pixelsPerSecond;
+        }
+      };
+
+      wavesurferRef.current.on("timeupdate", handleTimeUpdate);
+      wavesurferRef.current.on("seek", (progress) => {
+        if (wavesurferRef.current) {
+          const currentTime = wavesurferRef.current.getDuration() * progress;
+          handleTimeUpdate(currentTime);
         }
       });
     }
@@ -71,6 +145,31 @@ export default function EditorCard({ title, onNext }: Props) {
 
   const onMusicSave = (file: File) => {
     setEditMusic(file);
+  };
+
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    // If music is playing, the scroll is driven by timeupdate. Ignore user scroll to prevent a feedback loop.
+    if (isPlaying || !wavesurferRef.current) {
+      return;
+    }
+
+    // The rest of the logic handles manual scrubbing when the music is paused.
+    const currentScroll = e.currentTarget.scrollLeft;
+    const pixelsPerSecond = 800; // 400px per 0.5s
+    const expectedScroll =
+      wavesurferRef.current.getCurrentTime() * pixelsPerSecond;
+
+    // If the scroll difference is small, assume it's a residual programmatic scroll and ignore
+    if (Math.abs(currentScroll - expectedScroll) < 5) {
+      return;
+    }
+
+    // Otherwise, it's a user scroll, so seek the audio
+    const newTime = currentScroll / pixelsPerSecond;
+    const duration = wavesurferRef.current.getDuration();
+    if (duration > 0) {
+      wavesurferRef.current.seekTo(newTime / duration);
+    }
   };
 
   useEffect(() => {
@@ -128,10 +227,23 @@ export default function EditorCard({ title, onNext }: Props) {
           <img src="/logo_brand.svg" alt="logo" />
         </div>
         <div className={s.editContainer}>
-          <div className={s.editor}>
-            {Array.from({ length: 16 }, (_, i) => (
-              <div key={i} className={s.gridCell}></div>
-            ))}
+          <div className={s.editor} ref={editorRef} onScroll={handleScroll}>
+            {Array.from({ length: totalSections }, (_, i) => {
+              const msPerMeasure = 500;
+              const startTime = i * msPerMeasure;
+              const endTime = (i + 1) * msPerMeasure;
+              const notesForSection = dummyChart.notes.filter(
+                (note) => note.time >= startTime && note.time < endTime,
+              );
+              return (
+                <LineSection
+                  key={i}
+                  notes={notesForSection}
+                  measureStartTime={startTime}
+                  measureDuration={msPerMeasure}
+                />
+              );
+            })}
           </div>
         </div>
         <div className={s.musicInfo}>

@@ -101,18 +101,17 @@
 .editor{
     padding: 20px;
     color: #fdfdfe;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-auto-rows: 1fr;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-self: flex-start;
     width: 100%;
-    flex: 1;
-    .gridCell{
-        border: 1px solid #fdfdfe;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: rgba(0, 0, 0, 0.2);
-        min-height: 50px;
+    height: 100%;
+    overflow-x: scroll;
+    scrollbar-width: none;
+    scroll-behavior: smooth;
+    ::-webkit-scrollbar{
+        display: none;
     }
 }
 .musicInfo{
