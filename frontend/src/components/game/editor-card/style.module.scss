@@ -56,3 +56,91 @@
         }
     }
 }
+.topBar{
+    width: 100%;
+    height: 55px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0 12px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    background: linear-gradient(to bottom, #fff, #ccc);
+    img{
+        width: 120px;
+        height: auto;
+    }
+}
+.editNote{
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.8);
+    color: #fdfdfe;
+    font-size: 18px;
+    text-align: center;
+}
+.musicInfo{
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fdfdfe;
+}
+.waveform{
+    width: 100%;
+    height: 250px;
+    background: #FDFDFE66;
+    padding: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    border-top: 1px solid #8e8e8e;
+}
+.editContainer{
+    width: 100%;
+    height: calc(100vh - 55px);
+    margin-top: 55px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+    box-sizing: border-box;
+}
+.editor{
+    background: rgba(168, 168, 168, 0.8);
+    padding: 20px;
+    color: #fdfdfe;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-auto-rows: 1fr;
+    width: 100%;
+    flex: 1;
+    .gridCell{
+        border: 1px solid #fdfdfe;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0, 0, 0, 0.2);
+        min-height: 50px;
+    }
+}
+.musicInfo{
+    display: flex;
+    justify-content: space-between;
+    padding: 16px;
+    background:#FDFDFE66;
+    height: 75px;
+    color: #fdfdfe;
+    width: 100%;
+    .bpm, .musicTitle{
+        font-size: 16px;
+    }
+}
+.noteContainer{
+    background: #FDFDFE66;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fdfdfe;
+    font-size: 16px;
+    width: 100%;
+    height: 150px;
+}

@@ -1,4 +1,4 @@
-import s from './style.module.scss';
+import s from "./style.module.scss";
 
 interface GameStatsProps {
   score: number;

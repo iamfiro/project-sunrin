@@ -1,4 +1,4 @@
-export type NoteType = "tap" | "hold" ;
+export type NoteType = "tap" | "hold";
 
 export interface Note {
   id: string; // 유니크 ID

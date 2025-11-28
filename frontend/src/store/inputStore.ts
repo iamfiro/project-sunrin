@@ -1,4 +1,4 @@
-import { create } from 'zustand';
+import { create } from "zustand";
 
 type InputState = {
   // The array of 4 keys
@@ -19,34 +19,34 @@ type InputState = {
 
 export const useInputStore = create<InputState>((set, get) => ({
   // Default keys: d, f, j, k
-  keys: ['d', 'f', 'j', 'k'],
+  keys: ["d", "f", "j", "k"],
   pressedKeys: new Set<number>(),
-  
-  setKey: (index, key) => 
+
+  setKey: (index, key) =>
     set((state) => {
       const newKeys = [...state.keys] as [string, string, string, string];
       newKeys[index] = key;
       return { keys: newKeys };
     }),
-    
+
   setKeys: (keys) => set({ keys }),
-  
-  pressKey: (keyIndex) => 
+
+  pressKey: (keyIndex) =>
     set((state) => {
       const newSet = new Set(state.pressedKeys);
       newSet.add(keyIndex);
       return { pressedKeys: newSet };
     }),
-    
-  releaseKey: (keyIndex) => 
+
+  releaseKey: (keyIndex) =>
     set((state) => {
       const newSet = new Set(state.pressedKeys);
       newSet.delete(keyIndex);
       return { pressedKeys: newSet };
     }),
-    
+
   getPressedKeyNames: () => {
     const { keys, pressedKeys } = get();
-    return Array.from(pressedKeys).map(idx => keys[idx]);
+    return Array.from(pressedKeys).map((idx) => keys[idx]);
   },
 }));
