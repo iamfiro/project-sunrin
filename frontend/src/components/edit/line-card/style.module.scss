@@ -11,8 +11,36 @@
   width: 30px;
   height: 100%; // Or another small, appropriate height for a tap note
   background-color: $surface-brand;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
 }
 
 .longNote {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+  padding: 0;
+  background-color: transparent; // Container is transparent
+}
+
+.noteCap {
+  width: 6px;
+  height: 100%;
+  background-color: #007bff;
+  border-radius: 4px 4px 0 0;
+}
+
+.noteBody {
+  flex-grow: 1;
   background-color: #0057b3;
+}
+
+.noteEnd {
+  width: 6px;
+  height: 100%;
+  background-color: #007bff;
+  border-radius: 0 0 4px 4px;
+  cursor: ns-resize;
 }

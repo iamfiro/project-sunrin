@@ -1,10 +1,18 @@
-import { ChevronFirst, ChevronLast, Pause, Play, X } from "lucide-react";
+import {
+  ChevronFirst,
+  ChevronLast,
+  ChevronsLeftRight,
+  Pause,
+  Play,
+  Trash2,
+  X,
+} from "lucide-react";
 import MusicTempo from "music-tempo";
 import { useEffect, useRef, useState } from "react";
 import WaveSurfer from "wavesurfer.js";
 
-import { Chart } from "@/shared/types/game/chart";
 import { useEditorStore } from "@/store/useEditorStore";
+import { useNoteStore } from "@/store/useNoteStore";
 
 import LineSection from "../line-section";
 
@@ -19,54 +27,11 @@ export default function EditorCard({ title, onNext }: Props) {
   const editorRef = useRef<HTMLDivElement>(null);
   const wavesurferRef = useRef<WaveSurfer | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [totalSections, setTotalSections] = useState(16); // Add state for total sections
+  const [totalSections, setTotalSections] = useState(16);
 
-  const dummyChart: Chart = {
-    id: "chart_001",
-    title: "Test Song",
-    artist: "Test Artist",
-    difficulty: 5,
-    notes: [
-      {
-        id: "n1",
-        time: 1000, // 1초
-        lane: 1,
-        type: "tap",
-      },
-      {
-        id: "n2",
-        time: 1500,
-        lane: 2,
-        type: "tap",
-      },
-      {
-        id: "n3",
-        time: 2000,
-        lane: 3,
-        type: "hold",
-        duration: 800, // 0.8초
-      },
-      {
-        id: "n4",
-        time: 3000,
-        lane: 1,
-        type: "tap",
-      },
-      {
-        id: "n5",
-        time: 3500,
-        lane: 2,
-        type: "tap",
-      },
-      {
-        id: "n6",
-        time: 4000,
-        lane: 4,
-        type: "hold",
-        duration: 1200,
-      },
-    ],
-  };
+  const { notes, addNote, removeNote, getSelectedNote, updateNote } =
+    useNoteStore();
+  const selectedNote = getSelectedNote();
 
   const { editTitle, setEditTitle, editMusic, setEditMusic, bpm, setBpm } =
     useEditorStore();
@@ -81,7 +46,6 @@ export default function EditorCard({ title, onNext }: Props) {
         waveColor: "#fdfdfe",
         progressColor: "#b0b0b0",
         height: 80,
-        dragToSeek: true,
       });
       wavesurferRef.current.loadBlob(editMusic);
 
@@ -90,12 +54,10 @@ export default function EditorCard({ title, onNext }: Props) {
       wavesurferRef.current.on("finish", () => setIsPlaying(false));
       wavesurferRef.current.on("ready", () => {
         if (wavesurferRef.current) {
-          // Set total sections based on music duration
           const duration = wavesurferRef.current.getDuration();
           const sections = Math.ceil(duration / 0.5);
-          setTotalSections(sections > 0 ? sections : 16); // Fallback to 16 if calculation fails
+          setTotalSections(sections > 0 ? sections : 16);
 
-          // BPM calculation
           const audioBuffer = wavesurferRef.current.getDecodedData();
           if (audioBuffer) {
             const audioData = audioBuffer.getChannelData(0);
@@ -113,14 +75,14 @@ export default function EditorCard({ title, onNext }: Props) {
       };
 
       wavesurferRef.current.on("timeupdate", handleTimeUpdate);
-      wavesurferRef.current.on("seek", (progress) => {
+      wavesurferRef.current.on("seeking", (progress: number) => {
         if (wavesurferRef.current) {
           const currentTime = wavesurferRef.current.getDuration() * progress;
           handleTimeUpdate(currentTime);
         }
       });
     }
-  }, [title, editMusic, setBpm]);
+  }, [title, editMusic, setBpm, setTotalSections]);
 
   const handlePlayPause = () => {
     if (wavesurferRef.current) {
@@ -148,29 +110,96 @@ export default function EditorCard({ title, onNext }: Props) {
   };
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    // If music is playing, the scroll is driven by timeupdate. Ignore user scroll to prevent a feedback loop.
     if (isPlaying || !wavesurferRef.current) {
       return;
     }
 
-    // The rest of the logic handles manual scrubbing when the music is paused.
     const currentScroll = e.currentTarget.scrollLeft;
     const pixelsPerSecond = 800; // 400px per 0.5s
     const expectedScroll =
       wavesurferRef.current.getCurrentTime() * pixelsPerSecond;
 
-    // If the scroll difference is small, assume it's a residual programmatic scroll and ignore
     if (Math.abs(currentScroll - expectedScroll) < 5) {
       return;
     }
 
-    // Otherwise, it's a user scroll, so seek the audio
     const newTime = currentScroll / pixelsPerSecond;
     const duration = wavesurferRef.current.getDuration();
     if (duration > 0) {
       wavesurferRef.current.seekTo(newTime / duration);
     }
   };
+
+  // --- Note Manipulation Handlers ---
+  const handleAddNote = (type: "tap" | "hold") => {
+    if (!wavesurferRef.current) return;
+    const currentTime = wavesurferRef.current.getCurrentTime() * 1000; // Convert to ms
+    const newNote = {
+      time: Math.round(currentTime),
+      lane: 1,
+      type: type,
+      duration: type === "hold" ? 200 : undefined,
+    };
+    addNote(newNote);
+  };
+
+  const handleDeleteNote = () => {
+    if (selectedNote) {
+      removeNote(selectedNote.id);
+    }
+  };
+
+  // Keyboard controls for moving notes
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!selectedNote) return;
+
+      const measureDuration = 500;
+      let handled = true;
+
+      switch (e.key) {
+        case "ArrowUp":
+          updateNote(selectedNote.id, {
+            lane: Math.max(1, selectedNote.lane - 1),
+          });
+          break;
+        case "ArrowDown":
+          updateNote(selectedNote.id, {
+            lane: Math.min(4, selectedNote.lane + 1),
+          });
+          break;
+        case "ArrowLeft": {
+          const relativeTimeLeft = selectedNote.time % measureDuration;
+          const currentSectionStartLeft = selectedNote.time - relativeTimeLeft;
+          const newTimeLeft =
+            currentSectionStartLeft - measureDuration + relativeTimeLeft;
+          updateNote(selectedNote.id, { time: Math.max(0, newTimeLeft) });
+          break;
+        }
+        case "ArrowRight": {
+          const relativeTimeRight = selectedNote.time % measureDuration;
+          const currentSectionStartRight =
+            selectedNote.time - relativeTimeRight;
+          const newTimeRight =
+            currentSectionStartRight + measureDuration + relativeTimeRight;
+          updateNote(selectedNote.id, { time: newTimeRight });
+          break;
+        }
+        default:
+          handled = false;
+          break;
+      }
+
+      if (handled) {
+        e.preventDefault();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [selectedNote, updateNote]);
 
   useEffect(() => {
     return () => {
@@ -232,7 +261,7 @@ export default function EditorCard({ title, onNext }: Props) {
               const msPerMeasure = 500;
               const startTime = i * msPerMeasure;
               const endTime = (i + 1) * msPerMeasure;
-              const notesForSection = dummyChart.notes.filter(
+              const notesForSection = notes.filter(
                 (note) => note.time >= startTime && note.time < endTime,
               );
               return (
@@ -266,7 +295,24 @@ export default function EditorCard({ title, onNext }: Props) {
           </div>
           <p className={s.musicTitle}>{editTitle}</p>
         </div>
-        <div className={s.noteContainer}></div>
+        <div className={s.noteContainer}>
+          <div className={s.noteActions}>
+            <button onClick={() => handleAddNote("tap")}>숏노트 추가</button>
+            <button onClick={() => handleAddNote("hold")}>롱노트 추가</button>
+          </div>
+          {selectedNote && (
+            <div className={s.noteActions}>
+              <p>
+                선택된 노트: {selectedNote.type} (T: {selectedNote.time}ms, L:{" "}
+                {selectedNote.lane})
+              </p>
+              <button className={s.deleteButton} onClick={handleDeleteNote}>
+                <Trash2 />
+                삭제
+              </button>
+            </div>
+          )}
+        </div>
         <div className={s.waveform} ref={waveformRef}></div>
       </div>
     );

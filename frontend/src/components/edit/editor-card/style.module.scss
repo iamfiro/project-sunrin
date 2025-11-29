@@ -162,10 +162,32 @@
     background: #FDFDFE66;
     padding: 20px;
     display: flex;
-    align-items: center;
-    justify-content: center;
+    align-items: flex-start;
+    justify-content: flex-start;
     color: #fdfdfe;
     font-size: 16px;
     width: 100%;
-    height: 150px;
+    gap: 16px;
+.noteButton{
+    background: none;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    color: #111;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 8px;
+}
+.noteDeleteButton{
+    background: none;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    color: #111;
+    background-color: rgba(181, 39, 39, 0.8);
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 8px;
+}
 }
