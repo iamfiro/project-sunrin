@@ -5,6 +5,8 @@ import { Note, NoteType } from "@/shared/types/game/note";
 interface NoteHistory {
   notes: Note[];
   selectedNoteId: string | null;
+  shortNoteColor: string;
+  longNoteColor: string;
 }
 
 interface NoteState extends NoteHistory {
@@ -17,6 +19,8 @@ interface NoteState extends NoteHistory {
   selectNote: (noteId: string | null) => void;
   getSelectedNote: () => Note | undefined;
 
+  setShortNoteColor: (color: string) => void;
+  setLongNoteColor: (color: string) => void;
   undo: () => void;
   redo: () => void;
 }
@@ -49,18 +53,20 @@ export const useNoteStore = create<NoteState>((set, get) => {
 
   const checkCollision = createCollisionChecker();
 
-  const recordAndSet = (setter: (state: NoteState) => Partial<NoteState>) => {
+  const recordAndSet = (setter: (state: NoteState) => Partial<NoteHistory>) => {
     set((state) => {
-      const { notes, selectedNoteId, past } = state;
-      const newPast = [...past, { notes, selectedNoteId }];
-      const newValues = setter(state);
-      return { ...newValues, past: newPast, future: [] };
+      const { notes, selectedNoteId, shortNoteColor, longNoteColor, past } = state;
+      const newPast = [...past, { notes, selectedNoteId, shortNoteColor, longNoteColor }];
+      const newTrackedValues = setter(state);
+      return { ...newTrackedValues, past: newPast, future: [] };
     });
   };
 
   return {
     notes: [],
     selectedNoteId: null,
+    shortNoteColor: "#3b82f6", // tailwind blue-500
+    longNoteColor: "#8b5cf6",  // tailwind violet-500
     past: [],
     future: [],
 
@@ -106,7 +112,7 @@ export const useNoteStore = create<NoteState>((set, get) => {
       const { notes, selectedNoteId } = get();
       const noteToUpdate = notes.find((note) => note.id === noteId);
       if (!noteToUpdate) return;
-      
+
       let newLane = updates.lane ?? noteToUpdate.lane;
       let newTime = updates.time ?? noteToUpdate.time;
 
@@ -135,9 +141,9 @@ export const useNoteStore = create<NoteState>((set, get) => {
           }
         }
       }
-      
+
       const finalUpdates = { ...updates, lane: newLane, time: newTime };
-      
+
       recordAndSet(() => ({
           notes: notes.map((note) =>
             note.id === noteId ? { ...note, ...finalUpdates } : note,
@@ -151,6 +157,18 @@ export const useNoteStore = create<NoteState>((set, get) => {
             selectedNoteId: noteId,
         }));
     },
+    
+    setShortNoteColor: (color: string) => {
+      recordAndSet(() => ({
+        shortNoteColor: color,
+      }));
+    },
+
+    setLongNoteColor: (color: string) => {
+      recordAndSet(() => ({
+        longNoteColor: color,
+      }));
+    },
 
     getSelectedNote: () => {
       const { notes, selectedNoteId } = get();
@@ -159,28 +177,32 @@ export const useNoteStore = create<NoteState>((set, get) => {
 
     undo: () => {
       set((state) => {
-        const { past, future, notes, selectedNoteId } = state;
+        const { past, future, notes, selectedNoteId, shortNoteColor, longNoteColor } = state;
         if (past.length === 0) return {};
         const previousState = past[past.length - 1];
         return {
           past: past.slice(0, past.length - 1),
-          future: [{ notes, selectedNoteId }, ...future],
+          future: [{ notes, selectedNoteId, shortNoteColor, longNoteColor }, ...future],
           notes: previousState.notes,
           selectedNoteId: previousState.selectedNoteId,
+          shortNoteColor: previousState.shortNoteColor,
+          longNoteColor: previousState.longNoteColor,
         };
       });
     },
 
     redo: () => {
       set((state) => {
-        const { past, future, notes, selectedNoteId } = state;
+        const { past, future, notes, selectedNoteId, shortNoteColor, longNoteColor } = state;
         if (future.length === 0) return {};
         const nextState = future[0];
         return {
-          past: [...past, { notes, selectedNoteId }],
+          past: [...past, { notes, selectedNoteId, shortNoteColor, longNoteColor }],
           future: future.slice(1),
           notes: nextState.notes,
           selectedNoteId: nextState.selectedNoteId,
+          shortNoteColor: nextState.shortNoteColor,
+          longNoteColor: nextState.longNoteColor,
         };
       });
     },

@@ -1,7 +1,7 @@
 import {
   ChevronFirst,
   ChevronLast,
-  ChevronsLeftRight,
+  Palette,
   Pause,
   Play,
   Trash2,
@@ -14,6 +14,7 @@ import WaveSurfer from "wavesurfer.js";
 import { useEditorStore } from "@/store/useEditorStore";
 import { useNoteStore } from "@/store/useNoteStore";
 
+import ColorEditModal from "../color-edit-modal";
 import LineSection from "../line-section";
 
 import s from "./style.module.scss";
@@ -28,6 +29,7 @@ export default function EditorCard({ title, onNext }: Props) {
   const wavesurferRef = useRef<WaveSurfer | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [totalSections, setTotalSections] = useState(16);
+  const [isColorModalOpen, setIsColorModalOpen] = useState(false);
 
   const {
     notes,
@@ -106,6 +108,9 @@ export default function EditorCard({ title, onNext }: Props) {
           updateNote(selectedNote.id, { time: newTimeRight });
           break;
         }
+        case "Backspace":
+          removeNote(selectedNote.id);
+          break;
         default:
           handled = false;
           break;
@@ -331,7 +336,7 @@ export default function EditorCard({ title, onNext }: Props) {
             </button>
           </div>
           <div className={s.musicInfoContainer}>
-            <h1>음악 정보</h1>
+            <h1>제목</h1>
             <p className={s.musicTitle}>{editTitle}</p>
           </div>
         </div>
@@ -349,15 +354,28 @@ export default function EditorCard({ title, onNext }: Props) {
             >
               롱노트 추가
             </button>
+            <button
+              onClick={() => setIsColorModalOpen(true)}
+              className={s.editButton}
+            >
+              <Palette size={16} />
+              색상 변경
+            </button>
             {selectedNote && (
-              <button className={s.deleteButton} onClick={handleDeleteNote}>
-                <Trash2 size={16} />
-                삭제
-              </button>
+              <>
+                <button className={s.deleteButton} onClick={handleDeleteNote}>
+                  <Trash2 size={16} />
+                  삭제
+                </button>
+              </>
             )}
           </div>
         </div>
         <div className={s.waveform} ref={waveformRef}></div>
+        <ColorEditModal
+          isOpen={isColorModalOpen}
+          onClose={() => setIsColorModalOpen(false)}
+        />
       </div>
     );
   }

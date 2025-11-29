@@ -230,3 +230,20 @@
         font-weight: bold;
     }
 }
+
+.editButton{
+    height: 40px;
+    background: none;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    color: #fdfdfe;
+    background-color: rgba(86, 192, 44, 0.858);
+    padding: 12px;
+    font-size: 12px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}

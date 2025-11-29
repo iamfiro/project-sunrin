@@ -18,7 +18,13 @@ export default function LineCard({
   measureStartTime,
   measureDuration,
 }: Props) {
-  const { selectedNoteId, selectNote, updateNote } = useNoteStore();
+  const {
+    selectedNoteId,
+    selectNote,
+    updateNote,
+    shortNoteColor,
+    longNoteColor,
+  } = useNoteStore();
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Refs for tracking resize operation
@@ -123,11 +129,18 @@ export default function LineCard({
               }}
               onClick={handleNoteClick}
             >
-              <div className={s.noteCap} />
-              <div className={s.noteBody} />
+              <div
+                className={s.noteCap}
+                style={{ backgroundColor: longNoteColor }}
+              />
+              <div
+                className={s.noteBody}
+                style={{ backgroundColor: longNoteColor }}
+              />
               <div
                 className={s.noteEnd}
                 onPointerDown={(e) => handleResizeStart(e, note)}
+                style={{ backgroundColor: longNoteColor }}
               />
             </div>
           );
@@ -137,7 +150,7 @@ export default function LineCard({
           <div
             key={note.id}
             className={noteClasses}
-            style={{ top: `${top}%` }}
+            style={{ top: `${top}%`, backgroundColor: shortNoteColor }}
             onClick={handleNoteClick}
           />
         );

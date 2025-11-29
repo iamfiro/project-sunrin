@@ -27,7 +27,7 @@ const NoteComponent = ({ note, position, noteDisplayTime }: NoteProps) => {
     };
     return (
       <div
-        className={cn(s.note, s.hold, isSelected ? s.selected : "")}
+        className={cn(s.note, s.hold, { [s.selected]: isSelected })}
         style={style}
       >
         <div className={s.tail} style={tailStyle}></div>
