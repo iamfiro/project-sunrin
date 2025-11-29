@@ -29,12 +29,98 @@ export default function EditorCard({ title, onNext }: Props) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [totalSections, setTotalSections] = useState(16);
 
-  const { notes, addNote, removeNote, getSelectedNote, updateNote } =
-    useNoteStore();
+  const {
+    notes,
+    addNote,
+    removeNote,
+    getSelectedNote,
+    updateNote,
+    undo,
+    redo,
+  } = useNoteStore();
   const selectedNote = getSelectedNote();
 
   const { editTitle, setEditTitle, editMusic, setEditMusic, bpm, setBpm } =
     useEditorStore();
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const { metaKey, ctrlKey, key, shiftKey } = e;
+      const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
+      const isCmd = isMac ? metaKey : ctrlKey;
+
+      if (
+        e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement
+      ) {
+        return;
+      }
+
+      // Undo/Redo logic
+      if (isCmd && key.toLowerCase() === "z") {
+        e.preventDefault();
+        if (shiftKey) {
+          redo();
+        } else {
+          undo();
+        }
+        return;
+      }
+      if (isCmd && key.toLowerCase() === "y") {
+        e.preventDefault();
+        redo();
+        return;
+      }
+
+      // Note movement logic
+      if (!selectedNote) return;
+
+      const measureDuration = 500;
+      let handled = true;
+
+      switch (e.key) {
+        case "ArrowUp":
+          updateNote(selectedNote.id, {
+            lane: Math.max(1, selectedNote.lane - 1),
+          });
+          break;
+        case "ArrowDown":
+          updateNote(selectedNote.id, {
+            lane: Math.min(4, selectedNote.lane + 1),
+          });
+          break;
+        case "ArrowLeft": {
+          const relativeTimeLeft = selectedNote.time % measureDuration;
+          const currentSectionStartLeft = selectedNote.time - relativeTimeLeft;
+          const newTimeLeft =
+            currentSectionStartLeft - measureDuration + relativeTimeLeft;
+          updateNote(selectedNote.id, { time: Math.max(0, newTimeLeft) });
+          break;
+        }
+        case "ArrowRight": {
+          const relativeTimeRight = selectedNote.time % measureDuration;
+          const currentSectionStartRight =
+            selectedNote.time - relativeTimeRight;
+          const newTimeRight =
+            currentSectionStartRight + measureDuration + relativeTimeRight;
+          updateNote(selectedNote.id, { time: newTimeRight });
+          break;
+        }
+        default:
+          handled = false;
+          break;
+      }
+
+      if (handled) {
+        e.preventDefault();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [selectedNote, updateNote, undo, redo]);
 
   useEffect(() => {
     if (title === "edit" && editMusic && waveformRef.current) {
@@ -148,58 +234,6 @@ export default function EditorCard({ title, onNext }: Props) {
       removeNote(selectedNote.id);
     }
   };
-
-  // Keyboard controls for moving notes
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (!selectedNote) return;
-
-      const measureDuration = 500;
-      let handled = true;
-
-      switch (e.key) {
-        case "ArrowUp":
-          updateNote(selectedNote.id, {
-            lane: Math.max(1, selectedNote.lane - 1),
-          });
-          break;
-        case "ArrowDown":
-          updateNote(selectedNote.id, {
-            lane: Math.min(4, selectedNote.lane + 1),
-          });
-          break;
-        case "ArrowLeft": {
-          const relativeTimeLeft = selectedNote.time % measureDuration;
-          const currentSectionStartLeft = selectedNote.time - relativeTimeLeft;
-          const newTimeLeft =
-            currentSectionStartLeft - measureDuration + relativeTimeLeft;
-          updateNote(selectedNote.id, { time: Math.max(0, newTimeLeft) });
-          break;
-        }
-        case "ArrowRight": {
-          const relativeTimeRight = selectedNote.time % measureDuration;
-          const currentSectionStartRight =
-            selectedNote.time - relativeTimeRight;
-          const newTimeRight =
-            currentSectionStartRight + measureDuration + relativeTimeRight;
-          updateNote(selectedNote.id, { time: newTimeRight });
-          break;
-        }
-        default:
-          handled = false;
-          break;
-      }
-
-      if (handled) {
-        e.preventDefault();
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [selectedNote, updateNote]);
 
   useEffect(() => {
     return () => {
