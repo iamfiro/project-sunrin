@@ -44,3 +44,7 @@
   border-radius: 0 0 4px 4px;
   cursor: ns-resize;
 }
+.selected {
+  outline: 2px solid #ffab00; // Using outline to avoid affecting layout
+  outline-offset: -2px;
+}

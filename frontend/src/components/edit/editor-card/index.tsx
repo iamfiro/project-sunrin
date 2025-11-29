@@ -276,12 +276,15 @@ export default function EditorCard({ title, onNext }: Props) {
           </div>
         </div>
         <div className={s.musicInfo}>
-          <input
-            className={s.bpm}
-            type="number"
-            value={bpm}
-            onChange={(e) => setBpm(Number(e.target.value))}
-          />
+          <div className={s.bpmContainer}>
+            <p>BPM</p>
+            <input
+              className={s.bpm}
+              type="number"
+              value={bpm}
+              onChange={(e) => setBpm(Number(e.target.value))}
+            />
+          </div>
           <div className={s.control}>
             <button onClick={() => handleSeek(-5)}>
               <ChevronFirst scale={24} />
@@ -293,25 +296,32 @@ export default function EditorCard({ title, onNext }: Props) {
               <ChevronLast scale={24} />
             </button>
           </div>
-          <p className={s.musicTitle}>{editTitle}</p>
+          <div className={s.musicInfoContainer}>
+            <h1>음악 정보</h1>
+            <p className={s.musicTitle}>{editTitle}</p>
+          </div>
         </div>
         <div className={s.noteContainer}>
           <div className={s.noteActions}>
-            <button onClick={() => handleAddNote("tap")}>숏노트 추가</button>
-            <button onClick={() => handleAddNote("hold")}>롱노트 추가</button>
-          </div>
-          {selectedNote && (
-            <div className={s.noteActions}>
-              <p>
-                선택된 노트: {selectedNote.type} (T: {selectedNote.time}ms, L:{" "}
-                {selectedNote.lane})
-              </p>
+            <button
+              onClick={() => handleAddNote("tap")}
+              className={s.noteButton}
+            >
+              숏노트 추가
+            </button>
+            <button
+              onClick={() => handleAddNote("hold")}
+              className={s.noteButton}
+            >
+              롱노트 추가
+            </button>
+            {selectedNote && (
               <button className={s.deleteButton} onClick={handleDeleteNote}>
-                <Trash2 />
+                <Trash2 size={16} />
                 삭제
               </button>
-            </div>
-          )}
+            )}
+          </div>
         </div>
         <div className={s.waveform} ref={waveformRef}></div>
       </div>

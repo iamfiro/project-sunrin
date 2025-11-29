@@ -2,6 +2,7 @@ import cn from "classnames";
 import { memo } from "react";
 
 import { Note as NoteType } from "@/shared/types/game/note";
+import { useNoteStore } from "@/store/useNoteStore";
 
 import s from "./style.module.scss";
 
@@ -12,6 +13,9 @@ interface NoteProps {
 }
 
 const NoteComponent = ({ note, position, noteDisplayTime }: NoteProps) => {
+  const { selectedNoteId } = useNoteStore();
+  const isSelected = note.id === selectedNoteId;
+
   const style = {
     top: `${position * 100}%`,
   };
@@ -22,13 +26,18 @@ const NoteComponent = ({ note, position, noteDisplayTime }: NoteProps) => {
       height: `${height}%`,
     };
     return (
-      <div className={cn(s.note, s.hold)} style={style}>
+      <div
+        className={cn(s.note, s.hold, isSelected ? s.selected : "")}
+        style={style}
+      >
         <div className={s.tail} style={tailStyle}></div>
       </div>
     );
   }
 
-  return <div className={s.note} style={style} />;
+  return (
+    <div className={cn(s.note, { [s.selected]: isSelected })} style={style} />
+  );
 };
 
 export default memo(NoteComponent);

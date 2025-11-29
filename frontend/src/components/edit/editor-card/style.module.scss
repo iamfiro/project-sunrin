@@ -134,11 +134,10 @@
         font-weight: bold;
     }
     .musicTitle{
-        width: 100px;
         text-align: end;    
         font-size: 16px;
-        color: #fdfdfe;
-        font-weight: bold;
+        color: #111;
+        font-weight: medium !important;
     }
     .control{
         display: flex;
@@ -169,6 +168,7 @@
     width: 100%;
     gap: 16px;
 .noteButton{
+    height: 40px;
     background: none;
     border: none;
     outline: none;
@@ -176,18 +176,57 @@
     color: #111;
     background-color: rgba(255, 255, 255, 0.8);
     padding: 12px;
-    font-size: 16px;
+    font-size: 12px;
     border-radius: 8px;
 }
-.noteDeleteButton{
+.deleteButton{
+    height: 40px;
     background: none;
     border: none;
     outline: none;
     cursor: pointer;
-    color: #111;
+    color: #fdfdfe;
     background-color: rgba(181, 39, 39, 0.8);
     padding: 12px;
-    font-size: 16px;
+    font-size: 12px;
     border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
+.noteActions{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+}
+}
+
+.bpmContainer{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    p{
+        font-size: 16px;
+        color: #111;
+        font-weight: bold;
+    }
+    input{
+        border-radius: 8px;
+    }
+}
+
+.musicInfoContainer{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    h1{
+        font-size: 16px;
+        color: #111;
+        font-weight: bold;
+    }
 }

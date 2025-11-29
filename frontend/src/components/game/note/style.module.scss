@@ -10,10 +10,14 @@
     background-color: #800080;
 
     .tail {
-        position: absolute;
-        top: 100%;
-        width: 100%;
-        background-color: rgba(128, 0, 128, 0.5);
+      position: absolute;
+      top: 100%;
+      width: 100%;
+      background-color: rgba(128, 0, 128, 0.5);
     }
+  }
+
+  &.selected {
+    border: 2px solid red;
   }
 }
