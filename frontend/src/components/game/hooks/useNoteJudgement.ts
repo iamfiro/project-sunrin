@@ -216,8 +216,20 @@ export const useNoteJudgement = (
 
       const current = getResult();
 
-      // 판정 범위 밖에서 키를 누르면 아무 일도 일어나지 않음
+      // 노트가 없거나 판정 범위 밖에서 키를 누르면 MISS
       if (!closestNote || minTimeDiff > JUDGEMENT_WINDOWS.miss) {
+        // 노트가 하나도 없으면 (게임 시작 전/후) 무시
+        if (notes.length === 0) return;
+
+        showJudgement("Miss");
+        const combo = updateCombo([...current.combo], currentTime, true);
+
+        setResult({
+          miss: current.miss + 1,
+          combo,
+          isFullCombo: false,
+          isAllPerfect: false,
+        });
         return;
       }
 
