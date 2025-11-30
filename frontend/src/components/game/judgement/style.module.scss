@@ -3,9 +3,55 @@
   top: 70%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 3rem;
+  font-size: 58px;
   font-weight: bold;
-  color: white;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
   z-index: 100;
+  
+  // Scale 애니메이션 추가
+  animation: scaleUp 0.15s ease-out forwards;
+
+
+
+  &.perfect {
+    background: linear-gradient(#ffffff 0%, #00DCF6, #fff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  &.great {
+    background: linear-gradient(#ffffff 0%, #ffb300, #fff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  &.good {
+    background: linear-gradient(#ffffff 0%, #fff200, #fff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  &.miss {
+    background: linear-gradient(to bottom, #fff, rgb(255, 161, 161), #ffffff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  &.bad {
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
+
+@keyframes scaleUp {
+  0% {
+    transform: translate(-50%, -50%) scale(.5);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
 }

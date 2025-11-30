@@ -4,6 +4,7 @@ import {
   Auth,
   Editor,
   GameMain,
+  GameResult,
   Intro,
   Loading,
   SignIn,
@@ -44,6 +45,10 @@ export const router = createBrowserRouter([
   {
     path: "/game/main",
     element: <GameMain />,
+  },
+  {
+    path: "/game/result",
+    element: <GameResult />,
   },
   {
     path: "/game/editor",

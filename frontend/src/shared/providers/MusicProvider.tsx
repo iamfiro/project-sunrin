@@ -12,12 +12,14 @@ interface MusicContextType {
   volume: number;
   currentTime: number;
   duration: number;
+  currentSrc: string | null;
   play: () => void;
   pause: () => void;
   toggle: () => void;
   setVolume: (volume: number) => void;
   seek: (time: number) => void;
   loadMusic: (src: string, autoPlay?: boolean) => void;
+  stopMusic: () => void;
 }
 
 const MusicContext = createContext<MusicContextType | undefined>(undefined);
@@ -29,108 +31,110 @@ interface MusicProviderProps {
   loop?: boolean;
 }
 
+// 모듈 레벨 싱글톤 오디오 객체 (페이지 이동해도 유지)
+let globalAudio: HTMLAudioElement | null = null;
+let globalCurrentSrc: string | null = null;
+
+const getGlobalAudio = (loop: boolean = true): HTMLAudioElement => {
+  if (!globalAudio) {
+    globalAudio = new Audio();
+    globalAudio.loop = loop;
+  }
+  return globalAudio;
+};
+
 export function MusicProvider({
   children,
   defaultSrc,
   autoPlay = false,
   loop = true,
 }: MusicProviderProps) {
-  const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolumeState] = useState(1);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-
-  const initializeAudio = () => {
-    if (!audioRef.current) {
-      audioRef.current = new Audio();
-      audioRef.current.loop = loop;
-      audioRef.current.volume = volume;
-
-      audioRef.current.addEventListener("loadedmetadata", () => {
-        if (audioRef.current) {
-          setDuration(audioRef.current.duration);
-        }
-      });
-
-      audioRef.current.addEventListener("timeupdate", () => {
-        if (audioRef.current) {
-          setCurrentTime(audioRef.current.currentTime);
-        }
-      });
-
-      audioRef.current.addEventListener("ended", () => {
-        setIsPlaying(false);
-      });
-
-      audioRef.current.addEventListener("play", () => {
-        setIsPlaying(true);
-      });
-
-      audioRef.current.addEventListener("pause", () => {
-        setIsPlaying(false);
-      });
-
-      audioRef.current.addEventListener("error", (e) => {
-        console.error("Audio error:", e);
-        setIsPlaying(false);
-      });
-    }
-    return audioRef.current;
-  };
+  const [currentSrc, setCurrentSrc] = useState<string | null>(globalCurrentSrc);
+  const isInitializedRef = useRef(false);
 
   useEffect(() => {
-    initializeAudio();
+    const audio = getGlobalAudio(loop);
 
-    if (defaultSrc && audioRef.current) {
-      audioRef.current.src = defaultSrc;
+    // 이벤트 핸들러
+    const handleLoadedMetadata = () => setDuration(audio.duration);
+    const handleTimeUpdate = () => setCurrentTime(audio.currentTime);
+    const handleEnded = () => setIsPlaying(false);
+    const handlePlay = () => setIsPlaying(true);
+    const handlePause = () => setIsPlaying(false);
+    const handleError = (e: Event) => {
+      console.error("Audio error:", e);
+      setIsPlaying(false);
+    };
+
+    audio.addEventListener("loadedmetadata", handleLoadedMetadata);
+    audio.addEventListener("timeupdate", handleTimeUpdate);
+    audio.addEventListener("ended", handleEnded);
+    audio.addEventListener("play", handlePlay);
+    audio.addEventListener("pause", handlePause);
+    audio.addEventListener("error", handleError);
+
+    // 초기 상태 동기화 (이미 재생 중인 경우)
+    if (audio.src) {
+      setIsPlaying(!audio.paused);
+      setDuration(audio.duration || 0);
+      setCurrentTime(audio.currentTime || 0);
+      setCurrentSrc(globalCurrentSrc);
+    }
+
+    // 최초 한 번만 defaultSrc 로드
+    if (!isInitializedRef.current && defaultSrc && !globalCurrentSrc) {
+      isInitializedRef.current = true;
+      const baseUrl = import.meta.env.BASE_URL || "/";
+      const fullSrc =
+        baseUrl +
+        (defaultSrc.startsWith("/") ? defaultSrc.slice(1) : defaultSrc);
+      audio.src = fullSrc;
+      globalCurrentSrc = fullSrc;
+      setCurrentSrc(fullSrc);
+
       if (autoPlay) {
-        audioRef.current.play().catch((err) => {
+        audio.play().catch((err) => {
           console.error("Auto play failed:", err);
         });
       }
     }
 
     return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.removeEventListener("loadedmetadata", () => {});
-        audioRef.current.removeEventListener("timeupdate", () => {});
-        audioRef.current.removeEventListener("ended", () => {});
-        audioRef.current.removeEventListener("play", () => {});
-        audioRef.current.removeEventListener("pause", () => {});
-        audioRef.current.removeEventListener("error", () => {});
-        audioRef.current = null;
-      }
+      // cleanup에서 오디오를 중지하지 않음 (페이지 이동 시 유지)
+      audio.removeEventListener("loadedmetadata", handleLoadedMetadata);
+      audio.removeEventListener("timeupdate", handleTimeUpdate);
+      audio.removeEventListener("ended", handleEnded);
+      audio.removeEventListener("play", handlePlay);
+      audio.removeEventListener("pause", handlePause);
+      audio.removeEventListener("error", handleError);
     };
-  }, []);
+  }, [loop, defaultSrc, autoPlay]);
 
   useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.loop = loop;
-    }
+    const audio = getGlobalAudio(loop);
+    audio.loop = loop;
   }, [loop]);
 
   useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = volume;
-    }
-  }, [volume]);
+    const audio = getGlobalAudio(loop);
+    audio.volume = volume;
+  }, [volume, loop]);
 
   const play = () => {
-    const audio = initializeAudio();
-    if (audio) {
-      audio.play().catch((err) => {
-        console.error("Play failed:", err);
-        setIsPlaying(false);
-      });
-    }
+    const audio = getGlobalAudio(loop);
+    audio.play().catch((err) => {
+      console.error("Play failed:", err);
+      setIsPlaying(false);
+    });
   };
 
   const pause = () => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-    }
+    const audio = getGlobalAudio(loop);
+    audio.pause();
   };
 
   const toggle = () => {
@@ -144,26 +148,31 @@ export function MusicProvider({
   const setVolume = (newVolume: number) => {
     const clampedVolume = Math.max(0, Math.min(1, newVolume));
     setVolumeState(clampedVolume);
-    const audio = initializeAudio();
-    if (audio) {
-      audio.volume = clampedVolume;
-    }
+    const audio = getGlobalAudio(loop);
+    audio.volume = clampedVolume;
   };
 
   const seek = (time: number) => {
-    const audio = initializeAudio();
-    if (audio) {
-      audio.currentTime = time;
-    }
+    const audio = getGlobalAudio(loop);
+    audio.currentTime = time;
   };
 
   const loadMusic = (src: string, autoPlay: boolean = false) => {
-    const audio = initializeAudio();
-    if (!audio) return;
+    const audio = getGlobalAudio(loop);
 
-    const wasPlaying = isPlaying || autoPlay;
+    // 같은 음악이면 로드하지 않음
+    const baseUrl = import.meta.env.BASE_URL || "/";
+    const fullSrc = baseUrl + (src.startsWith("/") ? src.slice(1) : src);
 
-    // 파일 로드 완료 후 재생
+    if (globalCurrentSrc === fullSrc) {
+      if (autoPlay && audio.paused) {
+        audio.play().catch((err) => console.error("Play failed:", err));
+      }
+      return;
+    }
+
+    const wasPlaying = !audio.paused || autoPlay;
+
     const handleCanPlay = () => {
       if (wasPlaying) {
         audio.play().catch((err) => {
@@ -175,7 +184,6 @@ export function MusicProvider({
       audio.removeEventListener("error", handleError);
     };
 
-    // 에러 핸들링
     const handleError = (e: Event) => {
       const audioElement = e.target as HTMLAudioElement;
       const error = audioElement.error;
@@ -203,8 +211,6 @@ export function MusicProvider({
         encodedSrc: audio.src,
         error: errorMessage,
         errorCode: error?.code,
-        networkState: audioElement.networkState,
-        readyState: audioElement.readyState,
       });
 
       audio.removeEventListener("error", handleError);
@@ -214,12 +220,17 @@ export function MusicProvider({
     audio.addEventListener("canplay", handleCanPlay);
     audio.addEventListener("error", handleError);
 
-    // BASE_URL 추가
-    const baseUrl = import.meta.env.BASE_URL || "/";
-    const fullSrc = baseUrl + (src.startsWith("/") ? src.slice(1) : src);
-
     audio.src = fullSrc;
+    globalCurrentSrc = fullSrc;
+    setCurrentSrc(fullSrc);
     audio.load();
+  };
+
+  const stopMusic = () => {
+    const audio = getGlobalAudio(loop);
+    audio.pause();
+    audio.currentTime = 0;
+    setIsPlaying(false);
   };
 
   const value: MusicContextType = {
@@ -227,12 +238,14 @@ export function MusicProvider({
     volume,
     currentTime,
     duration,
+    currentSrc,
     play,
     pause,
     toggle,
     setVolume,
     seek,
     loadMusic,
+    stopMusic,
   };
 
   return (

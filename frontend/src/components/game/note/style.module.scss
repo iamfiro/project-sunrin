@@ -1,23 +1,55 @@
 .note {
   position: absolute;
   width: 100%;
-  height: 20px;
-  background-color: #ff00ff;
-  border: 1px solid #fff;
+  height: 45px;
+  background: linear-gradient(to bottom, #d3e7ff, #acb3bc);
   box-sizing: border-box;
+  z-index: 1;
+  contain: strict;
+  transform: translate3d(0, 0, 0);
 
   &.hold {
-    background-color: #800080;
+    background: linear-gradient(to bottom, #69faff, #00a5c6);
+    z-index: 2;
 
     .tail {
       position: absolute;
       top: 100%;
       width: 100%;
-      background-color: rgba(128, 0, 128, 0.5);
+      background: linear-gradient(to bottom, #00c8e0, #0095b3);
+      border-left: 2px solid rgba(255, 255, 255, 0.3);
+      border-right: 2px solid rgba(255, 255, 255, 0.3);
+      box-sizing: border-box;
+      contain: strict;
+      transform: translate3d(0, 0, 0);
+    }
+
+    .tailEnd {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 20px;
+      background: linear-gradient(to bottom, #00a5c6, #007a94);
+      border-radius: 0 0 4px 4px;
+    }
+
+    &.pressing {
+      animation: holdPulse 0.12s ease-in-out infinite;
+
+      .tail {
+        animation: tailGlow 0.12s ease-in-out infinite;
+      }
     }
   }
+}
 
-  &.selected {
-    border: 2px solid red;
-  }
+@keyframes holdPulse {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.15); }
+}
+
+@keyframes tailGlow {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.1); }
 }

@@ -230,3 +230,13 @@
         font-weight: bold;
     }
 }
+
+.video{
+    width: 300px;
+    height: auto;
+    object-fit: cover;
+    border-radius: 8px;
+    position: absolute;
+    top: 30px;
+    right: 30px;
+}

@@ -1,0 +1,167 @@
+// =============================================
+// HIT EFFECT - 극한 최적화 버전
+// =============================================
+
+$white: #fff;
+$white-80: rgba(255, 255, 255, 0.8);
+$white-60: rgba(255, 255, 255, 0.6);
+
+$ease: cubic-bezier(0.16, 1, 0.3, 1);
+
+.hitEffect {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  transform: translate3d(-50%, 0, 0);
+  width: 100px;
+  height: 100px;
+  pointer-events: none;
+  z-index: 50;
+  contain: strict;
+}
+
+// =============================================
+// PERFECT
+// =============================================
+.perfect {
+  .flashCore {
+    width: 40px;
+    height: 40px;
+    background: radial-gradient(circle, $white 0%, $white-80 40%, transparent 70%);
+    animation: flash 80ms $ease forwards;
+  }
+  .ring {
+    width: 45px;
+    height: 45px;
+    border: 2px solid $white;
+    animation: ringP 180ms $ease forwards;
+  }
+  .ringSecondary {
+    width: 35px;
+    height: 35px;
+    border: 1px solid $white-80;
+    animation: ringS 200ms $ease 20ms forwards;
+  }
+  .arc1 {
+    animation: arc1 160ms $ease forwards;
+  }
+  .arc2 {
+    animation: arc2 160ms $ease 20ms forwards;
+  }
+}
+
+// =============================================
+// GREAT
+// =============================================
+.great {
+  .flashCore {
+    width: 32px;
+    height: 32px;
+    background: radial-gradient(circle, $white-80 0%, $white-60 40%, transparent 70%);
+    animation: flash 70ms $ease forwards;
+  }
+  .ring {
+    width: 40px;
+    height: 40px;
+    border: 2px solid $white-80;
+    animation: ringG 160ms $ease forwards;
+  }
+  .ringSecondary {
+    width: 30px;
+    height: 30px;
+    border: 1px solid $white-60;
+    animation: ringSG 180ms $ease 15ms forwards;
+  }
+}
+
+// =============================================
+// GOOD
+// =============================================
+.good {
+  .flashCore {
+    width: 24px;
+    height: 24px;
+    background: radial-gradient(circle, $white-60 0%, transparent 70%);
+    animation: flash 60ms $ease forwards;
+  }
+  .ring {
+    width: 30px;
+    height: 30px;
+    border: 1px solid $white-60;
+    animation: ringGood 140ms $ease forwards;
+  }
+}
+
+// =============================================
+// 공통 요소
+// =============================================
+.flashCore,
+.ring,
+.ringSecondary,
+.arc1,
+.arc2 {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border-radius: 50%;
+  transform: translate3d(-50%, -50%, 0);
+  will-change: transform, opacity;
+}
+
+.arc1,
+.arc2 {
+  width: 40px;
+  height: 40px;
+  border: 1px solid $white;
+}
+
+.arc1 {
+  clip-path: polygon(50% 50%, 0 50%, 0 0, 50% 0);
+}
+
+.arc2 {
+  clip-path: polygon(50% 50%, 100% 50%, 100% 100%, 50% 100%);
+}
+
+// =============================================
+// 애니메이션
+// =============================================
+@keyframes flash {
+  0% { transform: translate3d(-50%, -50%, 0) scale(0.3); opacity: 1; }
+  100% { transform: translate3d(-50%, -50%, 0) scale(1.2); opacity: 0; }
+}
+
+@keyframes ringP {
+  0% { transform: translate3d(-50%, -50%, 0) scale(0.5); opacity: 1; }
+  100% { transform: translate3d(-50%, -50%, 0) scale(2); opacity: 0; }
+}
+
+@keyframes ringS {
+  0% { transform: translate3d(-50%, -50%, 0) scale(0.4); opacity: 0.8; }
+  100% { transform: translate3d(-50%, -50%, 0) scale(2.2); opacity: 0; }
+}
+
+@keyframes ringG {
+  0% { transform: translate3d(-50%, -50%, 0) scale(0.5); opacity: 1; }
+  100% { transform: translate3d(-50%, -50%, 0) scale(1.7); opacity: 0; }
+}
+
+@keyframes ringSG {
+  0% { transform: translate3d(-50%, -50%, 0) scale(0.4); opacity: 0.7; }
+  100% { transform: translate3d(-50%, -50%, 0) scale(1.8); opacity: 0; }
+}
+
+@keyframes ringGood {
+  0% { transform: translate3d(-50%, -50%, 0) scale(0.6); opacity: 0.7; }
+  100% { transform: translate3d(-50%, -50%, 0) scale(1.4); opacity: 0; }
+}
+
+@keyframes arc1 {
+  0% { transform: translate3d(-50%, -50%, 0) scale(0.7) rotate(0deg); opacity: 1; }
+  100% { transform: translate3d(-50%, -50%, 0) scale(1.8) rotate(-40deg); opacity: 0; }
+}
+
+@keyframes arc2 {
+  0% { transform: translate3d(-50%, -50%, 0) scale(0.65) rotate(0deg); opacity: 0.9; }
+  100% { transform: translate3d(-50%, -50%, 0) scale(1.9) rotate(50deg); opacity: 0; }
+}

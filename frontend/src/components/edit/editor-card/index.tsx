@@ -14,7 +14,6 @@ import WaveSurfer from "wavesurfer.js";
 import { useEditorStore } from "@/store/useEditorStore";
 import { useNoteStore } from "@/store/useNoteStore";
 
-import ColorEditModal from "../color-edit-modal";
 import LineSection from "../line-section";
 
 import s from "./style.module.scss";
@@ -27,9 +26,11 @@ export default function EditorCard({ title, onNext }: Props) {
   const waveformRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<HTMLDivElement>(null);
   const wavesurferRef = useRef<WaveSurfer | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [totalSections, setTotalSections] = useState(16);
   const [isColorModalOpen, setIsColorModalOpen] = useState(false);
+  const [musicUrl, setMusicUrl] = useState<string | undefined>(undefined);
 
   const {
     notes,
@@ -42,15 +43,19 @@ export default function EditorCard({ title, onNext }: Props) {
   } = useNoteStore();
   const selectedNote = getSelectedNote();
 
-  const {
-    editTitle,
-    setEditTitle,
-    editMusic,
-    setEditMusic,
-    bpm,
-    setBpm,
-    editVideoUrl,
-  } = useEditorStore();
+  const { editTitle, setEditTitle, editMusic, setEditMusic, bpm, setBpm } =
+    useEditorStore();
+
+  useEffect(() => {
+    if (editMusic) {
+      const url = URL.createObjectURL(editMusic);
+      setMusicUrl(url);
+
+      return () => {
+        URL.revokeObjectURL(url);
+      };
+    }
+  }, [editMusic]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -170,6 +175,9 @@ export default function EditorCard({ title, onNext }: Props) {
           const pixelsPerSecond = 400 / 0.5; // 400px per 500ms section
           editorRef.current.scrollLeft = currentTime * pixelsPerSecond;
         }
+        if (videoRef.current) {
+          videoRef.current.currentTime = currentTime;
+        }
       };
 
       wavesurferRef.current.on("timeupdate", handleTimeUpdate);
@@ -181,6 +189,16 @@ export default function EditorCard({ title, onNext }: Props) {
       });
     }
   }, [title, editMusic, setBpm, setTotalSections]);
+
+  useEffect(() => {
+    if (videoRef.current) {
+      if (isPlaying) {
+        videoRef.current.play();
+      } else {
+        videoRef.current.pause();
+      }
+    }
+  }, [isPlaying]);
 
   const handlePlayPause = () => {
     if (wavesurferRef.current) {
@@ -379,6 +397,7 @@ export default function EditorCard({ title, onNext }: Props) {
           </div>
         </div>
         <div className={s.waveform} ref={waveformRef}></div>
+        <video ref={videoRef} src={musicUrl} className={s.video} muted />
       </div>
     );
   }
