@@ -42,8 +42,15 @@ export default function EditorCard({ title, onNext }: Props) {
   } = useNoteStore();
   const selectedNote = getSelectedNote();
 
-  const { editTitle, setEditTitle, editMusic, setEditMusic, bpm, setBpm } =
-    useEditorStore();
+  const {
+    editTitle,
+    setEditTitle,
+    editMusic,
+    setEditMusic,
+    bpm,
+    setBpm,
+    editVideoUrl,
+  } = useEditorStore();
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -276,7 +283,7 @@ export default function EditorCard({ title, onNext }: Props) {
         <div className={s.body}>
           <input
             type="file"
-            accept="audio/*"
+            accept="audio/*,video/*"
             onChange={(e) => {
               const file = e.target.files?.[0];
               if (file) {
@@ -372,10 +379,6 @@ export default function EditorCard({ title, onNext }: Props) {
           </div>
         </div>
         <div className={s.waveform} ref={waveformRef}></div>
-        <ColorEditModal
-          isOpen={isColorModalOpen}
-          onClose={() => setIsColorModalOpen(false)}
-        />
       </div>
     );
   }
