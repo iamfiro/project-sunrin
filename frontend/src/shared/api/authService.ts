@@ -1,37 +1,56 @@
-import { User } from "@/shared/types/user";
-
 import request from "./client";
 
 export interface SignUpPayload {
   email: string;
-  username: string;
+  nickname: string;
   password: string;
+  password_confirm: string;
 }
 
 export interface SignInPayload {
-  username: string;
+  nickname: string;
   password: string;
 }
 
-export async function signup(payload: SignUpPayload) {
-  return request<{ success: boolean; message?: string }>("/auth/signup", {
+export interface User {
+  id: number;
+  email: string;
+  nickname: string;
+  // Add other user fields as needed
+}
+
+export interface AuthResponse {
+  message: string;
+  user: User;
+  tokens?: {
+    refresh: string;
+    access: string;
+  };
+}
+
+export async function signup(payload: SignUpPayload): Promise<AuthResponse> {
+  return request<AuthResponse>("/auth/register", {
     method: "POST",
     body: JSON.stringify(payload),
   });
 }
 
-export async function signin(payload: SignInPayload) {
-  // Expect server to set httpOnly cookie on success
-  return request<{ success: boolean; message?: string }>("/auth/signin", {
+export async function signin(payload: SignInPayload): Promise<AuthResponse> {
+  return request<AuthResponse>("/auth/login", {
     method: "POST",
-    body: JSON.stringify(payload),
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      nickname: payload.nickname,
+      password: payload.password,
+    }),
   });
 }
 
-export async function me() {
-  return request<User | null>("/auth/me", { method: "GET" });
+export async function logout(): Promise<void> {
+  // You might want to implement token invalidation on the backend
+  return Promise.resolve();
 }
 
-export async function logout() {
-  return request<{ success: boolean }>("/auth/logout", { method: "POST" });
-}
+// Removed the duplicate logout function

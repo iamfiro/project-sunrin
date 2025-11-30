@@ -9,11 +9,11 @@ export default function SignIn() {
   const navigate = useNavigate();
   const { signin } = useAuth();
   const [formData, setFormData] = useState({
-    username: "",
+    nickname: "",
     password: "",
   });
   const [errors, setErrors] = useState({
-    username: "",
+    nickname: "",
     password: "",
   });
 
@@ -33,16 +33,16 @@ export default function SignIn() {
   const validateForm = () => {
     let isValid = true;
     const newErrors = {
-      username: "",
+      nickname: "",
       password: "",
     };
 
     // Email validation
-    if (!formData.username) {
-      newErrors.username = "사용자 이름을 입력해주세요";
+    if (!formData.nickname) {
+      newErrors.nickname = "닉네임을 입력해주세요";
       isValid = false;
-    } else if (!/.{2,}/.test(formData.username)) {
-      newErrors.username = "올바른 사용자 이름 형식이 아닙니다";
+    } else if (!/.{2,}/.test(formData.nickname)) {
+      newErrors.nickname = "올바른 닉네임 형식이 아닙니다";
       isValid = false;
     }
 
@@ -55,7 +55,7 @@ export default function SignIn() {
       isValid = false;
     }
 
-    setErrors(newErrors);
+    setErrors(newErrors as any);
     return isValid;
   };
 
@@ -68,7 +68,7 @@ export default function SignIn() {
 
     try {
       await signin({
-        username: formData.username,
+        nickname: formData.nickname,
         password: formData.password,
       });
       navigate("/game/select");
@@ -90,22 +90,20 @@ export default function SignIn() {
 
         <form className={s.form} onSubmit={handleSubmit}>
           <div className={s.inputGroup}>
-            <label htmlFor="username" className={s.label}>
-              사용자 이름
+            <label htmlFor="nickname" className={s.label}>
+              닉네임
             </label>
             <input
               type="text"
-              id="username"
-              name="username"
+              id="nickname"
+              name="nickname"
               className={s.input}
-              placeholder="USERNAME"
-              value={formData.username}
+              placeholder="NICKNAME"
+              value={formData.nickname}
               onChange={handleChange}
-              autoComplete="username"
+              autoComplete="nickname"
             />
-            {errors.username && (
-              <span className={s.error}>{errors.username}</span>
-            )}
+            {errors.nickname && <p className={s.error}>{errors.nickname}</p>}
           </div>
 
           <div className={s.inputGroup}>

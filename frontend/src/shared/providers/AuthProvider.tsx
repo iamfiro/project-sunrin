@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
+
 import * as authService from "@/shared/api/authService";
 import { User } from "@/shared/types/user";
 
@@ -6,14 +7,20 @@ interface AuthContextValue {
   user: User | null;
   loading: boolean;
   refreshUser: () => Promise<void>;
-  signin: (payload: { username: string; password: string }) => Promise<void>;
-  signup: (payload: { email: string; username: string; password: string }) => Promise<void>;
+  signin: (payload: { nickname: string; password: string }) => Promise<void>;
+  signup: (payload: {
+    email: string;
+    username: string;
+    password: string;
+  }) => Promise<void>;
   signout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -34,12 +41,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const signin = async (payload: { username: string; password: string }) => {
-    await authService.signin(payload);
+  const signin = async (payload: { nickname: string; password: string }) => {
+    await authService.signin({
+      nickname: payload.nickname,
+      password: payload.password,
+    });
     await refreshUser();
   };
 
-  const signup = async (payload: { email: string; username: string; password: string }) => {
+  const signup = async (payload: {
+    email: string;
+    username: string;
+    password: string;
+  }) => {
     await authService.signup(payload);
   };
 
@@ -49,7 +63,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, refreshUser, signin, signup, signout }}>
+    <AuthContext.Provider
+      value={{ user, loading, refreshUser, signin, signup, signout }}
+    >
       {children}
     </AuthContext.Provider>
   );

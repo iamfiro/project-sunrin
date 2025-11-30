@@ -31,8 +31,10 @@ class RegisterSerializer(serializers.ModelSerializer):
             username=validated_data['nickname'],
             password=validated_data['password'],
             email=validated_data.get('email', ''),
-            nickname=validated_data['nickname']
+            nickname=validated_data['nickname'],
         )
+        # Explicitly save to ensure timestamps are set
+        user.save()
         return user
 
 

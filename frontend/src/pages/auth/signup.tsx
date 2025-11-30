@@ -1,25 +1,25 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { useAuth } from "@/shared/providers";
+import { signup as signupService } from "@/shared/api/authService";
 
 import s from "@/shared/styles/pages/auth/signup.module.scss";
 
 export default function SignUp() {
   const navigate = useNavigate();
-  const { signup } = useAuth();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
-    confirmPassword: "",
-    username: "",
+    password_confirm: "",
+    nickname: "",
   });
   const [errors, setErrors] = useState({
     email: "",
     password: "",
-    confirmPassword: "",
-    username: "",
+    password_confirm: "",
+    nickname: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -39,16 +39,16 @@ export default function SignUp() {
     const newErrors = {
       email: "",
       password: "",
-      confirmPassword: "",
-      username: "",
+      password2: "",
+      nickname: "",
     };
 
-    // Username validation
-    if (!formData.username) {
-      newErrors.username = "사용자 이름을 입력해주세요";
+    // Nickname validation
+    if (!formData.nickname) {
+      newErrors.nickname = "닉네임을 입력해주세요";
       isValid = false;
-    } else if (formData.username.length < 2) {
-      newErrors.username = "사용자 이름은 최소 2자 이상이어야 합니다";
+    } else if (formData.nickname.length < 2) {
+      newErrors.nickname = "닉네임은 최소 2자 이상이어야 합니다";
       isValid = false;
     }
 
@@ -71,11 +71,11 @@ export default function SignUp() {
     }
 
     // Confirm password validation
-    if (!formData.confirmPassword) {
-      newErrors.confirmPassword = "비밀번호 확인을 입력해주세요";
+    if (!formData.password_confirm) {
+      newErrors.password_confirm = "비밀번호 확인을 입력해주세요";
       isValid = false;
-    } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = "비밀번호가 일치하지 않습니다";
+    } else if (formData.password !== formData.password_confirm) {
+      newErrors.password_confirm = "비밀번호가 일치하지 않습니다";
       isValid = false;
     }
 
@@ -90,20 +90,56 @@ export default function SignUp() {
       return;
     }
 
-    try {
-      await signup({
-        email: formData.email,
-        username: formData.username,
-        password: formData.password,
-      });
+    setIsSubmitting(true);
 
-      navigate("/auth/signin");
-    } catch (error) {
+    try {
+      const { password2, ...signupData } = formData;
+      const response = await signupService(signupData);
+
+      if (response.message) {
+        // Redirect to login page with success message
+        navigate("/auth/signin", {
+          state: {
+            success: true,
+            message: "회원가입이 완료되었습니다. 로그인해주세요.",
+          },
+        });
+      }
+    } catch (error: any) {
       console.error("회원가입 실패:", error);
-      setErrors((prev) => ({
-        ...prev,
-        email: "회원가입에 실패했습니다. 다시 시도해주세요.",
-      }));
+
+      // Handle different error cases
+      if (error.response?.data) {
+        const errorData = error.response.data;
+        const newErrors = { ...errors };
+
+        if (errorData.email) {
+          newErrors.email = Array.isArray(errorData.email)
+            ? errorData.email[0]
+            : errorData.email;
+        }
+
+        if (errorData.nickname) {
+          newErrors.nickname = Array.isArray(errorData.nickname)
+            ? errorData.nickname[0]
+            : errorData.nickname;
+        }
+
+        if (errorData.password) {
+          newErrors.password = Array.isArray(errorData.password)
+            ? errorData.password[0]
+            : errorData.password;
+        }
+
+        setErrors(newErrors);
+      } else {
+        setErrors((prev) => ({
+          ...prev,
+          email: "회원가입 중 오류가 발생했습니다. 다시 시도해주세요.",
+        }));
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -116,21 +152,21 @@ export default function SignUp() {
 
         <form className={s.form} onSubmit={handleSubmit}>
           <div className={s.inputGroup}>
-            <label htmlFor="username" className={s.label}>
-              사용자 이름
+            <label htmlFor="nickname" className={s.label}>
+              닉네임
             </label>
             <input
               type="text"
-              id="username"
-              name="username"
+              id="nickname"
+              name="nickname"
               className={s.input}
-              placeholder="USERNAME"
-              value={formData.username}
+              placeholder="닉네임을 입력하세요"
+              value={formData.nickname}
               onChange={handleChange}
-              autoComplete="username"
+              autoComplete="nickname"
             />
-            {errors.username && (
-              <span className={s.error}>{errors.username}</span>
+            {errors.nickname && (
+              <span className={s.error}>{errors.nickname}</span>
             )}
           </div>
 
@@ -176,21 +212,25 @@ export default function SignUp() {
             </label>
             <input
               type="password"
-              id="confirmPassword"
-              name="confirmPassword"
+              id="password_confirm"
+              name="password_confirm"
               className={s.input}
               placeholder="비밀번호를 다시 입력하세요"
-              value={formData.confirmPassword}
+              value={formData.password_confirm}
               onChange={handleChange}
               autoComplete="new-password"
             />
-            {errors.confirmPassword && (
-              <span className={s.error}>{errors.confirmPassword}</span>
+            {errors.password_confirm && (
+              <span className={s.error}>{errors.password_confirm}</span>
             )}
           </div>
 
-          <button type="submit" className={s.submitButton}>
-            회원가입
+          <button
+            type="submit"
+            className={s.submitButton}
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "처리 중..." : "회원가입"}
           </button>
         </form>
 
