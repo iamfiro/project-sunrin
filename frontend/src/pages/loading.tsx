@@ -1,16 +1,9 @@
 import { useEffect, useState } from "react";
 
-import { useMusic } from "@/shared/providers";
-
 import s from "@/shared/styles/pages/loading.module.scss";
 
 export default function Loading() {
   const [dots, setDots] = useState(".");
-  const { loadMusic } = useMusic();
-
-  useEffect(() => {
-    loadMusic("/music/Retro Waltz.mp3", true);
-  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -27,7 +20,7 @@ export default function Loading() {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      window.location.href = "/game/select";
+      window.location.href = "/auth";
     }, 4000);
 
     return () => clearTimeout(timer);
