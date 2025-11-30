@@ -1,3 +1,5 @@
+import { useNavigate } from "react-router-dom";
+
 import { User } from "@/shared/types/user";
 
 import { FlexAlign, HStack } from "../stack";
@@ -5,6 +7,12 @@ import { FlexAlign, HStack } from "../stack";
 import s from "./style.module.scss";
 
 export default function Header({ user }: { user: User }) {
+  const navigate = useNavigate();
+
+  const handleEditorClick = () => {
+    navigate("/game/editor");
+  };
+
   return (
     <header className={s.header}>
       <div style={{ width: 520 }}>
@@ -31,6 +39,11 @@ export default function Header({ user }: { user: User }) {
             <span>{user.stats.highestScore}점</span>
           </div>
         </HStack>
+        <div className={s.editor}>
+          <button onClick={handleEditorClick}>
+            <p>에디터</p>
+          </button>
+        </div>
       </HStack>
     </header>
   );

@@ -1,0 +1,59 @@
+.container {
+    width: 100%;
+
+    padding: $spacing-40;
+
+    position:fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+
+    display: flex;
+    justify-content: space-between;
+}
+
+.info {
+    background-color: $surface-white;
+
+    min-width: 300px;
+    height: fit-content;
+
+    clip-path: polygon(0 0, 100% 0, 95% 100%, 0% 100%);
+
+    padding: $spacing-16 $spacing-24;
+    padding-right: $spacing-48;
+
+    span {
+        color: $text-subtle;
+        font-size: 18px;
+    }
+
+    p {
+        font-size: 22px;
+        font-weight: 500;
+    }
+}
+
+.cover {
+    width: 50px;
+    aspect-ratio: 1/1;
+    object-fit: cover;
+
+    border-radius: $radius-8;
+}
+
+.bpm {
+    color: $text;
+
+    opacity: 0.3;
+
+    span {
+        font-size: 32px;
+        color: inherit;
+    }
+    p {
+        font-size: 52px;
+        font-weight: 700;
+        color: inherit;
+    }
+}

@@ -1,0 +1,242 @@
+.contents{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    .header{
+        width: 400px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-direction: row;
+        padding: 12px;
+        .spacer{
+            width: 24px;
+            height: 24px;
+        }
+        h2{
+            font-size: 24px;
+            font-weight: semibold;
+            color: #fdfdfe;
+        }
+    }
+    .body{
+        display: flex;
+        align-items: flex-start;
+        justify-content: flex-start;
+        flex-direction: column;
+        padding: 12px;
+        border: 1px solid #fdfdfe;
+        border-radius: 12px;
+        gap: 16px;
+        width: 400px;
+        padding: 12px;
+        input{
+            width: 100%;
+            padding: 8px;
+            border: none;
+            border-bottom: 1px solid #b0b0b0;
+            background: none;
+            outline: none;
+            color: #fdfdfe;
+        }
+        button{
+            width: 100%;
+            padding: 12px;
+            background-color: #fdfdfe;
+            font-weight: semibold;
+            outline: none;
+            border: none;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    }
+}
+.topBar{
+    width: 100%;
+    height: 55px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0 12px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    background: linear-gradient(to bottom, #fff, #ccc);
+    img{
+        width: 120px;
+        height: auto;
+    }
+}
+.editNote{
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.8);
+    color: #fdfdfe;
+    font-size: 18px;
+    text-align: center;
+}
+.waveform{
+    width: 100%;
+    height: 250px;
+    background: #FDFDFE66;
+    padding: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    border-top: 2px solid #8e8e8e;
+}
+.editContainer{
+    width: 100%;
+    height: calc(100vh - 55px);
+    margin-top: 55px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+    box-sizing: border-box;
+}
+.editor{
+    padding: 20px;
+    color: #fdfdfe;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-self: flex-start;
+    width: 100%;
+    height: 100%;
+    overflow-x: scroll;
+    scrollbar-width: none;
+    scroll-behavior: smooth;
+    ::-webkit-scrollbar{
+        display: none;
+    }
+}
+.musicInfo{
+    border-bottom: solid 2px #8e8e8e;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    background:#FDFDFE66;
+    height: 75px;
+    width: 100%;
+    .bpm{
+        width: 100px;
+        padding: 8px;
+        background: none;
+        outline: none;
+        border : 1px solid #8e8e8e;
+        font-size: 16px;
+        color: #111;
+        font-weight: bold;
+    }
+    .musicTitle{
+        text-align: end;    
+        font-size: 16px;
+        color: #111;
+        font-weight: medium !important;
+    }
+    .control{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        button{
+            border: none;
+            outline: none;
+            background: none;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+        }
+        button:hover{
+            scale: 1.1;
+            color: $surface-brand;
+        }
+    }
+}
+.noteContainer{
+    background: #FDFDFE66;
+    padding: 20px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    color: #fdfdfe;
+    font-size: 16px;
+    width: 100%;
+    gap: 16px;
+.noteButton{
+    height: 40px;
+    background: none;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    color: #111;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 12px;
+    font-size: 12px;
+    border-radius: 8px;
+}
+.deleteButton{
+    height: 40px;
+    background: none;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    color: #fdfdfe;
+    background-color: rgba(181, 39, 39, 0.8);
+    padding: 12px;
+    font-size: 12px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+.noteActions{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+}
+}
+
+.bpmContainer{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    p{
+        font-size: 16px;
+        color: #111;
+        font-weight: bold;
+    }
+    input{
+        border-radius: 8px;
+    }
+}
+
+.musicInfoContainer{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    h1{
+        font-size: 16px;
+        color: #111;
+        font-weight: bold;
+    }
+}
+
+.video{
+    width: 300px;
+    height: auto;
+    object-fit: cover;
+    border-radius: 8px;
+    position: absolute;
+    top: 30px;
+    right: 30px;
+}

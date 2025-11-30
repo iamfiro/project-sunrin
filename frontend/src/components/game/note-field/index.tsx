@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, useMemo } from "react";
 
 import { Note } from "@/shared/types/game/note";
 
@@ -13,48 +13,49 @@ interface NoteFieldProps {
   pressedKeys: Set<number>;
 }
 
-const NoteField = ({
-  notes,
-  scroll,
-  noteDisplayTime,
-  pressedKeys,
-}: NoteFieldProps) => {
-  const getNotesForLane = (lane: number) => {
-    return notes.filter((note) => note.lane === lane);
-  };
+const LANES = [0, 1, 2, 3] as const;
 
-  return (
-    <div className={s.contents}>
-      <NoteLine
-        lane={0}
-        notes={getNotesForLane(0)}
-        scroll={scroll}
-        noteDisplayTime={noteDisplayTime}
-        pressedKeys={pressedKeys}
-      />
-      <NoteLine
-        lane={1}
-        notes={getNotesForLane(1)}
-        scroll={scroll}
-        noteDisplayTime={noteDisplayTime}
-        pressedKeys={pressedKeys}
-      />
-      <NoteLine
-        lane={2}
-        notes={getNotesForLane(2)}
-        scroll={scroll}
-        noteDisplayTime={noteDisplayTime}
-        pressedKeys={pressedKeys}
-      />
-      <NoteLine
-        lane={3}
-        notes={getNotesForLane(3)}
-        scroll={scroll}
-        noteDisplayTime={noteDisplayTime}
-        pressedKeys={pressedKeys}
-      />
-    </div>
-  );
-};
+const NoteField = memo(
+  ({ notes, scroll, noteDisplayTime, pressedKeys }: NoteFieldProps) => {
+    // 레인별 노트 분리 (메모이제이션)
+    const notesByLane = useMemo(() => {
+      const result: Note[][] = [[], [], [], []];
+      for (const note of notes) {
+        if (note.lane >= 0 && note.lane < 4) {
+          result[note.lane].push(note);
+        }
+      }
+      return result;
+    }, [notes]);
 
-export default memo(NoteField);
+    // 키 눌림 상태 배열
+    const pressedArray = useMemo(
+      () => [
+        pressedKeys.has(0),
+        pressedKeys.has(1),
+        pressedKeys.has(2),
+        pressedKeys.has(3),
+      ],
+      [pressedKeys],
+    );
+
+    return (
+      <div className={s.contents}>
+        {LANES.map((lane) => (
+          <NoteLine
+            key={lane}
+            lane={lane}
+            notes={notesByLane[lane]}
+            scroll={scroll}
+            noteDisplayTime={noteDisplayTime}
+            isKeyPressed={pressedArray[lane]}
+          />
+        ))}
+      </div>
+    );
+  },
+);
+
+NoteField.displayName = "NoteField";
+
+export default NoteField;

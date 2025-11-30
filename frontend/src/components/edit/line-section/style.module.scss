@@ -1,0 +1,20 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  height: 100%;
+  min-width: 400px;
+  border-bottom: 1px solid #8e8e8e;
+  position: relative;
+}
+
+.ghostNote {
+  position: fixed;
+  pointer-events: none;
+  opacity: 0.7;
+  z-index: 9999;
+  background-color: $surface-brand;
+  border: 2px solid #ffcc00;
+  box-sizing: border-box;
+}

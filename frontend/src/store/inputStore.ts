@@ -1,52 +1,57 @@
-import { create } from 'zustand';
+import { create } from "zustand";
 
 type InputState = {
-  // The array of 4 keys
-  keys: [string, string, string, string];
+  // The array of 4 key codes (physical keys)
+  keyCodes: [string, string, string, string];
   // Currently pressed keys (as indices)
   pressedKeys: Set<number>;
-  // Set a key at specific index (0-3)
-  setKey: (index: number, key: string) => void;
-  // Set all keys at once
-  setKeys: (keys: [string, string, string, string]) => void;
+  // Set a key code at specific index (0-3)
+  setKeyCode: (index: number, keyCode: string) => void;
+  // Set all key codes at once
+  setKeyCodes: (keyCodes: [string, string, string, string]) => void;
   // Handle key press
   pressKey: (keyIndex: number) => void;
   // Handle key release
   releaseKey: (keyIndex: number) => void;
-  // Get pressed key names
-  getPressedKeyNames: () => string[];
+  // Get pressed key codes
+  getPressedKeyCodes: () => string[];
 };
 
 export const useInputStore = create<InputState>((set, get) => ({
-  // Default keys: d, f, j, k
-  keys: ['d', 'f', 'j', 'k'],
+  // Default keys: KeyD, KeyF, KeyJ, KeyK (physical keyboard codes)
+  keyCodes: ["KeyD", "KeyF", "KeyJ", "KeyK"],
   pressedKeys: new Set<number>(),
-  
-  setKey: (index, key) => 
+
+  setKeyCode: (index, keyCode) =>
     set((state) => {
-      const newKeys = [...state.keys] as [string, string, string, string];
-      newKeys[index] = key;
-      return { keys: newKeys };
+      const newKeyCodes = [...state.keyCodes] as [
+        string,
+        string,
+        string,
+        string,
+      ];
+      newKeyCodes[index] = keyCode;
+      return { keyCodes: newKeyCodes };
     }),
-    
-  setKeys: (keys) => set({ keys }),
-  
-  pressKey: (keyIndex) => 
+
+  setKeyCodes: (keyCodes) => set({ keyCodes }),
+
+  pressKey: (keyIndex) =>
     set((state) => {
       const newSet = new Set(state.pressedKeys);
       newSet.add(keyIndex);
       return { pressedKeys: newSet };
     }),
-    
-  releaseKey: (keyIndex) => 
+
+  releaseKey: (keyIndex) =>
     set((state) => {
       const newSet = new Set(state.pressedKeys);
       newSet.delete(keyIndex);
       return { pressedKeys: newSet };
     }),
-    
-  getPressedKeyNames: () => {
-    const { keys, pressedKeys } = get();
-    return Array.from(pressedKeys).map(idx => keys[idx]);
+
+  getPressedKeyCodes: () => {
+    const { keyCodes, pressedKeys } = get();
+    return Array.from(pressedKeys).map((idx) => keyCodes[idx]);
   },
 }));

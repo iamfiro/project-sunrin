@@ -8,8 +8,8 @@ class Note(models.Model):
         ('hold', 'Hold'),
     ]
 
-    id = models.CharField(max_length=100, primary_key=True, help_text="노트 ID")
-    chart = models.ForeignKey('Chart', on_delete=models.CASCADE, related_name='notes', null=True, blank=True, help_text="노트가 속한 차트")
+    id = models.AutoField(primary_key=True, help_text="노트 ID")
+    chart = models.ForeignKey('Chart', on_delete=models.CASCADE, related_name='notes', help_text="노트가 속한 차트")
     time = models.IntegerField(help_text="노트가 내려올 시간 (ms 단위)")
     lane = models.IntegerField(help_text="노트의 라인 위치")
     type = models.CharField(max_length=10, choices=NOTE_TYPES, help_text="노트 타입")
@@ -28,6 +28,7 @@ class Chart(models.Model):
     isCommunitySong = models.BooleanField(default=False, help_text="커뮤니티 곡 여부")
     artist = models.CharField(max_length=200, help_text="아티스트명")
     difficulty = models.IntegerField(help_text="난이도 (1~15)")
+    creator = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='charts', help_text="차트를 만든 사용자")
 
     def __str__(self):
         return f"{self.title} by {self.artist} (ID: {self.musicId})"
@@ -56,6 +57,7 @@ class Result(models.Model):
         ('SS', 'SS'),
     ]
 
+    musicId = models.CharField(max_length=100, help_text="곡 ID")
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='results', help_text="결과를 기록한 사용자")
     chart = models.ForeignKey(Chart, on_delete=models.CASCADE, related_name='results', help_text="결과가 속한 차트")
     difficulty = models.IntegerField(help_text="플레이한 난이도")
@@ -67,11 +69,11 @@ class Result(models.Model):
     isAllPerfect = models.BooleanField(default=False, help_text="올 퍼펙트 여부")
     earlyCount = models.IntegerField(default=0, help_text="빠르게 친 판정 수")
     lateCount = models.IntegerField(default=0, help_text="느리게 친 판정 수")
-    perfect = models.CharField(max_length=500, help_text="퍼펙트 판정 기록")
-    great = models.CharField(max_length=500, help_text="그레이트 판정 기록")
-    good = models.CharField(max_length=500, help_text="굿 판정 기록")
-    miss = models.CharField(max_length=500, help_text="미스 판정 기록")
-    bad = models.CharField(max_length=500, null=True, blank=True, help_text="배드 판정 기록")
+    perfect = models.IntegerField(default=0, help_text="퍼펙트 판정 수")
+    great = models.IntegerField(default=0, help_text="그레이트 판정 수")
+    good = models.IntegerField(default=0, help_text="굿 판정 수")
+    miss = models.IntegerField(default=0, help_text="미스 판정 수")
+    bad = models.IntegerField(default=0, help_text="배드 판정 수")
     playedAt = models.DateTimeField(auto_now_add=True, help_text="플레이 시간")
 
     def __str__(self):

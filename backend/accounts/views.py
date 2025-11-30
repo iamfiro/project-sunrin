@@ -29,10 +29,10 @@ def login(request):
     """로그인 API - JWT 토큰 발급"""
     serializer = LoginSerializer(data=request.data)
     if serializer.is_valid():
-        username = serializer.validated_data['name']
+        nickname = serializer.validated_data['nickname']
         password = serializer.validated_data['password']
         
-        user = authenticate(username=username, password=password)
+        user = authenticate(username=nickname, password=password)
         
         if user is not None:
             refresh = RefreshToken.for_user(user)

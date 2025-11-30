@@ -1,27 +1,28 @@
 import { useEffect, useState } from "react";
 
+import { useMusic } from "@/shared/providers";
+
 import s from "@/shared/styles/pages/intro.module.scss";
 
 export default function Intro() {
   const [showingContainer, setShowingContainer] = useState("logo");
+  const { loadMusic } = useMusic();
+
+  useEffect(() => {
+    loadMusic("/music/Retro Waltz.mp3", true);
+  }, []);
 
   useEffect(() => {
     const logoTimer = setTimeout(() => {
       setShowingContainer("credit");
     }, 3000);
 
-    const creditTimer = setTimeout(() => {
-      setShowingContainer("gameComposition");
-    }, 5000);
-
     const gameCompositionTimer = setTimeout(() => {
-      // After intro, go to auth page so user can choose sign up or sign in
-      window.location.href = "/auth";
+      window.location.href = "/game/loading";
     }, 7000);
 
     return () => {
       clearTimeout(logoTimer);
-      clearTimeout(creditTimer);
       clearTimeout(gameCompositionTimer);
     };
   }, []);
@@ -43,12 +44,6 @@ export default function Intro() {
         <div className={s.blackContainer}>
           <span>제작 / 개발</span>
           <span className={s.creditText}>조성주 박찬혁 신유준</span>
-        </div>
-      )}
-      {showingContainer === "gameComposition" && (
-        <div className={s.blackContainer}>
-          <span>노래 제공</span>
-          <span className={s.creditText}>황동화</span>
         </div>
       )}
     </>
