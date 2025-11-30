@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 
 import { Note } from "@/shared/types/game/note";
+import { useHitEffectStore } from "@/store/useHitEffectStore";
 import {
   TimingType,
   useJudgementLineStore,
@@ -74,6 +75,7 @@ export const useNoteJudgement = (
 ) => {
   const { setResult, getResult } = useResultStore();
   const { updateTiming } = useJudgementLineStore();
+  const { triggerEffect } = useHitEffectStore();
 
   const handleKeyPress = useCallback(
     (keyIndex: number) => {
@@ -148,6 +150,7 @@ export const useNoteJudgement = (
         if (timeDiff <= JUDGEMENT_WINDOWS.perfect) {
           showJudgement("Perfect");
           updateTiming(normalizedTiming, timingType);
+          triggerEffect(targetLane, "perfect");
           const baseScore = 500;
           score += Math.floor(
             baseScore * baseScoreMultiplier * comboMultiplier,
@@ -157,6 +160,7 @@ export const useNoteJudgement = (
         } else if (timeDiff <= JUDGEMENT_WINDOWS.great) {
           showJudgement("Great");
           updateTiming(normalizedTiming, timingType);
+          triggerEffect(targetLane, "great");
           const baseScore = 300;
           score += Math.floor(
             baseScore * baseScoreMultiplier * comboMultiplier,
@@ -166,6 +170,7 @@ export const useNoteJudgement = (
         } else if (timeDiff <= JUDGEMENT_WINDOWS.good) {
           showJudgement("Good");
           updateTiming(normalizedTiming, timingType);
+          triggerEffect(targetLane, "good");
           const baseScore = 100;
           score += Math.floor(
             baseScore * baseScoreMultiplier * comboMultiplier,
@@ -220,6 +225,7 @@ export const useNoteJudgement = (
       showJudgement,
       setNotes,
       updateTiming,
+      triggerEffect,
     ],
   );
 

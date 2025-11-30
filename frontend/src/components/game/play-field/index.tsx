@@ -1,8 +1,10 @@
 import { useEffect } from "react";
 
 import { useInputStore } from "@/store/inputStore";
+import { useHitEffectStore } from "@/store/useHitEffectStore";
 
 import ComboDisplay from "../combo-display";
+import HitEffect from "../hit-effect";
 import {
   useGameEnd,
   useGameTimer,
@@ -13,9 +15,12 @@ import {
   useNoteJudgement,
 } from "../hooks";
 import Judgement from "../judgement";
+import KeyPressIndicator from "../key-press-indicator";
 import NoteField from "../note-field";
 
 import s from "./style.module.scss";
+
+const LANE_POSITIONS = [12.5, 37.5, 62.5, 87.5];
 
 interface PlayFieldProps {
   onGameStarted?: (isStarted: boolean) => void;
@@ -27,6 +32,7 @@ export default function PlayField({
   onVideoEndCallback,
 }: PlayFieldProps) {
   const { pressedKeys } = useInputStore();
+  const { effects, removeEffect } = useHitEffectStore();
 
   const { scroll, startTimeRef, countdown, isGameStarted } = useGameTimer();
 
@@ -81,6 +87,18 @@ export default function PlayField({
         noteDisplayTime={noteDisplayTime}
         pressedKeys={pressedKeys}
       />
+
+      {/* 판정 이펙트 (여러 개 동시 렌더링) */}
+      {effects.map((effect) => (
+        <HitEffect
+          key={effect.id}
+          judgement={effect.judgement}
+          position={LANE_POSITIONS[effect.lane]}
+          show={true}
+          onComplete={() => removeEffect(effect.id)}
+        />
+      ))}
+      <KeyPressIndicator pressedKeys={pressedKeys} />
     </div>
   );
 }

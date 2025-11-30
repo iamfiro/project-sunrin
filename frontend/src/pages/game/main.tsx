@@ -37,6 +37,7 @@ export default function GameMain() {
               onGameStarted={setIsGameStarted}
               onVideoEndCallback={handleVideoEndCallback}
             />
+
             <div className={s.playFieldInfo}>
               <div className={s.judgementLine}>
                 <JudgementLine />

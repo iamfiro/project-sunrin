@@ -1,14 +1,12 @@
 .container{
     width: 25%;
-    height: calc(100% - 30px); /* Reduce height by 30px */
-    margin-bottom: 30px; /* Add margin to push content up */
+    height: 100%;
     border: 1px solid rgba(255, 255, 255, 0.138);
-    border-bottom: none; /* Remove bottom border */
+    border-bottom: none;
     box-sizing: border-box;
     position: relative;
-    background-color: rgba(0, 0, 0, 0.3); // Default background
+    background-color: rgba(0, 0, 0, 0.3);
     
-    /* Add a pseudo-element for the judgment line */
     &::after {
         content: '';
         position: absolute;
@@ -20,6 +18,6 @@
     }
 
     &.keyPressed {
-        background-color: rgba(255, 255, 255, 0.5); // Highlight when key is pressed
+        background-color: rgba(255, 255, 255, 0.5);
     }
 }

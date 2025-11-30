@@ -1,0 +1,294 @@
+// =============================================
+// HIT EFFECT - 최적화된 화이트 판정 이펙트
+// =============================================
+
+// 색상
+$white-primary: #fff;
+$white-90: rgba(255, 255, 255, 0.9);
+$white-70: rgba(255, 255, 255, 0.7);
+$white-50: rgba(255, 255, 255, 0.5);
+
+// 타이밍
+$flash-duration: 100ms;
+$ring-duration: 220ms;
+$arc-duration: 200ms;
+
+// 이징
+$ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+// =============================================
+// 메인 컨테이너
+// =============================================
+.hitEffect {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  transform: translateX(-50%);
+  width: 140px;
+  height: 140px;
+  pointer-events: none;
+  z-index: 500;
+  contain: layout style paint; // 성능 최적화
+
+  // =========================================
+  // PERFECT - 가장 강렬
+  // =========================================
+  &.perfect {
+    .flashCore {
+      width: 50px;
+      height: 50px;
+      background: radial-gradient(circle, $white-primary 0%, $white-90 40%, transparent 70%);
+      box-shadow:
+        0 0 40px 15px $white-primary,
+        0 0 80px 30px $white-90;
+    }
+
+    .ring {
+      border-width: 3px;
+      box-shadow:
+        0 0 25px $white-primary,
+        0 0 50px $white-70;
+      animation: ringExpandPerfect $ring-duration $ease-out-expo forwards;
+    }
+
+    .ringSecondary {
+      border-width: 2px;
+      animation: ringExpandSecondary 260ms $ease-out-expo forwards;
+      animation-delay: 25ms;
+    }
+
+    .arc1,
+    .arc2 {
+      border-width: 2px;
+      box-shadow: 0 0 15px $white-primary;
+    }
+  }
+
+  // =========================================
+  // GREAT - 중간
+  // =========================================
+  &.great {
+    .flashCore {
+      width: 42px;
+      height: 42px;
+      background: radial-gradient(circle, $white-90 0%, $white-70 40%, transparent 70%);
+      box-shadow:
+        0 0 30px 10px $white-90,
+        0 0 60px 20px $white-70;
+    }
+
+    .ring {
+      border-width: 2.5px;
+      box-shadow:
+        0 0 20px $white-90,
+        0 0 40px $white-50;
+      animation: ringExpandGreat $ring-duration $ease-out-expo forwards;
+    }
+
+    .ringSecondary {
+      border-width: 1.5px;
+      animation: ringExpandSecondaryGreat 240ms $ease-out-expo forwards;
+      animation-delay: 20ms;
+    }
+
+    .arc1,
+    .arc2 {
+      border-width: 1.5px;
+      box-shadow: 0 0 12px $white-90;
+    }
+  }
+
+  // =========================================
+  // GOOD - 약함
+  // =========================================
+  &.good {
+    .flashCore {
+      width: 35px;
+      height: 35px;
+      background: radial-gradient(circle, $white-70 0%, $white-50 40%, transparent 70%);
+      box-shadow:
+        0 0 20px 8px $white-70,
+        0 0 40px 15px $white-50;
+    }
+
+    .ring {
+      border-width: 2px;
+      box-shadow: 0 0 15px $white-70;
+      animation: ringExpandGood 180ms $ease-out-expo forwards;
+    }
+
+    .ringSecondary {
+      display: none;
+    }
+
+    .arc1,
+    .arc2 {
+      border-width: 1px;
+      box-shadow: 0 0 8px $white-70;
+      opacity: 0.7;
+    }
+  }
+}
+
+// =============================================
+// 플래시 코어
+// =============================================
+.flashCore {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  animation: flashBurst $flash-duration $ease-out-expo forwards;
+  will-change: transform, opacity;
+}
+
+@keyframes flashBurst {
+  0% {
+    transform: translate(-50%, -50%) scale(0.3);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.5);
+    opacity: 0;
+  }
+}
+
+// =============================================
+// 메인 링
+// =============================================
+.ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 55px;
+  height: 55px;
+  transform: translate(-50%, -50%);
+  border: 3px solid $white-primary;
+  border-radius: 50%;
+  will-change: transform, opacity;
+}
+
+@keyframes ringExpandPerfect {
+  0% {
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2.2);
+    opacity: 0;
+  }
+}
+
+@keyframes ringExpandGreat {
+  0% {
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.9);
+    opacity: 0;
+  }
+}
+
+@keyframes ringExpandGood {
+  0% {
+    transform: translate(-50%, -50%) scale(0.6);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.6);
+    opacity: 0;
+  }
+}
+
+// =============================================
+// 세컨더리 링
+// =============================================
+.ringSecondary {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 45px;
+  height: 45px;
+  transform: translate(-50%, -50%);
+  border: 2px solid $white-70;
+  border-radius: 50%;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+@keyframes ringExpandSecondary {
+  0% {
+    transform: translate(-50%, -50%) scale(0.4);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2.4);
+    opacity: 0;
+  }
+}
+
+@keyframes ringExpandSecondaryGreat {
+  0% {
+    transform: translate(-50%, -50%) scale(0.4);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2);
+    opacity: 0;
+  }
+}
+
+// =============================================
+// 아크 (레이더 효과)
+// =============================================
+.arc1,
+.arc2 {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 50px;
+  height: 50px;
+  transform: translate(-50%, -50%);
+  border: 2px solid $white-primary;
+  border-radius: 50%;
+  will-change: transform, opacity;
+}
+
+.arc1 {
+  clip-path: polygon(50% 50%, 0% 50%, 0% 0%, 50% 0%);
+  animation: arc1Sweep $arc-duration $ease-out-expo forwards;
+}
+
+.arc2 {
+  clip-path: polygon(50% 50%, 100% 50%, 100% 100%, 50% 100%);
+  animation: arc2Sweep $arc-duration $ease-out-expo forwards;
+  animation-delay: 30ms;
+}
+
+@keyframes arc1Sweep {
+  0% {
+    transform: translate(-50%, -50%) scale(0.7) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2) rotate(-50deg);
+    opacity: 0;
+  }
+}
+
+@keyframes arc2Sweep {
+  0% {
+    transform: translate(-50%, -50%) scale(0.65) rotate(0deg);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2.1) rotate(60deg);
+    opacity: 0;
+  }
+}

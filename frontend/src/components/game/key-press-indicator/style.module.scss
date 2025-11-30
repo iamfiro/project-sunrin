@@ -1,0 +1,122 @@
+// 키 입력 시각적 피드백 컴포넌트
+
+// 눌렀을 때 색상 (사이언)
+$pressed-color: #00aeff;
+$pressed-glow: rgba(0, 229, 255, 0.8);
+
+.container {
+  width: 100%;
+  height: 50px;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 0;
+  background: transparent;
+  overflow: hidden;
+}
+
+.keyButton {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  // 기본: 흰색/밝은 회색
+  background: linear-gradient(
+    to bottom,
+    rgb(192, 192, 192) 0%,
+    rgba(240, 240, 245) 50%,
+    rgba(220, 220, 230) 100%
+  );
+  border: 1px solid rgb(91, 91, 91);
+  border-bottom: 3px solid rgba(200, 200, 210, 0.9);
+  transition: all 0.05s ease-out;
+  overflow: hidden;
+
+  // 기본 상태 내부 그라데이션 (광택)
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50%;
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.6) 0%,
+      transparent 100%
+    );
+    pointer-events: none;
+    border-radius: 5px 5px 0 0;
+  }
+
+  // 눌렸을 때 - 사이언 색상
+  &.pressed {
+    background: linear-gradient(
+      to bottom,
+      lighten($pressed-color, 15%) 0%,
+      $pressed-color 50%,
+      darken($pressed-color, 10%) 100%
+    );
+    border-color: $pressed-color;
+    border-bottom-width: 1px;
+    transform: translateY(2px);
+    box-shadow:
+      inset 0 2px 8px rgba(0, 0, 0, 0.2),
+      0 0 20px $pressed-glow,
+      0 0 40px rgba(0, 229, 255, 0.4);
+
+    .keyLabel {
+      color: #fff;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+      transform: scale(0.95);
+    }
+
+    &::before {
+      background: linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0.5) 0%,
+        transparent 60%
+      );
+    }
+  }
+}
+
+.keyLabel {
+  font-family: "Galmuri9", monospace;
+  font-size: 14px;
+  font-weight: bold;
+  color: rgba(60, 60, 80, 0.9);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+  z-index: 2;
+  transition: all 0.05s ease-out;
+  user-select: none;
+}
+
+.pressGlow {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    ellipse at center top,
+    rgba(0, 229, 255, 0.9) 0%,
+    rgba(0, 229, 255, 0.4) 40%,
+    transparent 70%
+  );
+  pointer-events: none;
+  animation: glowPulse 0.1s ease-out forwards;
+}
+
+@keyframes glowPulse {
+  0% {
+    opacity: 1;
+    transform: translateX(-50%) scaleY(0.3);
+  }
+  100% {
+    opacity: 0.8;
+    transform: translateX(-50%) scaleY(1);
+  }
+}
