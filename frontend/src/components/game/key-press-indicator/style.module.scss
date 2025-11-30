@@ -40,7 +40,7 @@ $pressed: #00aeff;
   }
 
   &.pressed {
-    background: linear-gradient(to bottom, lighten($pressed, 15%), $pressed 50%, darken($pressed, 10%));
+    background: linear-gradient(to bottom, lighten($pressed, 15%), $pressed 50%);
     border-color: $pressed;
     border-bottom-width: 1px;
     transform: translate3d(0, 2px, 0);

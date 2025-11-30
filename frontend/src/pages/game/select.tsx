@@ -39,14 +39,23 @@ export default function SongSelect() {
 
   useEffect(() => {
     const video = videoRef.current;
-    if (!video) return;
+    if (!video) {
+      console.log("Video ref is null, cannot load or play video.");
+      return;
+    }
 
+    console.log("Attempting to load video:", video.currentSrc);
     video.load();
     const playPromise = video.play();
     if (playPromise !== undefined) {
-      playPromise.catch(() => {
-        // ignore autoplay restrictions
-      });
+      playPromise
+        .then(() => {
+          console.log("Video playback started successfully.");
+        })
+        .catch((error) => {
+          console.warn("Video autoplay prevented or failed:", error);
+          // ignore autoplay restrictions, but log the warning
+        });
     }
   }, [currentIndex]);
 
@@ -58,6 +67,8 @@ export default function SongSelect() {
         className={s.video}
         disablePictureInPicture={true}
         ref={videoRef}
+        muted
+        playsInline
       >
         <source
           key={mockTrack[currentIndex].backgroundVideoSrc}

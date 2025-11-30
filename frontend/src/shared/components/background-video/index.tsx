@@ -11,13 +11,13 @@ interface Props {
   onEnded?: () => void;
 }
 
-export default function BackgroundVideo({ 
-  src, 
-  className, 
-  style, 
+export default function BackgroundVideo({
+  src,
+  className,
+  style,
   isPaused = false,
   loop = true,
-  onEnded
+  onEnded,
 }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -55,6 +55,7 @@ export default function BackgroundVideo({
       disablePictureInPicture={true}
       style={style}
       onEnded={handleVideoEnded}
+      playsInline
     >
       <source src={src} type="video/mp4" />
     </video>
