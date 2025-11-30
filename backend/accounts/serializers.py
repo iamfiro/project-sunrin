@@ -5,22 +5,20 @@ User = get_user_model()
 
 class UserSerializer(serializers.ModelSerializer):
     """사용자 정보 직렬화"""
-    name = serializers.CharField(source='username', read_only=True)
     class Meta:
         model = User
-        fields = ('id', 'name', 'email', 'high_score', 'created_at')
-        read_only_fields = ('id', 'created_at', 'high_score')
+        fields = ('id', 'nickname', 'email')
+        read_only_fields = ('id', 'email')
 
 
 class RegisterSerializer(serializers.ModelSerializer):
     """회원가입 직렬화"""
-    name = serializers.CharField(source='username')
     password = serializers.CharField(write_only=True, min_length=8)
     password_confirm = serializers.CharField(write_only=True)
 
     class Meta:
         model = User
-        fields = ('name', 'email', 'password', 'password_confirm')
+        fields = ('nickname', 'email', 'password', 'password_confirm')
 
     def validate(self, data):
         if data['password'] != data['password_confirm']:
@@ -30,14 +28,15 @@ class RegisterSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data.pop('password_confirm')
         user = User.objects.create_user(
-            username=validated_data['name'],
+            username=validated_data['nickname'],
             password=validated_data['password'],
-            email=validated_data.get('email', '')
+            email=validated_data.get('email', ''),
+            nickname=validated_data['nickname']
         )
         return user
 
 
 class LoginSerializer(serializers.Serializer):
     """로그인 직렬화"""
-    name = serializers.CharField()
+    nickname = serializers.CharField()
     password = serializers.CharField(write_only=True)
