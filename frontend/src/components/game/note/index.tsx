@@ -9,9 +9,15 @@ interface NoteProps {
   note: NoteType;
   position: number; // 0 ~ 1 (0: start, 1: end)
   noteDisplayTime: number;
+  isHolding?: boolean; // 롱노트를 누르고 있는지 여부
 }
 
-const NoteComponent = ({ note, position, noteDisplayTime }: NoteProps) => {
+const NoteComponent = ({
+  note,
+  position,
+  noteDisplayTime,
+  isHolding = false,
+}: NoteProps) => {
   const style = {
     top: `${position * 100}%`,
   };
@@ -22,8 +28,13 @@ const NoteComponent = ({ note, position, noteDisplayTime }: NoteProps) => {
       height: `${height}%`,
     };
     return (
-      <div className={cn(s.note, s.hold)} style={style}>
-        <div className={s.tail} style={tailStyle}></div>
+      <div
+        className={cn(s.note, s.hold, { [s.pressing]: isHolding })}
+        style={style}
+      >
+        <div className={s.tail} style={tailStyle}>
+          <div className={s.tailEnd} />
+        </div>
       </div>
     );
   }

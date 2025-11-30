@@ -1,12 +1,19 @@
 @keyframes comboIncrease {
   0% {
     transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
   }
-  50% {
-    transform: translate(-50%, -50%) scale(1.2);
+  20% {
+    transform: translate(-50%, -50%) scale(1.15);
+    opacity: 1;
+  }
+  40% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
   }
   100% {
     transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
   }
 }
 
@@ -35,11 +42,11 @@
   user-select: none;
   
   &.increase {
-    animation: comboIncrease 0.2s ease-out;
+    animation: comboIncrease 0.8s ease-out;
   }
   
   &.break {
-    animation: comboBreak 0.3s ease-out forwards;
+    animation: comboBreak 0.5s ease-out forwards;
   }
 }
 

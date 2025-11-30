@@ -1,7 +1,9 @@
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 
 import { Note } from "@/shared/types/game/note";
+import { useInputStore } from "@/store/inputStore";
 import { useHitEffectStore } from "@/store/useHitEffectStore";
+import { useHoldNoteStore } from "@/store/useHoldNoteStore";
 import {
   TimingType,
   useJudgementLineStore,
@@ -76,6 +78,123 @@ export const useNoteJudgement = (
   const { setResult, getResult } = useResultStore();
   const { updateTiming } = useJudgementLineStore();
   const { triggerEffect } = useHitEffectStore();
+  const { startHold, endHold, getActiveHold } = useHoldNoteStore();
+  const { pressedKeys } = useInputStore();
+
+  // 롱노트 키 릴리즈 감지
+  useEffect(() => {
+    const checkHoldNotes = () => {
+      const currentTime = performance.now() - (startTimeRef.current || 0);
+
+      // 각 레인의 활성 롱노트 체크
+      for (let lane = 0; lane < 4; lane++) {
+        const activeHold = getActiveHold(lane);
+        if (!activeHold) continue;
+
+        const isKeyPressed = pressedKeys.has(lane);
+
+        // 롱노트 끝 시점에 도달했는지 체크
+        if (currentTime >= activeHold.endTime) {
+          if (isKeyPressed) {
+            // 성공적으로 롱노트 완료
+            completeHoldNote(lane, activeHold.noteId);
+          } else {
+            // 이미 키를 뗀 상태 (MISS는 keyRelease에서 처리됨)
+            endHold(lane);
+            setNotes((notes) =>
+              notes.filter((n) => n.id !== activeHold.noteId),
+            );
+          }
+        } else if (!isKeyPressed) {
+          // 아직 끝나지 않았는데 키를 뗌 -> MISS
+          failHoldNote(lane, activeHold.noteId);
+        }
+      }
+    };
+
+    const interval = setInterval(checkHoldNotes, 16); // ~60fps
+    return () => clearInterval(interval);
+  }, [pressedKeys, startTimeRef, getActiveHold, endHold, setNotes]);
+
+  const completeHoldNote = useCallback(
+    (lane: number, noteId: string) => {
+      const currentTime = performance.now() - startTimeRef.current!;
+      const current = getResult();
+
+      let score = current.score;
+      let perfect = current.perfect;
+      let combo = [...current.combo];
+
+      // 롱노트 완료 보너스 점수
+      const currentComboCount =
+        combo.length > 0 ? parseInt(combo[combo.length - 1].split("-")[2]) : 0;
+      const comboBonus = Math.floor(currentComboCount / 20) * 0.05;
+      const comboMultiplier = Math.min(1 + comboBonus, 1.5);
+
+      showJudgement("Perfect");
+      triggerEffect(lane, "perfect");
+      score += Math.floor(750 * comboMultiplier); // 롱노트 완료 점수
+      perfect++;
+      combo = updateCombo(combo, currentTime, false);
+
+      const miss = current.miss;
+      const great = current.great;
+      const good = current.good;
+      const accuracy = calculateAccuracy(perfect, great, good, 0, miss);
+      const totalNotes = perfect + great + good + miss;
+      const rank = calculateRank(accuracy, perfect, totalNotes);
+
+      setResult({
+        score,
+        perfect,
+        great,
+        good,
+        miss,
+        combo,
+        earlyCount: current.earlyCount,
+        lateCount: current.lateCount,
+        accuracy,
+        rank,
+        isFullCombo: miss === 0,
+        isAllPerfect: miss === 0 && great === 0 && good === 0,
+      });
+
+      endHold(lane);
+      setNotes((notes) => notes.filter((n) => n.id !== noteId));
+    },
+    [
+      startTimeRef,
+      getResult,
+      setResult,
+      showJudgement,
+      triggerEffect,
+      endHold,
+      setNotes,
+    ],
+  );
+
+  const failHoldNote = useCallback(
+    (lane: number, noteId: string) => {
+      const currentTime = performance.now() - startTimeRef.current!;
+      const current = getResult();
+
+      showJudgement("Miss");
+      const combo = updateCombo([...current.combo], currentTime, true);
+
+      setResult({
+        miss: current.miss + 1,
+        combo,
+        earlyCount: current.earlyCount,
+        lateCount: current.lateCount,
+        isFullCombo: false,
+        isAllPerfect: false,
+      });
+
+      endHold(lane);
+      setNotes((notes) => notes.filter((n) => n.id !== noteId));
+    },
+    [startTimeRef, getResult, setResult, showJudgement, endHold, setNotes],
+  );
 
   const handleKeyPress = useCallback(
     (keyIndex: number) => {
@@ -104,8 +223,42 @@ export const useNoteJudgement = (
 
       if (closestNote) {
         const timeDiff = Math.abs(closestNote.time - currentTime);
-        const rawTimeDiff = closestNote.time - currentTime; // 음수면 late, 양수면 early
+        const rawTimeDiff = closestNote.time - currentTime;
 
+        // 롱노트인 경우
+        if (closestNote.type === "hold" && closestNote.duration) {
+          // 롱노트 시작 판정만 하고, 점수는 끝에서 줌
+          if (timeDiff <= JUDGEMENT_WINDOWS.good) {
+            // 롱노트 활성화
+            startHold(
+              targetLane,
+              closestNote.id,
+              closestNote.time,
+              closestNote.duration,
+            );
+
+            // 판정선 타이밍 업데이트
+            const normalizedTiming = Math.max(
+              -1,
+              Math.min(1, rawTimeDiff / JUDGEMENT_WINDOWS.miss),
+            );
+            let timingType: TimingType;
+            if (Math.abs(normalizedTiming) < 0.3) {
+              timingType = "perfect";
+            } else if (normalizedTiming > 0) {
+              timingType = "early";
+            } else {
+              timingType = "late";
+            }
+            updateTiming(normalizedTiming, timingType);
+
+            // 시작 시 이펙트만 보여줌
+            triggerEffect(targetLane, "great");
+          }
+          return; // 롱노트는 여기서 종료 (점수는 끝에서)
+        }
+
+        // 일반 노트 판정
         let score = current.score;
         let perfect = current.perfect;
         let great = current.great;
@@ -119,20 +272,13 @@ export const useNoteJudgement = (
         if (isEarly) earlyCount++;
         else lateCount++;
 
-        // 노트 타입에 따른 점수 배율
-        const isLongNote = closestNote.type === "hold";
-        const baseScoreMultiplier = isLongNote ? 1.5 : 1; // 롱노트는 1.5배
-
-        // 콤보 보너스 계산 (현재 콤보 수에 따라)
         const currentComboCount =
           combo.length > 0
             ? parseInt(combo[combo.length - 1].split("-")[2])
             : 0;
-        const comboBonus = Math.floor(currentComboCount / 20) * 0.05; // 20콤보마다 5% 추가
-        const comboMultiplier = Math.min(1 + comboBonus, 1.5); // 최대 1.5배
+        const comboBonus = Math.floor(currentComboCount / 20) * 0.05;
+        const comboMultiplier = Math.min(1 + comboBonus, 1.5);
 
-        // 판정선에 표시할 타이밍 계산 (-1 ~ 1)
-        // rawTimeDiff가 양수면 early (왼쪽), 음수면 late (오른쪽)
         const normalizedTiming = Math.max(
           -1,
           Math.min(1, rawTimeDiff / JUDGEMENT_WINDOWS.miss),
@@ -152,9 +298,7 @@ export const useNoteJudgement = (
           updateTiming(normalizedTiming, timingType);
           triggerEffect(targetLane, "perfect");
           const baseScore = 500;
-          score += Math.floor(
-            baseScore * baseScoreMultiplier * comboMultiplier,
-          );
+          score += Math.floor(baseScore * comboMultiplier);
           perfect++;
           combo = updateCombo(combo, currentTime, false);
         } else if (timeDiff <= JUDGEMENT_WINDOWS.great) {
@@ -162,9 +306,7 @@ export const useNoteJudgement = (
           updateTiming(normalizedTiming, timingType);
           triggerEffect(targetLane, "great");
           const baseScore = 300;
-          score += Math.floor(
-            baseScore * baseScoreMultiplier * comboMultiplier,
-          );
+          score += Math.floor(baseScore * comboMultiplier);
           great++;
           combo = updateCombo(combo, currentTime, false);
         } else if (timeDiff <= JUDGEMENT_WINDOWS.good) {
@@ -172,13 +314,10 @@ export const useNoteJudgement = (
           updateTiming(normalizedTiming, timingType);
           triggerEffect(targetLane, "good");
           const baseScore = 100;
-          score += Math.floor(
-            baseScore * baseScoreMultiplier * comboMultiplier,
-          );
+          score += Math.floor(baseScore * comboMultiplier);
           good++;
           combo = updateCombo(combo, currentTime, false);
         } else {
-          // Good과 Miss 판정 범위 사이 (100ms ~ 150ms): Miss 판정
           showJudgement("Miss");
           combo = updateCombo(combo, currentTime, true);
 
@@ -226,6 +365,7 @@ export const useNoteJudgement = (
       setNotes,
       updateTiming,
       triggerEffect,
+      startHold,
     ],
   );
 

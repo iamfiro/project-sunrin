@@ -3,17 +3,68 @@
   width: 100%;
   height: 45px;
   background: linear-gradient(to bottom, #d3e7ff, #acb3bc);
-
   box-sizing: border-box;
+  z-index: 1; // 판정선보다 아래
 
   &.hold {
     background: linear-gradient(to bottom, #69faff, #00a5c6);
+    z-index: 2; // 일반 노트보다는 위, 판정선보다는 아래
 
     .tail {
-        position: absolute;
-        top: 100%;
-        width: 100%;
-        background-color: #00aeff44;
+      position: absolute;
+      top: 100%;
+      width: 100%;
+      // 투명 제거, 불투명하게
+      background: linear-gradient(to bottom, #00c8e0, #0095b3);
+      border-left: 2px solid rgba(255, 255, 255, 0.3);
+      border-right: 2px solid rgba(255, 255, 255, 0.3);
+      box-sizing: border-box;
     }
+
+    .tailEnd {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 20px;
+      background: linear-gradient(to bottom, #00a5c6, #007a94);
+      border-radius: 0 0 4px 4px;
+    }
+
+    // 누르고 있을 때 애니메이션
+    &.pressing {
+      animation: holdPulse 0.15s ease-in-out infinite;
+
+      .tail {
+        animation: tailGlow 0.15s ease-in-out infinite;
+      }
+    }
+  }
+}
+
+@keyframes holdPulse {
+  0% {
+    filter: brightness(1);
+    box-shadow: 0 0 10px rgba(0, 200, 255, 0.5);
+  }
+  50% {
+    filter: brightness(1.3);
+    box-shadow: 0 0 25px rgba(0, 200, 255, 0.9), 0 0 40px rgba(0, 200, 255, 0.5);
+  }
+  100% {
+    filter: brightness(1);
+    box-shadow: 0 0 10px rgba(0, 200, 255, 0.5);
+  }
+}
+
+@keyframes tailGlow {
+  0% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.25);
+  }
+  100% {
+    filter: brightness(1);
   }
 }

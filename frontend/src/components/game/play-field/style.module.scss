@@ -8,7 +8,9 @@
     position: relative;
 
     background-color: #000000;
-    overflow: hidden;
+    // 위쪽만 노트가 넘쳐서 보이도록 clip-path 사용
+    overflow: visible;
+    clip-path: inset(-15% 0 0 0); // 위쪽 15% 여유, 나머지는 클립
 }
 
 .countdownOverlay {
