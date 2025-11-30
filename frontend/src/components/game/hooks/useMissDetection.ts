@@ -10,8 +10,8 @@ export const JUDGEMENT_WINDOWS = {
   miss: 150, // 판정 범위 (키를 눌렀을 때)
 };
 
-// 노트가 자동으로 Miss 처리되는 시간 (3초)
-export const AUTO_MISS_TIME = 3000;
+// 노트가 자동으로 Miss 처리되는 시간 (판정선 통과 후)
+export const AUTO_MISS_TIME = 200; // 3000 → 200ms
 
 const calculateAccuracy = (
   perfect: number,
@@ -75,9 +75,14 @@ export const useMissDetection = (
   const { setResult, getResult } = useResultStore();
 
   useEffect(() => {
-    const missedNotes = notes.filter(
-      (note) => scroll > note.time + AUTO_MISS_TIME,
-    );
+    const missedNotes = notes.filter((note) => {
+      // 롱노트는 끝 시간 기준, 일반 노트는 시작 시간 기준
+      const noteEndTime =
+        note.type === "hold" && note.duration
+          ? note.time + note.duration
+          : note.time;
+      return scroll > noteEndTime + AUTO_MISS_TIME;
+    });
 
     if (missedNotes.length > 0) {
       const current = getResult();
@@ -100,6 +105,9 @@ export const useMissDetection = (
         true,
       );
 
+      // Miss 판정 표시
+      showJudgement("Miss");
+
       setResult({
         miss: newMissCount,
         combo,
@@ -113,5 +121,6 @@ export const useMissDetection = (
         notes.filter((note) => !missedNotes.some((m) => m.id === note.id)),
       );
     }
-  }, [scroll, notes]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scroll]);
 };

@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { createPortal } from "react-dom";
 
 import { useInputStore } from "@/store/inputStore";
 import { useHitEffectStore } from "@/store/useHitEffectStore";
@@ -71,34 +72,40 @@ export default function PlayField({
   }, [handleVideoEnd, onVideoEndCallback]);
 
   return (
-    <div className={s.container}>
-      {!isGameStarted && (
-        <div className={s.countdownOverlay}>
-          <span className={s.countdownText}>
-            {countdown > 0 ? countdown : "START!"}
-          </span>
-        </div>
-      )}
-      <ComboDisplay />
-      <Judgement judgement={judgement} judgementId={judgementId} />
-      <NoteField
-        notes={notes}
-        scroll={scroll}
-        noteDisplayTime={noteDisplayTime}
-        pressedKeys={pressedKeys}
-      />
+    <>
+      {/* 카운트다운을 Portal로 렌더링해서 모든 요소 위에 표시 */}
+      {!isGameStarted &&
+        createPortal(
+          <div className={s.countdownOverlay}>
+            <span className={s.countdownText}>
+              {countdown > 0 ? countdown : "START!"}
+            </span>
+          </div>,
+          document.body,
+        )}
 
-      {/* 판정 이펙트 (여러 개 동시 렌더링) */}
-      {effects.map((effect) => (
-        <HitEffect
-          key={effect.id}
-          judgement={effect.judgement}
-          position={LANE_POSITIONS[effect.lane]}
-          show={true}
-          onComplete={() => removeEffect(effect.id)}
+      <div className={s.container}>
+        <ComboDisplay />
+        <Judgement judgement={judgement} judgementId={judgementId} />
+        <NoteField
+          notes={notes}
+          scroll={scroll}
+          noteDisplayTime={noteDisplayTime}
+          pressedKeys={pressedKeys}
         />
-      ))}
-      <KeyPressIndicator pressedKeys={pressedKeys} />
-    </div>
+
+        {/* 판정 이펙트 (여러 개 동시 렌더링) */}
+        {effects.map((effect) => (
+          <HitEffect
+            key={effect.id}
+            judgement={effect.judgement}
+            position={LANE_POSITIONS[effect.lane]}
+            show={true}
+            onComplete={() => removeEffect(effect.id)}
+          />
+        ))}
+        <KeyPressIndicator pressedKeys={pressedKeys} />
+      </div>
+    </>
   );
 }

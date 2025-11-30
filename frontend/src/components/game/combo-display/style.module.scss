@@ -1,66 +1,37 @@
-@keyframes comboIncrease {
-  0% {
-    transform: translate(-50%, -50%) scale(1);
-    opacity: 1;
-  }
-  20% {
-    transform: translate(-50%, -50%) scale(1.15);
-    opacity: 1;
-  }
-  40% {
-    transform: translate(-50%, -50%) scale(1);
-    opacity: 1;
-  }
-  100% {
-    transform: translate(-50%, -50%) scale(1);
-    opacity: 1;
-  }
-}
-
-@keyframes comboBreak {
-  0% {
-    transform: translate(-50%, -50%) scale(1);
-    opacity: 1;
-  }
-  100% {
-    transform: translate(-50%, -50%) scale(0.5);
-    opacity: 0;
-  }
-}
-
 .comboContainer {
   position: fixed;
   top: 25%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate3d(-50%, -50%, 0);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  z-index: 100;
+  z-index: 90;
   pointer-events: none;
   user-select: none;
-  
+  contain: strict;
+
   &.increase {
-    animation: comboIncrease 0.8s ease-out;
+    animation: comboIncrease 0.5s ease-out;
   }
-  
+
   &.break {
-    animation: comboBreak 0.5s ease-out forwards;
+    animation: comboBreak 0.35s ease-out forwards;
   }
 }
 
 .comboNumber {
-  font-size: clamp(3rem, 8vw, 6rem);
+  font-size: clamp(2.5rem, 7vw, 5rem);
   font-weight: 900;
   color: #fff;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
   line-height: 1;
   letter-spacing: 0.05em;
 }
 
 .comboLabel {
-  font-size: clamp(0.8rem, 2vw, 1.2rem);
+  font-size: clamp(0.7rem, 1.8vw, 1rem);
   font-weight: 700;
   color: #fff;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
@@ -68,4 +39,16 @@
   margin-top: 0.2em;
   margin-left: 0.3em;
   opacity: 0.8;
+}
+
+@keyframes comboIncrease {
+  0% { transform: translate3d(-50%, -50%, 0) scale(1); }
+  20% { transform: translate3d(-50%, -50%, 0) scale(1.1); }
+  40% { transform: translate3d(-50%, -50%, 0) scale(1); }
+  100% { transform: translate3d(-50%, -50%, 0) scale(1); }
+}
+
+@keyframes comboBreak {
+  0% { transform: translate3d(-50%, -50%, 0) scale(1); opacity: 1; }
+  100% { transform: translate3d(-50%, -50%, 0) scale(0.5); opacity: 0; }
 }

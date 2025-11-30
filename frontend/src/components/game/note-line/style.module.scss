@@ -1,25 +1,27 @@
-.container{
-    width: 25%;
-    height: 100%;
-    border: 1px solid rgba(255, 255, 255, 0.138);
-    border-bottom: none;
-    box-sizing: border-box;
-    position: relative;
-    background-color: rgba(0, 0, 0, 0.3);
-    
-    // 판정선 (노트 위에 표시)
-    &::after {
-        content: '';
-        position: absolute;
-        bottom: 0px;
-        left: 0;
-        width: 100%;
-        height: 10px;
-        background-color: #ff51518c;
-        z-index: 100; // 노트보다 위에
-    }
+.container {
+  width: 25%;
+  height: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.138);
+  border-bottom: none;
+  box-sizing: border-box;
+  position: relative;
+  background-color: rgba(0, 0, 0, 0.3);
+  contain: strict; // 최대 격리
+  transform: translateZ(0);
 
-    &.keyPressed {
-        background-color: rgba(255, 255, 255, 0.5);
-    }
+  // 판정선 (노트 위에 표시)
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 10px;
+    background-color: #ff51518c;
+    z-index: 100;
+  }
+
+  &.keyPressed {
+    background-color: rgba(255, 255, 255, 0.15); // 0.5 → 0.15
+  }
 }

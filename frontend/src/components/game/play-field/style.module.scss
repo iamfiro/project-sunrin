@@ -1,64 +1,42 @@
-.container{
-    width: 500px;
-    height: calc(100% - 100px);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-
-    background-color: #000000;
-    // 위쪽만 노트가 넘쳐서 보이도록 clip-path 사용
-    overflow: visible;
-    clip-path: inset(-15% 0 0 0); // 위쪽 15% 여유, 나머지는 클립
+.container {
+  width: 500px;
+  height: calc(100% - 100px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  background-color: #000;
+  overflow: visible;
+  clip-path: inset(-15% 0 0 0);
+  contain: layout style;
+  transform: translate3d(0, 0, 0);
 }
 
 .countdownOverlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: rgba(0, 0, 0, 0.6);
-    z-index: 1044534000;
-    animation: fadeIn 0.3s ease-in-out;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 999999;
 }
 
 .countdownText {
-    font-size: 120px;
-    font-weight: bold;
-    color: #ffffff;
-    text-shadow: 0 0 20px rgba(255, 255, 255, 0.8),
-                 0 0 40px rgba(255, 255, 255, 0.5);
-    animation: countdownDrop 0.8s ease-out;
+  font-size: 100px;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+  animation: countdownPop 0.6s ease-out;
+  transform: translate3d(0, 0, 0);
 }
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
-}
-
-@keyframes countdownDrop {
-    0% {
-        transform: translateY(-150%);
-        opacity: 0;
-    }
-    60% {
-        transform: translateY(10%);
-        opacity: 1;
-    }
-    80% {
-        transform: translateY(-5%);
-    }
-    100% {
-        transform: translateY(0);
-        opacity: 1;
-    }
+@keyframes countdownPop {
+  0% { transform: translate3d(0, 0, 0) scale(0.5); opacity: 0; }
+  50% { transform: translate3d(0, 0, 0) scale(1.1); opacity: 1; }
+  100% { transform: translate3d(0, 0, 0) scale(1); opacity: 1; }
 }

@@ -1,13 +1,12 @@
-import React, { memo, useEffect, useRef } from "react";
+import { memo, useEffect, useRef } from "react";
 
-import styles from "./style.module.scss";
+import s from "./style.module.scss";
 
 export type JudgementType = "perfect" | "great" | "good" | "miss";
 
 interface HitEffectProps {
   judgement: JudgementType | null;
   position?: number;
-  duration?: number;
   show?: boolean;
   onComplete?: () => void;
 }
@@ -16,52 +15,66 @@ interface HitEffectProps {
 const DURATION_MAP: Record<JudgementType, number> = {
   perfect: 280,
   great: 240,
-  good: 200,
+  good: 180,
   miss: 0,
 };
 
-const HitEffect: React.FC<HitEffectProps> = memo(
-  ({ judgement, position = 50, duration, show = false, onComplete }) => {
+const HitEffect = memo(
+  ({ judgement, position = 50, show = false, onComplete }: HitEffectProps) => {
     const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-    const effectDuration =
-      duration ?? (judgement ? DURATION_MAP[judgement] : 240);
 
     useEffect(() => {
       if (show && judgement && judgement !== "miss") {
-        timerRef.current = setTimeout(() => {
-          onComplete?.();
-        }, effectDuration);
+        timerRef.current = setTimeout(
+          () => onComplete?.(),
+          DURATION_MAP[judgement],
+        );
       }
-
       return () => {
-        if (timerRef.current) {
-          clearTimeout(timerRef.current);
-        }
+        if (timerRef.current) clearTimeout(timerRef.current);
       };
-    }, [show, judgement, effectDuration, onComplete]);
+    }, [show, judgement, onComplete]);
 
-    if (!show || !judgement || judgement === "miss") {
-      return null;
+    if (!show || !judgement || judgement === "miss") return null;
+
+    // Good: 최소 DOM (flash + ring만)
+    if (judgement === "good") {
+      return (
+        <div
+          className={`${s.hitEffect} ${s.good}`}
+          style={{ left: `${position}%` }}
+        >
+          <div className={s.flashCore} />
+          <div className={s.ring} />
+        </div>
+      );
     }
 
+    // Great: flash + ring + secondary
+    if (judgement === "great") {
+      return (
+        <div
+          className={`${s.hitEffect} ${s.great}`}
+          style={{ left: `${position}%` }}
+        >
+          <div className={s.flashCore} />
+          <div className={s.ring} />
+          <div className={s.ringSecondary} />
+        </div>
+      );
+    }
+
+    // Perfect: 풀 이펙트
     return (
       <div
-        className={`${styles.hitEffect} ${styles[judgement]}`}
+        className={`${s.hitEffect} ${s.perfect}`}
         style={{ left: `${position}%` }}
       >
-        {/* 중앙 플래시 코어 */}
-        <div className={styles.flashCore} />
-
-        {/* 외곽 링 */}
-        <div className={styles.ring} />
-
-        {/* 세컨더리 링 */}
-        <div className={styles.ringSecondary} />
-
-        {/* 아크 (레이더 효과) - 2개로 축소 */}
-        <div className={styles.arc1} />
-        <div className={styles.arc2} />
+        <div className={s.flashCore} />
+        <div className={s.ring} />
+        <div className={s.ringSecondary} />
+        <div className={s.arc1} />
+        <div className={s.arc2} />
       </div>
     );
   },
