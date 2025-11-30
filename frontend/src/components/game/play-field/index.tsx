@@ -1,5 +1,8 @@
+import { useEffect } from "react";
+
 import { useInputStore } from "@/store/inputStore";
 
+import ComboDisplay from "../combo-display";
 import {
   useGameEnd,
   useGameTimer,
@@ -9,20 +12,32 @@ import {
   useNoteGeneration,
   useNoteJudgement,
 } from "../hooks";
-import ComboDisplay from "../combo-display";
 import Judgement from "../judgement";
 import NoteField from "../note-field";
 
 import s from "./style.module.scss";
 
-export default function PlayField() {
+interface PlayFieldProps {
+  onGameStarted?: (isStarted: boolean) => void;
+  onVideoEndCallback?: (handler: () => void) => void;
+}
+
+export default function PlayField({
+  onGameStarted,
+  onVideoEndCallback,
+}: PlayFieldProps) {
   const { pressedKeys } = useInputStore();
 
-  // 게임 타이머
-  const { scroll, startTimeRef } = useGameTimer();
+  const { scroll, startTimeRef, countdown, isGameStarted } = useGameTimer();
 
-  // 노트 생성
-  const { notes, setNotes, noteDisplayTime } = useNoteGeneration(scroll);
+  useEffect(() => {
+    onGameStarted?.(isGameStarted);
+  }, [isGameStarted, onGameStarted]);
+
+  const { notes, setNotes, noteDisplayTime } = useNoteGeneration(
+    scroll,
+    isGameStarted,
+  );
 
   // 판정 표시
   const { judgement, judgementId, showJudgement } = useJudgement();
@@ -36,16 +51,28 @@ export default function PlayField() {
   );
 
   // 키보드 입력
-  useKeyboardInput(handleKeyPress);
+  useKeyboardInput(handleKeyPress, isGameStarted);
 
   // Miss 자동 감지
   useMissDetection(scroll, notes, startTimeRef, showJudgement, setNotes);
 
   // 게임 종료
-  useGameEnd(notes);
+  const { handleVideoEnd } = useGameEnd(notes);
+
+  // 비디오 종료 핸들러를 부모에게 전달
+  useEffect(() => {
+    onVideoEndCallback?.(handleVideoEnd);
+  }, [handleVideoEnd, onVideoEndCallback]);
 
   return (
     <div className={s.container}>
+      {!isGameStarted && (
+        <div className={s.countdownOverlay}>
+          <span className={s.countdownText}>
+            {countdown > 0 ? countdown : "START!"}
+          </span>
+        </div>
+      )}
       <ComboDisplay />
       <Judgement judgement={judgement} judgementId={judgementId} />
       <NoteField

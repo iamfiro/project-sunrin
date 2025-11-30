@@ -18,6 +18,10 @@ export const useGameEnd = (notes: Note[]) => {
       return () => clearTimeout(timer);
     }
   }, [notes, navigate]);
+
+  const handleVideoEnd = () => {
+    navigate("/game/result");
+  };
+
+  return { handleVideoEnd };
 };
-
-

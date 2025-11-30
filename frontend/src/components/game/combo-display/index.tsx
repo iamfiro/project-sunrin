@@ -1,64 +1,52 @@
+import { useEffect, useState } from "react";
+
 import { useResultStore } from "@/store/useResultStore";
-import { useEffect, useState, useRef } from "react";
 
 import s from "./style.module.scss";
 
 export default function ComboDisplay() {
   const { combo } = useResultStore();
   const [currentCombo, setCurrentCombo] = useState(0);
-  const [isVisible, setIsVisible] = useState(false);
   const [animationKey, setAnimationKey] = useState(0);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const [isComboIncreasing, setIsComboIncreasing] = useState(false);
 
   useEffect(() => {
+    // combo 배열의 마지막 요소에서 현재 콤보 수를 가져옴
     if (combo.length > 0) {
       const lastCombo = combo[combo.length - 1];
-      const [, , count] = lastCombo.split("-").map(Number);
-      
-      // 콤보가 증가했을 때만 애니메이션 트리거
-      if (count > currentCombo) {
-        setAnimationKey(prev => prev + 1);
-      }
-      
-      setCurrentCombo(count);
+      const comboCount = parseInt(lastCombo.split("-")[2]);
 
-      // 콤보가 1 이상일 때만 표시
-      if (count > 0) {
-        setIsVisible(true);
-        
-        // 이전 타이머 클리어
-        if (timerRef.current) {
-          clearTimeout(timerRef.current);
-        }
-        
-        // 3초 후 숨김
-        timerRef.current = setTimeout(() => {
-          setIsVisible(false);
-        }, 3000);
-      } else {
-        setIsVisible(false);
+      console.log("🎮 Combo Debug:", {
+        comboArray: combo,
+        lastCombo,
+        comboCount,
+        currentCombo,
+      });
+
+      if (comboCount !== currentCombo) {
+        setIsComboIncreasing(comboCount > currentCombo);
+        setCurrentCombo(comboCount);
+        setAnimationKey((prev) => prev + 1);
       }
     } else {
       setCurrentCombo(0);
-      setIsVisible(false);
     }
-
-    return () => {
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
-      }
-    };
   }, [combo, currentCombo]);
 
-  if (!isVisible) return null;
+  if (currentCombo < 2) {
+    return null;
+  }
+
+  const comboRange = currentCombo >= 50 ? "high" : "normal";
 
   return (
-    <div 
-      className={s.container} 
+    <div
+      className={`${s.comboContainer} ${isComboIncreasing ? s.increase : s.break}`}
       key={animationKey}
+      data-combo-range={comboRange}
     >
-      <span className={s.label}>COMBO</span>
-      <p className={s.count}>{currentCombo}</p>
+      <span className={s.comboNumber}>{currentCombo}</span>
+      <span className={s.comboLabel}>COMBO</span>
     </div>
   );
 }

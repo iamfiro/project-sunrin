@@ -7,8 +7,11 @@ export const JUDGEMENT_WINDOWS = {
   perfect: 30,
   great: 60,
   good: 100,
-  miss: 150,
+  miss: 150, // 판정 범위 (키를 눌렀을 때)
 };
+
+// 노트가 자동으로 Miss 처리되는 시간 (3초)
+export const AUTO_MISS_TIME = 3000;
 
 const calculateAccuracy = (
   perfect: number,
@@ -73,7 +76,7 @@ export const useMissDetection = (
 
   useEffect(() => {
     const missedNotes = notes.filter(
-      (note) => scroll > note.time + JUDGEMENT_WINDOWS.miss,
+      (note) => scroll > note.time + AUTO_MISS_TIME,
     );
 
     if (missedNotes.length > 0) {
@@ -91,13 +94,15 @@ export const useMissDetection = (
         current.perfect + current.great + current.good + newMissCount;
       const rank = calculateRank(accuracy, current.perfect, totalNotes);
 
+      const combo = updateCombo(
+        current.combo,
+        performance.now() - startTimeRef.current!,
+        true,
+      );
+
       setResult({
         miss: newMissCount,
-        combo: updateCombo(
-          current.combo,
-          performance.now() - startTimeRef.current!,
-          true,
-        ),
+        combo,
         accuracy,
         rank,
         isFullCombo: false,
@@ -108,6 +113,5 @@ export const useMissDetection = (
         notes.filter((note) => !missedNotes.some((m) => m.id === note.id)),
       );
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scroll, notes]);
 };

@@ -1,46 +1,64 @@
-.container {
-  position: absolute;
-  top: 60px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 100;
-  
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: $spacing-16;
-  
-  animation: scaleUp 0.15s ease-out forwards;
-}
-
-.label {
-  font-size: 20px;
-  font-weight: 700;
-  letter-spacing: 0.2em;
-  color: #ffffff;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-  font-family: "Galmuri9", monospace;
-}
-
-.count {
-  font-size: 80px;
-  font-weight: 900;
-  color: #ffffff;
-  line-height: 1;
-  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
-  font-family: "Galmuri9", monospace;
-}
-
-@keyframes scaleUp {
+@keyframes comboIncrease {
   0% {
-    transform: translateX(-50%) scale(0.5);
-    opacity: 0;
+    transform: translate(-50%, -50%) scale(1);
   }
   50% {
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes comboBreak {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
     opacity: 1;
   }
   100% {
-    transform: translateX(-50%) scale(1);
-    opacity: 1;
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 0;
   }
+}
+
+.comboContainer {
+  position: fixed;
+  top: 25%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  pointer-events: none;
+  user-select: none;
+  
+  &.increase {
+    animation: comboIncrease 0.2s ease-out;
+  }
+  
+  &.break {
+    animation: comboBreak 0.3s ease-out forwards;
+  }
+}
+
+.comboNumber {
+  font-size: clamp(3rem, 8vw, 6rem);
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  line-height: 1;
+  letter-spacing: 0.05em;
+}
+
+.comboLabel {
+  font-size: clamp(0.8rem, 2vw, 1.2rem);
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  letter-spacing: 0.3em;
+  margin-top: 0.2em;
+  margin-left: 0.3em;
+  opacity: 0.8;
 }

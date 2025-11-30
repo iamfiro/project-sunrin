@@ -73,17 +73,27 @@ const createRandomNotesBatch = (startTime: number, count: number): Note[] => {
   return notes;
 };
 
-export const useNoteGeneration = (scroll: number) => {
-  const initialNotes = useMemo<Note[]>(
-    () => createRandomNotesBatch(NOTE_INITIAL_DELAY, NOTE_BATCH_SIZE),
-    [],
-  );
-  const [notes, setNotes] = useState<Note[]>(initialNotes);
-  const lastNoteTimeRef = useRef(
-    initialNotes[initialNotes.length - 1]?.time ?? NOTE_INITIAL_DELAY,
-  );
+export const useNoteGeneration = (scroll: number, isGameStarted: boolean) => {
+  const [notes, setNotes] = useState<Note[]>([]);
+  const lastNoteTimeRef = useRef(NOTE_INITIAL_DELAY);
+  const initializedRef = useRef(false);
 
   useEffect(() => {
+    // 게임이 시작되면 초기 노트 생성
+    if (isGameStarted && !initializedRef.current) {
+      // 노트가 화면 위에서부터 천천히 내려오도록 NOTE_DISPLAY_TIME 이후에 시작
+      const startTime = NOTE_DISPLAY_TIME + NOTE_INITIAL_DELAY;
+      const initialNotes = createRandomNotesBatch(startTime, NOTE_BATCH_SIZE);
+      setNotes(initialNotes);
+      lastNoteTimeRef.current = initialNotes[initialNotes.length - 1]?.time ?? startTime;
+      initializedRef.current = true;
+    }
+  }, [isGameStarted]);
+
+  useEffect(() => {
+    // 게임이 시작되지 않았으면 노트 생성 안함
+    if (!isGameStarted) return;
+
     if (notes.length <= NOTE_RENEW_THRESHOLD) {
       const nextStartTime = Math.max(
         lastNoteTimeRef.current + NOTE_MIN_INTERVAL,
@@ -95,7 +105,7 @@ export const useNoteGeneration = (scroll: number) => {
       setNotes((prev) => [...prev, ...newNotes]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [notes.length, scroll]);
+  }, [notes.length, scroll, isGameStarted]);
 
   return { notes, setNotes, noteDisplayTime: NOTE_DISPLAY_TIME };
 };

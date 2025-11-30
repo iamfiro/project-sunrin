@@ -6,6 +6,7 @@ import {
   useJudgementLineStore,
 } from "@/store/useJudgementLineStore";
 import { useResultStore } from "@/store/useResultStore";
+
 import { JUDGEMENT_WINDOWS } from "./useMissDetection";
 
 const calculateAccuracy = (
@@ -65,9 +66,6 @@ const updateCombo = (
   }
 };
 
-/**
- * 노트 판정 처리
- */
 export const useNoteJudgement = (
   notes: Note[],
   startTimeRef: React.RefObject<number>,
@@ -97,39 +95,8 @@ export const useNoteJudgement = (
 
       const current = getResult();
 
-      // 노트가 없거나 판정 범위 밖일 때 Miss 처리
+      // 판정 범위 밖에서 키를 누르면 아무 일도 일어나지 않음
       if (!closestNote || minTimeDiff > JUDGEMENT_WINDOWS.miss) {
-        showJudgement("Miss");
-
-        let missPosition = 0;
-        if (closestNote) {
-          const rawTimeDiff = closestNote.time - currentTime;
-          missPosition = rawTimeDiff > 0 ? -1 : 1;
-        }
-        updateTiming(missPosition, "miss");
-
-        const miss = current.miss + 1;
-        const combo = updateCombo([...current.combo], currentTime, true);
-        const accuracy = calculateAccuracy(
-          current.perfect,
-          current.great,
-          current.good,
-          0,
-          miss,
-        );
-        const totalNotes =
-          current.perfect + current.great + current.good + miss;
-        const rank = calculateRank(accuracy, current.perfect, totalNotes);
-
-        setResult({
-          ...current,
-          miss,
-          combo,
-          accuracy,
-          rank,
-          isFullCombo: false,
-          isAllPerfect: false,
-        });
         return;
       }
 
@@ -141,7 +108,7 @@ export const useNoteJudgement = (
         let perfect = current.perfect;
         let great = current.great;
         let good = current.good;
-        let miss = current.miss;
+        const miss = current.miss;
         let combo = [...current.combo];
         let earlyCount = current.earlyCount;
         let lateCount = current.lateCount;
@@ -206,12 +173,12 @@ export const useNoteJudgement = (
           good++;
           combo = updateCombo(combo, currentTime, false);
         } else {
+          // Good과 Miss 판정 범위 사이 (100ms ~ 150ms): Miss 판정
           showJudgement("Miss");
-          miss++;
           combo = updateCombo(combo, currentTime, true);
 
           setResult({
-            miss,
+            miss: miss + 1,
             combo,
             earlyCount,
             lateCount,

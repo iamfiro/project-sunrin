@@ -4,6 +4,7 @@ import { useInputStore } from "@/store/inputStore";
 
 export const useKeyboardInput = (
   handleKeyPress: (keyIndex: number) => void,
+  isGameStarted: boolean,
 ) => {
   const { keyCodes, pressKey, releaseKey } = useInputStore();
   const handleKeyPressRef = useRef(handleKeyPress);
@@ -16,6 +17,9 @@ export const useKeyboardInput = (
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.repeat) return;
       
+      // 게임이 시작되지 않았으면 키 입력 무시
+      if (!isGameStarted) return;
+      
       const keyIndex = keyCodes.indexOf(e.code);
 
       if (keyIndex !== -1) {
@@ -25,6 +29,9 @@ export const useKeyboardInput = (
     };
 
     const handleKeyUp = (e: KeyboardEvent) => {
+      // 게임이 시작되지 않았으면 키 입력 무시
+      if (!isGameStarted) return;
+      
       const keyIndex = keyCodes.indexOf(e.code);
       if (keyIndex !== -1) {
         releaseKey(keyIndex);
@@ -38,5 +45,5 @@ export const useKeyboardInput = (
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("keyup", handleKeyUp);
     };
-  }, [keyCodes, pressKey, releaseKey]);
+  }, [keyCodes, pressKey, releaseKey, isGameStarted]);
 };
