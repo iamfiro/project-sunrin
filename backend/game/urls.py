@@ -2,13 +2,12 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.ChartViewSet.as_view({'get': 'list'}), name='chart-list'),
+    path('', views.ChartViewSet.as_view({'get': 'list', 'post': 'create'}), name='chart-list'),
     path('<str:musicId>/', views.ChartViewSet.as_view({
         'get': 'retrieve',
         'put': 'update',
         'patch': 'partial_update',
-        'delete': 'destroy',
-        'post': 'create'
+        'delete': 'destroy'
     }), name='chart-detail'),
     path('<str:musicId>/leaderboard/', views.leaderboard, name='leaderboard'),
     path('<str:musicId>/results/', views.chart_results, name='chart-results'),

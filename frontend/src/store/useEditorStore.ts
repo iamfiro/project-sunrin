@@ -7,6 +7,10 @@ interface EditorStore {
   setEditMusic: (music: File | null) => void;
   bpm: number;
   setBpm: (bpm: number) => void;
+  artist: string;
+  setArtist: (artist: string) => void;
+  difficulty: number;
+  setDifficulty: (difficulty: number) => void;
   editVideoUrl: string | null;
 }
 
@@ -29,5 +33,9 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   },
   bpm: 0,
   setBpm: (bpm: number) => set({ bpm }),
+  artist: "",
+  setArtist: (artist: string) => set({ artist }),
+  difficulty: 1,
+  setDifficulty: (difficulty: number) => set({ difficulty }),
   editVideoUrl: null,
 }));

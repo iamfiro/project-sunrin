@@ -1,5 +1,11 @@
 from rest_framework import serializers
 from .models import Note, Chart, Rank, Result
+from ulid import ULID
+import cv2
+from django.core.files.base import ContentFile
+from django.conf import settings
+import os
+import json
 
 class NoteSerializer(serializers.ModelSerializer):
     """노트 시리얼라이저"""
@@ -12,19 +18,25 @@ class ChartSerializer(serializers.ModelSerializer):
     notes = NoteSerializer(many=True, read_only=True)
     ranks = serializers.SerializerMethodField()
     userBestRecord = serializers.SerializerMethodField()
+    musicFile = serializers.FileField(write_only=True)
+    notes_data = serializers.CharField(write_only=True)
 
     class Meta:
         model = Chart
-        fields = '__all__'
+        fields = (
+            'musicId', 'title', 'song', 'backgroundVideo', 'coverUrl', 
+            'isCommunitySong', 'artist', 'bpm', 'difficulty', 'creator',
+            'notes', 'ranks', 'userBestRecord', 'musicFile', 'notes_data'
+        )
+        read_only_fields = ('musicId', 'song', 'backgroundVideo', 'coverUrl', 'creator', 'isCommunitySong')
 
     def get_ranks(self, obj):
-        ranks = obj.ranks.order_by('-score')[:10]  # 상위 10개 랭킹
+        ranks = obj.ranks.order_by('-score')[:10]
         return RankSerializer(ranks, many=True, context=self.context).data
     
     def get_userBestRecord(self, obj):
-        """현재 로그인한 사용자의 베스트 기록"""
         request = self.context.get('request')
-        if not request or not request.user or not request.user.is_authenticated:
+        if not request or not request.user.is_authenticated:
             return None
         
         best_result = Result.objects.filter(
@@ -44,27 +56,79 @@ class ChartSerializer(serializers.ModelSerializer):
         return None
 
     def create(self, validated_data):
-        # notes는 request.data에서 직접 가져옴 (read_only 필드이므로)
-        request = self.context.get('request')
-        notes_data = request.data.get('notes', []) if request else []
+        import posixpath
+        request = self.context['request']
+        music_file = validated_data.pop('musicFile')
+        notes_data_str = validated_data.pop('notes_data')
         
-        chart = Chart.objects.create(**validated_data)
-        for note_data in notes_data:
-            Note.objects.create(chart=chart, **note_data)
+        music_id = str(ULID())
+        file_name = f'{music_id}.mp4'
+        
+        # --- Song File ---
+        song_os_path = os.path.join(settings.MEDIA_ROOT, 'songs', file_name)
+        song_db_path = posixpath.join(settings.MEDIA_URL, 'songs', file_name)
+        
+        os.makedirs(os.path.dirname(song_os_path), exist_ok=True)
+        with open(song_os_path, 'wb+') as f:
+            for chunk in music_file.chunks():
+                f.write(chunk)
+
+        # --- Video File ---
+        # Using the same file for song and video, just different DB path based on model
+        video_os_path = os.path.join(settings.MEDIA_ROOT, 'video', file_name)
+        video_db_path = posixpath.join(settings.MEDIA_URL, 'video', file_name)
+        
+        os.makedirs(os.path.dirname(video_os_path), exist_ok=True)
+        with open(video_os_path, 'wb+') as f:
+            music_file.seek(0)
+            for chunk in music_file.chunks():
+                f.write(chunk)
+
+        # --- Cover Image ---
+        temp_dir = os.path.join(settings.MEDIA_ROOT, 'temp')
+        os.makedirs(temp_dir, exist_ok=True)
+        temp_video_path = os.path.join(temp_dir, file_name)
+        
+        music_file.seek(0)
+        with open(temp_video_path, 'wb+') as f:
+            for chunk in music_file.chunks():
+                f.write(chunk)
+        
+        cap = cv2.VideoCapture(temp_video_path)
+        ret, frame = cap.read()
+        cover_db_path = ''
+        if ret:
+            cover_filename = f'{music_id}.jpg'
+            cover_os_path = os.path.join(settings.MEDIA_ROOT, 'covers', cover_filename)
+            cover_db_path = posixpath.join(settings.MEDIA_URL, 'covers', cover_filename)
+            os.makedirs(os.path.dirname(cover_os_path), exist_ok=True)
+            cv2.imwrite(cover_os_path, frame)
+        else:
+            # If frame extraction fails, use a default cover
+            cover_db_path = posixpath.join(settings.MEDIA_URL, 'covers', 'bochi.jpg')
+        cap.release()
+        os.remove(temp_video_path)
+
+        chart = Chart.objects.create(
+            musicId=music_id,
+            song=song_db_path,
+            backgroundVideo=video_db_path,
+            coverUrl=cover_db_path,
+            creator=request.user,
+            isCommunitySong=True,
+            **validated_data
+        )
+
+        if notes_data_str:
+            notes_data = json.loads(notes_data_str)
+            for note_data in notes_data:
+                Note.objects.create(chart=chart, **note_data)
+        
         return chart
 
     def update(self, instance, validated_data):
-        # notes는 request.data에서 직접 가져옴 (read_only 필드이므로)
-        request = self.context.get('request')
-        notes_data = request.data.get('notes', []) if request else []
-        
-        instance = super().update(instance, validated_data)
-        if notes_data:
-            # 기존 노트 삭제 후 새로 생성 (단순화)
-            instance.notes.all().delete()
-            for note_data in notes_data:
-                Note.objects.create(chart=instance, **note_data)
-        return instance
+        # This part needs to be updated if chart editing is implemented
+        return super().update(instance, validated_data)
 
 class RankUserSerializer(serializers.Serializer):
     """랭킹에 포함될 유저 정보 시리얼라이저"""

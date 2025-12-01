@@ -2,7 +2,6 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 
-
 class CookieJWTAuthentication(JWTAuthentication):
     """쿠키에서 JWT 토큰을 읽어 인증하는 클래스"""
     
@@ -12,7 +11,20 @@ class CookieJWTAuthentication(JWTAuthentication):
         
         if access_token is None:
             # 쿠키에 없으면 헤더에서 확인 (기존 방식 지원)
-            return super().authenticate(request)
+            header = self.get_header(request)
+            if header is None:
+                # 쿠키도 없고 헤더도 없으면 None 반환 (인증 안함)
+                return None
+            
+            raw_token = self.get_raw_token(header)
+            if raw_token is None:
+                return None
+            
+            try:
+                validated_token = self.get_validated_token(raw_token)
+                return self.get_user(validated_token), validated_token
+            except (InvalidToken, TokenError):
+                return None
         
         # 토큰 검증
         try:

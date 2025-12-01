@@ -3,12 +3,20 @@ const API_BASE = "http://localhost:8000";
 async function request<T = any>(path: string, init: RequestInit = {}) {
   const url = path.startsWith("http") ? path : `${API_BASE}${path}`;
 
+  const headers: HeadersInit = {
+    ...init.headers,
+  };
+
+  // FormData의 경우 Content-Type을 설정하지 않음
+  // 브라우저가 자동으로 multipart/form-data로 설정하도록 함
+  if (!(init.body instanceof FormData)) {
+    headers["Content-Type"] = "application/json";
+  }
+
   const defaultInit: RequestInit = {
     credentials: "include", // include cookies for httpOnly token
-    headers: {
-      "Content-Type": "application/json",
-    },
     ...init,
+    headers,
   };
 
   const res = await fetch(url, defaultInit);

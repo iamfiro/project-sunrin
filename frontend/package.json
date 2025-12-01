@@ -12,12 +12,15 @@
   "dependencies": {
     "@tanstack/react-query": "^5.90.11",
     "@types/node": "^24.10.1",
+    "@types/react-router-dom": "^5.3.3",
+    "@types/react-toastify": "^4.0.2",
     "classnames": "^2.5.1",
     "lucide-react": "^0.554.0",
     "music-tempo": "^1.0.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^7.9.6",
+    "react-toastify": "^11.0.5",
     "sass": "^1.94.0",
     "wavesurfer.js": "^7.0.0",
     "zustand": "^5.0.8"

@@ -1,10 +1,41 @@
-import { Chart, ChartSortOption } from "@/shared/types/chart";
+import { Chart, ChartSortOption, Note } from "@/shared/types/chart";
 
 import request from "./client";
 
 export interface GetChartsParams {
   search?: string;
   sort?: ChartSortOption;
+}
+
+export interface SaveChartNote {
+  time: number;
+  lane: number;
+  type: "tap" | "hold";
+  duration?: number;
+}
+
+export interface SaveChartParams {
+  title: string;
+  artist: string;
+  bpm: number;
+  notes_data: SaveChartNote[];
+  musicFile: File;
+  difficulty: number;
+}
+
+export async function saveChart(data: SaveChartParams) {
+  const formData = new FormData();
+  formData.append("title", data.title);
+  formData.append("artist", data.artist);
+  formData.append("bpm", data.bpm.toString());
+  formData.append("difficulty", data.difficulty.toString());
+  formData.append("musicFile", data.musicFile);
+  formData.append("notes_data", JSON.stringify(data.notes_data));
+
+  return request<Chart>("/charts/", {
+    method: "POST",
+    body: formData,
+  });
 }
 
 export async function getCharts(_params?: GetChartsParams) {

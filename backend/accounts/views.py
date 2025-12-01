@@ -1,5 +1,5 @@
 from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -41,6 +41,7 @@ def set_token_cookies(response, refresh):
 
 
 @api_view(['POST'])
+@authentication_classes([])  # 인증 비활성화
 @permission_classes([AllowAny])
 def register(request):
     """회원가입 API"""
@@ -49,12 +50,14 @@ def register(request):
         user = serializer.save()
         return Response({
             'message': '회원가입이 완료되었습니다.',
-            'user': UserSerializer(user).data
+            'user': {'id': user.id, 'nickname': user.nickname}
         }, status=status.HTTP_201_CREATED)
+    
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
+@authentication_classes([])  # 인증 비활성화
 @permission_classes([AllowAny])
 def login(request):
     """로그인 API - JWT 토큰을 httpOnly 쿠키에 설정"""
@@ -63,7 +66,16 @@ def login(request):
         nickname = serializer.validated_data['nickname']
         password = serializer.validated_data['password']
         
+        # Try to authenticate with both username and nickname
         user = authenticate(username=nickname, password=password)
+        if user is None:
+            # Try to find user by nickname
+            try:
+                user = User.objects.get(nickname=nickname)
+                if not user.check_password(password):
+                    user = None
+            except User.DoesNotExist:
+                pass
         
         if user is not None:
             refresh = RefreshToken.for_user(user)
@@ -77,7 +89,7 @@ def login(request):
             return response
         else:
             return Response({
-                'error': '아이디 또는 비밀번호가 올바르지 않습니다.'
+                'error': '아이디 또는 비밀명호가 올바르지 않습니다.'
             }, status=status.HTTP_401_UNAUTHORIZED)
     
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -93,6 +105,7 @@ def me(request):
 
 
 @api_view(['POST'])
+@authentication_classes([])  # 인증 비활성화
 @permission_classes([AllowAny])
 def logout(request):
     """로그아웃 - 쿠키 삭제"""

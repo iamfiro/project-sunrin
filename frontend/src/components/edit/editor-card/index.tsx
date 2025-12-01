@@ -9,8 +9,11 @@ import {
 } from "lucide-react";
 import MusicTempo from "music-tempo";
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import WaveSurfer from "wavesurfer.js";
 
+import { saveChart } from "@/shared/api/chartService";
 import { useEditorStore } from "@/store/useEditorStore";
 import { useNoteStore } from "@/store/useNoteStore";
 
@@ -23,6 +26,7 @@ interface Props {
   onNext: () => void;
 }
 export default function EditorCard({ title, onNext }: Props) {
+  const navigate = useNavigate();
   const waveformRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<HTMLDivElement>(null);
   const wavesurferRef = useRef<WaveSurfer | null>(null);
@@ -43,8 +47,18 @@ export default function EditorCard({ title, onNext }: Props) {
   } = useNoteStore();
   const selectedNote = getSelectedNote();
 
-  const { editTitle, setEditTitle, editMusic, setEditMusic, bpm, setBpm } =
-    useEditorStore();
+  const {
+    editTitle,
+    setEditTitle,
+    editMusic,
+    setEditMusic,
+    bpm,
+    setBpm,
+    artist,
+    setArtist,
+    difficulty,
+    setDifficulty,
+  } = useEditorStore();
 
   useEffect(() => {
     if (editMusic) {
@@ -265,6 +279,38 @@ export default function EditorCard({ title, onNext }: Props) {
     }
   };
 
+  const handleSave = async () => {
+    if (!editTitle || !editMusic) {
+      toast.error("제목과 음악 파일을 모두 입력해주세요.");
+      return;
+    }
+
+    try {
+      // Omit the 'id' from each note, as the backend will assign it.
+      const notes_data = notes.map(({ id, ...rest }) => rest);
+
+      const chartData = {
+        title: editTitle,
+        artist: artist,
+        bpm: bpm || 120, // 기본값 120
+        notes_data: notes_data,
+        musicFile: editMusic,
+        difficulty: difficulty,
+      };
+
+      await saveChart(chartData);
+      toast.success("차트가 성공적으로 저장되었습니다!");
+      navigate("/game/select"); // 저장 후 선택 화면으로 이동
+    } catch (error) {
+      console.error("Error saving chart:", error);
+      if (error instanceof Error) {
+        toast.error(`차트 저장 중 오류가 발생했습니다: ${error.message}`);
+      } else {
+        toast.error("차트 저장 중 알 수 없는 오류가 발생했습니다.");
+      }
+    }
+  };
+
   useEffect(() => {
     return () => {
       if (wavesurferRef.current) {
@@ -309,6 +355,18 @@ export default function EditorCard({ title, onNext }: Props) {
               }
             }}
           />
+          <input
+            type="text"
+            placeholder="아티스트"
+            onChange={(e) => setArtist(e.target.value)}
+          />
+          <input
+            type="number"
+            placeholder="난이도 (1-15)"
+            min="1"
+            max="15"
+            onChange={(e) => setDifficulty(Number(e.target.value))}
+          />
           <button onClick={onNext}>다음으로</button>
         </div>
       </div>
@@ -318,6 +376,9 @@ export default function EditorCard({ title, onNext }: Props) {
       <div className={s.contents}>
         <div className={s.topBar}>
           <img src="/logo_brand.svg" alt="logo" />
+          <button onClick={handleSave} className={s.saveButton}>
+            저장
+          </button>
         </div>
         <div className={s.editContainer}>
           <div className={s.editor} ref={editorRef} onScroll={handleScroll}>
