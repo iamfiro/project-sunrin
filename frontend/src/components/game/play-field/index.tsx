@@ -1,6 +1,7 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 
+import { Note } from "@/shared/types/game/note";
 import { useInputStore } from "@/store/inputStore";
 import { useHitEffectStore } from "@/store/useHitEffectStore";
 
@@ -12,7 +13,6 @@ import {
   useJudgement,
   useKeyboardInput,
   useMissDetection,
-  useNoteGeneration,
   useNoteJudgement,
 } from "../hooks";
 import Judgement from "../judgement";
@@ -22,13 +22,16 @@ import NoteField from "../note-field";
 import s from "./style.module.scss";
 
 const LANE_POSITIONS = [12.5, 37.5, 62.5, 87.5];
+const NOTE_DISPLAY_TIME = 600;
 
 interface PlayFieldProps {
+  notes: Note[];
   onGameStarted?: (isStarted: boolean) => void;
   onVideoEndCallback?: (handler: () => void) => void;
 }
 
 export default function PlayField({
+  notes: initialNotes,
   onGameStarted,
   onVideoEndCallback,
 }: PlayFieldProps) {
@@ -36,20 +39,24 @@ export default function PlayField({
   const { effects, removeEffect } = useHitEffectStore();
 
   const { scroll, startTimeRef, countdown, isGameStarted } = useGameTimer();
+  const [notes, setNotes] = useState<Note[]>([]);
 
   useEffect(() => {
     onGameStarted?.(isGameStarted);
   }, [isGameStarted, onGameStarted]);
 
-  const { notes, setNotes, noteDisplayTime } = useNoteGeneration(
-    scroll,
-    isGameStarted,
-  );
+  useEffect(() => {
+    if (isGameStarted && initialNotes.length > 0 && notes.length === 0) {
+      const adjustedNotes = initialNotes.map((note) => ({
+        ...note,
+        time: note.time + NOTE_DISPLAY_TIME,
+      }));
+      setNotes(adjustedNotes);
+    }
+  }, [isGameStarted, initialNotes, notes.length]);
 
-  // 판정 표시
   const { judgement, judgementId, showJudgement } = useJudgement();
 
-  // 노트 판정 처리
   const { handleKeyPress } = useNoteJudgement(
     notes,
     startTimeRef,
@@ -57,23 +64,18 @@ export default function PlayField({
     setNotes,
   );
 
-  // 키보드 입력
   useKeyboardInput(handleKeyPress, isGameStarted);
 
-  // Miss 자동 감지
   useMissDetection(scroll, notes, startTimeRef, showJudgement, setNotes);
 
-  // 게임 종료
   const { handleVideoEnd } = useGameEnd(notes);
 
-  // 비디오 종료 핸들러를 부모에게 전달
   useEffect(() => {
     onVideoEndCallback?.(handleVideoEnd);
   }, [handleVideoEnd, onVideoEndCallback]);
 
   return (
     <>
-      {/* 카운트다운을 Portal로 렌더링해서 모든 요소 위에 표시 */}
       {!isGameStarted &&
         createPortal(
           <div className={s.countdownOverlay}>
@@ -90,11 +92,10 @@ export default function PlayField({
         <NoteField
           notes={notes}
           scroll={scroll}
-          noteDisplayTime={noteDisplayTime}
+          noteDisplayTime={NOTE_DISPLAY_TIME}
           pressedKeys={pressedKeys}
         />
 
-        {/* 판정 이펙트 (여러 개 동시 렌더링) */}
         {effects.map((effect) => (
           <HitEffect
             key={effect.id}

@@ -1,14 +1,22 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+import { getChart } from "@/shared/api/chartService";
+import { saveResult } from "@/shared/api/resultService";
 import { BackgroundVideo } from "@/shared/components";
+import { Chart } from "@/shared/types/chart";
 import { useResultStore } from "@/store/useResultStore";
 
 import s from "@/shared/styles/pages/game/result.module.scss";
 
+const API_BASE = "http://localhost:8000";
+
 export default function GameResult() {
   const navigate = useNavigate();
+  const [chart, setChart] = useState<Chart | null>(null);
+  const resultSavedRef = useRef(false);
 
+  const musicId = useResultStore((state) => state.musicId);
   const accuracy = useResultStore((state) => state.accuracy);
   const rank = useResultStore((state) => state.rank);
   const score = useResultStore((state) => state.score);
@@ -17,27 +25,73 @@ export default function GameResult() {
   const great = useResultStore((state) => state.great);
   const good = useResultStore((state) => state.good);
   const miss = useResultStore((state) => state.miss);
+  const bad = useResultStore((state) => state.bad);
+  const earlyCount = useResultStore((state) => state.earlyCount);
+  const lateCount = useResultStore((state) => state.lateCount);
+  const isFullCombo = useResultStore((state) => state.isFullCombo);
+  const isAllPerfect = useResultStore((state) => state.isAllPerfect);
   const hasValidResult = useResultStore((state) => state.hasValidResult);
   const resetResult = useResultStore((state) => state.resetResult);
 
-  // 최대 콤보 계산
   const maxCombo = useMemo(() => {
     if (combo.length === 0) return 0;
     return Math.max(...combo.map((c) => parseInt(c.split("-")[2]) || 0));
   }, [combo]);
 
-  // 총 노트 수
   const totalNotes = perfect + great + good + miss;
 
   useEffect(() => {
     if (!hasValidResult()) {
       navigate("/game", { replace: true });
+      return;
     }
-  }, [hasValidResult, navigate]);
+
+    if (musicId) {
+      getChart(musicId).then(setChart);
+    }
+  }, [hasValidResult, navigate, musicId]);
+
+  useEffect(() => {
+    if (!hasValidResult() || resultSavedRef.current || !musicId) return;
+
+    resultSavedRef.current = true;
+    saveResult({
+      musicId,
+      score,
+      accuracy,
+      combo: combo.join(","),
+      rank,
+      isFullCombo,
+      isAllPerfect,
+      perfect,
+      great,
+      good,
+      miss,
+      bad: bad ?? 0,
+      earlyCount,
+      lateCount,
+    }).catch(console.error);
+  }, [
+    hasValidResult,
+    musicId,
+    score,
+    accuracy,
+    combo,
+    rank,
+    isFullCombo,
+    isAllPerfect,
+    perfect,
+    great,
+    good,
+    miss,
+    bad,
+    earlyCount,
+    lateCount,
+  ]);
 
   const handleRetry = () => {
     resetResult();
-    navigate("/game/main");
+    navigate(`/game/main?musicId=${musicId}`);
   };
 
   const handleExit = () => {
@@ -45,7 +99,6 @@ export default function GameResult() {
     navigate("/game/select");
   };
 
-  // 랭크 클래스 (소문자)
   const rankClass = rank?.toLowerCase() || "f";
 
   return (
@@ -53,16 +106,13 @@ export default function GameResult() {
       <div className={s.container}>
         <div className={s.overlay} />
 
-        {/* 상단 - 랭크 */}
         <section className={s.rankSection}>
           <span className={s.rankLabel}>Rank</span>
           <span className={`${s.rank} ${s[rankClass]}`}>{rank}</span>
           <span className={s.scoreValue}>{score.toLocaleString()}</span>
         </section>
 
-        {/* 중앙 - 스탯 */}
         <section className={s.statsSection}>
-          {/* 정확도 바 */}
           <div className={s.accuracyBar}>
             <div className={s.accuracyHeader}>
               <span className={s.accuracyLabel}>Accuracy</span>
@@ -76,7 +126,6 @@ export default function GameResult() {
             </div>
           </div>
 
-          {/* 판정 그리드 */}
           <div className={s.statsGrid}>
             <div className={s.statItem}>
               <span className={s.statLabel}>Perfect</span>
@@ -96,7 +145,6 @@ export default function GameResult() {
             </div>
           </div>
 
-          {/* 콤보 정보 */}
           <div className={s.comboInfo}>
             <div className={s.comboItem}>
               <span className={s.comboLabel}>Max Combo</span>
@@ -109,7 +157,6 @@ export default function GameResult() {
           </div>
         </section>
 
-        {/* 하단 - 버튼 */}
         <section className={s.buttonSection}>
           <button className={`${s.button} ${s.secondary}`} onClick={handleExit}>
             나가기
@@ -120,9 +167,8 @@ export default function GameResult() {
         </section>
       </div>
 
-      {/* 배경 영상 */}
       <BackgroundVideo
-        src="/music/hebi - onward/background.mp4"
+        src={chart ? `${API_BASE}${chart.backgroundVideo}` : ""}
         isPaused={false}
         loop={true}
       />

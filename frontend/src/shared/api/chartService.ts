@@ -31,10 +31,10 @@ export function filterCharts(
 
   switch (sort) {
     case "latest":
-      filtered.sort((a, b) => b.id - a.id);
+      filtered.sort((a, b) => parseInt(b.id) - parseInt(a.id));
       break;
     case "oldest":
-      filtered.sort((a, b) => a.id - b.id);
+      filtered.sort((a, b) => parseInt(a.id) - parseInt(b.id));
       break;
     case "mostPlayed":
       filtered.sort((a, b) => {

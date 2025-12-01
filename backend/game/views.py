@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from .models import Chart, Result, Rank
-from .serializers import ChartSerializer, ResultSerializer, RankSerializer
+from .serializers import ChartSerializer, ResultSerializer, RankSerializer, CreateResultSerializer
 
 class ChartViewSet(viewsets.ModelViewSet):
     """차트 CRUD 뷰셋"""
@@ -33,24 +33,43 @@ class ChartViewSet(viewsets.ModelViewSet):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_result(request):
-    """결과 저장"""
-    serializer = ResultSerializer(data=request.data)
-    if serializer.is_valid():
-        chart = get_object_or_404(Chart, musicId=request.data.get('musicId'))
-        result = serializer.save(user=request.user, chart=chart)
+    serializer = CreateResultSerializer(data=request.data)
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        # 랭킹 업데이트
-        rank, created = Rank.objects.get_or_create(
-            user=request.user,
-            chart=chart,
-            defaults={'score': result.score}
-        )
-        if not created and result.score > rank.score:
-            rank.score = result.score
-            rank.save()
+    data = serializer.validated_data
+    chart = get_object_or_404(Chart, musicId=data['musicId'])
 
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    result = Result.objects.create(
+        user=request.user,
+        chart=chart,
+        musicId=data['musicId'],
+        difficulty=chart.difficulty,
+        score=data['score'],
+        accuracy=data['accuracy'],
+        combo=data['combo'],
+        rank=data['rank'],
+        isFullCombo=data['isFullCombo'],
+        isAllPerfect=data['isAllPerfect'],
+        perfect=data.get('perfect', 0),
+        great=data.get('great', 0),
+        good=data.get('good', 0),
+        miss=data.get('miss', 0),
+        bad=data.get('bad', 0),
+        earlyCount=data.get('earlyCount', 0),
+        lateCount=data.get('lateCount', 0),
+    )
+
+    rank, created = Rank.objects.get_or_create(
+        user=request.user,
+        chart=chart,
+        defaults={'score': result.score}
+    )
+    if not created and result.score > rank.score:
+        rank.score = result.score
+        rank.save()
+
+    return Response(ResultSerializer(result).data, status=status.HTTP_201_CREATED)
 
 
 @api_view(['GET'])

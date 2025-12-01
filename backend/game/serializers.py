@@ -9,7 +9,7 @@ class NoteSerializer(serializers.ModelSerializer):
 
 class ChartSerializer(serializers.ModelSerializer):
     """차트 시리얼라이저"""
-    notes = NoteSerializer(many=True, write_only=True)
+    notes = NoteSerializer(many=True, read_only=True)
     ranks = serializers.SerializerMethodField()
     userBestRecord = serializers.SerializerMethodField()
 
@@ -44,19 +44,26 @@ class ChartSerializer(serializers.ModelSerializer):
         return None
 
     def create(self, validated_data):
-        notes_data = validated_data.pop('notes')
+        # notes는 request.data에서 직접 가져옴 (read_only 필드이므로)
+        request = self.context.get('request')
+        notes_data = request.data.get('notes', []) if request else []
+        
         chart = Chart.objects.create(**validated_data)
         for note_data in notes_data:
             Note.objects.create(chart=chart, **note_data)
         return chart
 
     def update(self, instance, validated_data):
-        notes_data = validated_data.pop('notes', [])
+        # notes는 request.data에서 직접 가져옴 (read_only 필드이므로)
+        request = self.context.get('request')
+        notes_data = request.data.get('notes', []) if request else []
+        
         instance = super().update(instance, validated_data)
-        # 기존 노트 삭제 후 새로 생성 (단순화)
-        instance.notes.all().delete()
-        for note_data in notes_data:
-            Note.objects.create(chart=instance, **note_data)
+        if notes_data:
+            # 기존 노트 삭제 후 새로 생성 (단순화)
+            instance.notes.all().delete()
+            for note_data in notes_data:
+                Note.objects.create(chart=instance, **note_data)
         return instance
 
 class RankUserSerializer(serializers.Serializer):
@@ -82,11 +89,26 @@ class RankSerializer(serializers.ModelSerializer):
         fields = ('user', 'score')
 
 class ResultSerializer(serializers.ModelSerializer):
-    """결과 시리얼라이저"""
     username = serializers.CharField(source='user.nickname', read_only=True)
-    musicId = serializers.CharField(source='chart.musicId', read_only=True)
     title = serializers.CharField(source='chart.title', read_only=True)
 
     class Meta:
         model = Result
         fields = '__all__'
+        read_only_fields = ('user', 'chart', 'playedAt')
+
+class CreateResultSerializer(serializers.Serializer):
+    musicId = serializers.CharField()
+    score = serializers.IntegerField()
+    accuracy = serializers.FloatField()
+    combo = serializers.CharField()
+    rank = serializers.CharField()
+    isFullCombo = serializers.BooleanField()
+    isAllPerfect = serializers.BooleanField()
+    perfect = serializers.IntegerField(default=0)
+    great = serializers.IntegerField(default=0)
+    good = serializers.IntegerField(default=0)
+    miss = serializers.IntegerField(default=0)
+    bad = serializers.IntegerField(default=0)
+    earlyCount = serializers.IntegerField(default=0)
+    lateCount = serializers.IntegerField(default=0)

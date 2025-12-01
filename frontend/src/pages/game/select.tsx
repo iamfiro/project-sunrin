@@ -1,5 +1,6 @@
 import { Search } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import { TrackCard, TrackCover } from "@/components/music";
 import { filterCharts, getCharts } from "@/shared/api/chartService";
@@ -10,10 +11,10 @@ import { Chart, ChartSortOption } from "@/shared/types/chart";
 
 import s from "@/shared/styles/pages/game/select.module.scss";
 
-// API 응답의 coverUrl을 전체 URL로 변환
 const API_BASE = "http://localhost:8000";
 
 export default function SongSelect() {
+  const navigate = useNavigate();
   const [charts, setCharts] = useState<Chart[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -32,6 +33,7 @@ export default function SongSelect() {
   }, [charts, searchQuery, sortOption]);
 
   const currentChart = filteredCharts[currentIndex];
+  const displayChart = currentChart || charts[0];
 
   const next = useCallback(() => {
     if (filteredCharts.length === 0) return;
@@ -45,12 +47,37 @@ export default function SongSelect() {
     );
   }, [filteredCharts.length]);
 
+  const selectChart = useCallback(() => {
+    if (!currentChart) return;
+    navigate(`/game/main?musicId=${currentChart.musicId}`);
+  }, [currentChart, navigate]);
+
   useKeyNavigationShortcuts({
     onNext: next,
     onPrev: prev,
     nextKeyCodes: ["KeyS"],
     prevKeyCodes: ["KeyW"],
   });
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.code === "Enter" && !e.repeat) {
+        const target = e.target as HTMLElement;
+        if (
+          target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.tagName === "SELECT"
+        ) {
+          return;
+        }
+        e.preventDefault();
+        selectChart();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [selectChart]);
 
   useEffect(() => {
     setCurrentIndex(0);
@@ -69,7 +96,7 @@ export default function SongSelect() {
 
   useEffect(() => {
     const video = videoRef.current;
-    if (!video || !currentChart) return;
+    if (!video || !displayChart) return;
 
     video.load();
     const playPromise = video.play();
@@ -78,7 +105,7 @@ export default function SongSelect() {
         console.warn("Video autoplay prevented or failed:", error);
       });
     }
-  }, [currentChart]);
+  }, [displayChart]);
 
   useEffect(() => {
     setLoading(true);
@@ -96,7 +123,6 @@ export default function SongSelect() {
       });
   }, []);
 
-  // 첫 사용자 상호작용 시 음소거 해제
   useEffect(() => {
     const handleUserInteraction = () => {
       setIsMuted(false);
@@ -141,7 +167,7 @@ export default function SongSelect() {
 
   return (
     <div className={s.container}>
-      {currentChart && (
+      {displayChart && (
         <video
           autoPlay
           loop
@@ -153,8 +179,8 @@ export default function SongSelect() {
           onClick={() => setIsMuted(false)}
         >
           <source
-            key={currentChart.backgroundVideo}
-            src={`${API_BASE}${currentChart.backgroundVideo}`}
+            key={displayChart.backgroundVideo}
+            src={`${API_BASE}${displayChart.backgroundVideo}`}
             type="video/mp4"
           />
         </video>
@@ -163,24 +189,26 @@ export default function SongSelect() {
         <Header />
         <div className={s.content}>
           <div className={s.left}>
-            {currentChart && (
+            {displayChart && (
               <TrackCover
-                title={currentChart.title}
-                artist={currentChart.artist}
-                bpm={currentChart.bpm}
-                coverSrc={`${API_BASE}${currentChart.coverUrl}`}
-                community={currentChart.isCommunitySong}
-                cdSrc={`${API_BASE}${currentChart.coverUrl}`}
+                id={displayChart.musicId}
+                title={displayChart.title}
+                artist={displayChart.artist}
+                bpm={displayChart.bpm}
+                coverSrc={`${API_BASE}${displayChart.coverUrl}`}
+                community={displayChart.isCommunitySong}
+                cdSrc={`${API_BASE}${displayChart.coverUrl}`}
                 difficulties={[]}
                 playTime={0}
-                backgroundVideoSrc={`${API_BASE}${currentChart.backgroundVideo}`}
-                userBestRecord={currentChart.userBestRecord}
-                ranks={currentChart.ranks.map((rank, idx) => ({
+                backgroundVideoSrc={`${API_BASE}${displayChart.backgroundVideo}`}
+                userBestRecord={displayChart.userBestRecord}
+                ranks={displayChart.ranks.map((rank, idx) => ({
                   user: {
                     id: String(rank.user.id),
                     name: rank.user.username,
-                    profileImage:
-                      rank.user.profileImage || "/images/default-profile.png",
+                    profileImage: rank.user.profileImage
+                      ? `${API_BASE}${rank.user.profileImage}`
+                      : "/images/default-profile.png",
                     stats: { perfectCount: 0, highestScore: 0 },
                   },
                   username: rank.user.username,
@@ -237,6 +265,7 @@ export default function SongSelect() {
                       }}
                     >
                       <TrackCard
+                        id={chart.musicId}
                         title={chart.title}
                         artist={chart.artist}
                         coverSrc={`${API_BASE}${chart.coverUrl}`}
@@ -256,13 +285,23 @@ export default function SongSelect() {
           </div>
         </div>
         <footer className={s.footer}>
-          <HStack align={FlexAlign.Center} gap={8}>
-            <img
-              src="/images/keyboard/keyboard_updown.svg"
-              alt="updown"
-              height={22}
-            />
-            <span>Change Music</span>
+          <HStack align={FlexAlign.Center} gap={24}>
+            <HStack align={FlexAlign.Center} gap={8}>
+              <img
+                src="/images/keyboard/keyboard_updown.svg"
+                alt="updown"
+                height={22}
+              />
+              <span>Change Music</span>
+            </HStack>
+            <HStack align={FlexAlign.Center} gap={8}>
+              <img
+                src="/images/keyboard/keyboard_enter.svg"
+                alt="enter"
+                height={22}
+              />
+              <span>Select</span>
+            </HStack>
           </HStack>
         </footer>
       </main>

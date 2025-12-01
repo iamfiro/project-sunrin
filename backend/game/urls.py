@@ -10,4 +10,6 @@ urlpatterns = [
         'delete': 'destroy',
         'post': 'create'
     }), name='chart-detail'),
+    path('<str:musicId>/leaderboard/', views.leaderboard, name='leaderboard'),
+    path('<str:musicId>/results/', views.chart_results, name='chart-results'),
 ]

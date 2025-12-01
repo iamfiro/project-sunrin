@@ -12,6 +12,15 @@
     padding-top: 55px;
 }
 
+.loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    font-size: 1.5rem;
+    color: #fff;
+}
+
 .playFieldWrap {
     height: 100vh;
 

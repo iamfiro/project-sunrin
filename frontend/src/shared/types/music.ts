@@ -2,6 +2,8 @@ import { UserBestRecord } from "./chart";
 import { TrackRank } from "./rank";
 
 export interface Track {
+  id: string;
+
   title: string;
   artist: string;
 

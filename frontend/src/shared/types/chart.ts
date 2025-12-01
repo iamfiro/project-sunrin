@@ -18,10 +18,20 @@ export interface UserBestRecord {
   isAllPerfect: boolean;
 }
 
-export interface Chart {
+export interface Note {
   id: number;
+  time: number;
+  lane: number;
+  type: "tap" | "hold";
+  duration: number | null;
+  chart: number;
+}
+
+export interface Chart {
+  id: string;
   ranks: ChartRank[];
   userBestRecord: UserBestRecord | null;
+  notes: Note[];
   musicId: string;
   title: string;
   song: string;

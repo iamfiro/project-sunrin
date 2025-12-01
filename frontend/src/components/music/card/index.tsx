@@ -11,6 +11,7 @@ interface TrackCardProps extends Track {
 }
 
 export default function TrackCard({
+  id,
   title,
   artist,
   coverSrc,
@@ -19,7 +20,7 @@ export default function TrackCard({
 }: TrackCardProps) {
   return (
     <a
-      href="/game/main"
+      href={`/game/main?musicId=${id}`}
       className={`${s.container} ${selected ? s.selected : ""}`}
     >
       <HStack
