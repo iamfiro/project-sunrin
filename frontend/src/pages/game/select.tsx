@@ -2,6 +2,7 @@ import { Search } from "lucide-react";
 import { useEffect, useRef } from "react";
 
 import { TrackCard, TrackCover } from "@/components/music";
+import { getCharts } from "@/shared/api/chartService";
 import { Header } from "@/shared/components";
 import { FlexAlign, HStack, VStack } from "@/shared/components/stack";
 import useCircularIndex from "@/shared/hook/useCircularIndex";
@@ -58,6 +59,16 @@ export default function SongSelect() {
         });
     }
   }, [currentIndex]);
+
+  useEffect(() => {
+    getCharts()
+      .then((data) => {
+        console.log(data);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }, []);
 
   return (
     <div className={s.container}>

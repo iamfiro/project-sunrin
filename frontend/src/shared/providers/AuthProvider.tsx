@@ -42,11 +42,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   const signin = async (payload: { nickname: string; password: string }) => {
-    await authService.signin({
+    const response = await authService.signin({
       nickname: payload.nickname,
       password: payload.password,
     });
-    await refreshUser();
+    // 로그인 응답에서 바로 user 설정 (쿠키는 자동으로 설정됨)
+    if (response.user) {
+      setUser(response.user as User);
+    } else {
+      await refreshUser();
+    }
   };
 
   const signup = async (payload: {

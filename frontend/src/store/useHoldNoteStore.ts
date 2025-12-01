@@ -59,4 +59,3 @@ export const useHoldNoteStore = create<HoldNoteStore>((set, get) => ({
     set({ activeHolds: new Map() });
   },
 }));
-

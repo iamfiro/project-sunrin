@@ -1,5 +1,6 @@
-import request from "./client";
 import { Chart } from "@/shared/types/chart";
+
+import request from "./client";
 
 export async function getCharts() {
   return request<Chart[]>("/charts/", {

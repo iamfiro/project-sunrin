@@ -48,9 +48,19 @@ export async function signin(payload: SignInPayload): Promise<AuthResponse> {
   });
 }
 
-export async function logout(): Promise<void> {
-  // You might want to implement token invalidation on the backend
-  return Promise.resolve();
+export async function me(): Promise<User | null> {
+  try {
+    const response = await request<{ user: User }>("/auth/me", {
+      method: "GET",
+    });
+    return response.user;
+  } catch (error) {
+    return null;
+  }
 }
 
-// Removed the duplicate logout function
+export async function logout(): Promise<void> {
+  await request("/auth/logout", {
+    method: "POST",
+  });
+}

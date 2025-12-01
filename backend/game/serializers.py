@@ -9,8 +9,9 @@ class NoteSerializer(serializers.ModelSerializer):
 
 class ChartSerializer(serializers.ModelSerializer):
     """차트 시리얼라이저"""
-    notes = NoteSerializer(many=True)
+    notes = NoteSerializer(many=True, write_only=True)
     ranks = serializers.SerializerMethodField()
+    userBestRecord = serializers.SerializerMethodField()
 
     class Meta:
         model = Chart
@@ -19,6 +20,28 @@ class ChartSerializer(serializers.ModelSerializer):
     def get_ranks(self, obj):
         ranks = obj.ranks.order_by('-score')[:10]  # 상위 10개 랭킹
         return RankSerializer(ranks, many=True).data
+    
+    def get_userBestRecord(self, obj):
+        """현재 로그인한 사용자의 베스트 기록"""
+        request = self.context.get('request')
+        if not request or not request.user or not request.user.is_authenticated:
+            return None
+        
+        best_result = Result.objects.filter(
+            chart=obj,
+            user=request.user
+        ).order_by('-score').first()
+        
+        if best_result:
+            return {
+                'accuracy': best_result.accuracy,
+                'combo': best_result.combo,
+                'score': best_result.score,
+                'rank': best_result.rank,
+                'isFullCombo': best_result.isFullCombo,
+                'isAllPerfect': best_result.isAllPerfect,
+            }
+        return None
 
     def create(self, validated_data):
         notes_data = validated_data.pop('notes')

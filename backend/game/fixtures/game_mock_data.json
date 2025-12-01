@@ -1,0 +1,269 @@
+[
+  {
+    "model": "accounts.user",
+    "pk": 1,
+    "fields": {
+      "password": "pbkdf2_sha256$600000$randomsalt123$randomhash123",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "player1",
+      "first_name": "",
+      "last_name": "",
+      "email": "player1@example.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "nickname": "리듬마스터",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 2,
+    "fields": {
+      "password": "pbkdf2_sha256$600000$randomsalt123$randomhash123",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "player2",
+      "first_name": "",
+      "last_name": "",
+      "email": "player2@example.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "nickname": "비트매니아",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 3,
+    "fields": {
+      "password": "pbkdf2_sha256$600000$randomsalt123$randomhash123",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "player3",
+      "first_name": "",
+      "last_name": "",
+      "email": "player3@example.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "nickname": "음악천재",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "game.chart",
+    "pk": 1,
+    "fields": {
+      "musicId": "SONG001",
+      "title": "Electric Dreams",
+      "song": "/media/songs/electric_dreams.mp3",
+      "backgroundVideo": "/media/videos/electric_dreams.mp4",
+      "coverUrl": "/media/covers/electric_dreams.jpg",
+      "isCommunitySong": false,
+      "artist": "Neon Synth",
+      "difficulty": 5,
+      "creator": 1
+    }
+  },
+  {
+    "model": "game.chart",
+    "pk": 2,
+    "fields": {
+      "musicId": "SONG002",
+      "title": "Cosmic Journey",
+      "song": "/media/songs/cosmic_journey.mp3",
+      "backgroundVideo": "/media/videos/cosmic_journey.mp4",
+      "coverUrl": "/media/covers/cosmic_journey.jpg",
+      "isCommunitySong": false,
+      "artist": "Space Beats",
+      "difficulty": 8,
+      "creator": 2
+    }
+  },
+  {
+    "model": "game.chart",
+    "pk": 3,
+    "fields": {
+      "musicId": "SONG003",
+      "title": "Digital Paradise",
+      "song": "/media/songs/digital_paradise.mp3",
+      "backgroundVideo": "/media/videos/digital_paradise.mp4",
+      "coverUrl": "/media/covers/digital_paradise.jpg",
+      "isCommunitySong": false,
+      "artist": "Cyber Wave",
+      "difficulty": 12,
+      "creator": 3
+    }
+  },
+  {
+    "model": "game.note",
+    "pk": 1,
+    "fields": {
+      "chart": 1,
+      "time": 1000,
+      "lane": 0,
+      "type": "tap",
+      "duration": null
+    }
+  },
+  {
+    "model": "game.note",
+    "pk": 2,
+    "fields": {
+      "chart": 1,
+      "time": 1500,
+      "lane": 1,
+      "type": "tap",
+      "duration": null
+    }
+  },
+  {
+    "model": "game.note",
+    "pk": 3,
+    "fields": {
+      "chart": 1,
+      "time": 2000,
+      "lane": 2,
+      "type": "hold",
+      "duration": 500
+    }
+  },
+  {
+    "model": "game.note",
+    "pk": 4,
+    "fields": {
+      "chart": 1,
+      "time": 2500,
+      "lane": 3,
+      "type": "tap",
+      "duration": null
+    }
+  },
+  {
+    "model": "game.note",
+    "pk": 5,
+    "fields": {
+      "chart": 2,
+      "time": 800,
+      "lane": 1,
+      "type": "tap",
+      "duration": null
+    }
+  },
+  {
+    "model": "game.note",
+    "pk": 6,
+    "fields": {
+      "chart": 2,
+      "time": 1200,
+      "lane": 2,
+      "type": "hold",
+      "duration": 700
+    }
+  },
+  {
+    "model": "game.rank",
+    "pk": 1,
+    "fields": {
+      "chart": 1,
+      "user": 1,
+      "score": 950000
+    }
+  },
+  {
+    "model": "game.rank",
+    "pk": 2,
+    "fields": {
+      "chart": 1,
+      "user": 2,
+      "score": 920000
+    }
+  },
+  {
+    "model": "game.rank",
+    "pk": 3,
+    "fields": {
+      "chart": 2,
+      "user": 1,
+      "score": 880000
+    }
+  },
+  {
+    "model": "game.result",
+    "pk": 1,
+    "fields": {
+      "musicId": "SONG001",
+      "user": 1,
+      "chart": 1,
+      "difficulty": 5,
+      "score": 950000,
+      "accuracy": 95.5,
+      "rank": "S",
+      "combo": "100,50,75",
+      "isFullCombo": false,
+      "isAllPerfect": false,
+      "earlyCount": 15,
+      "lateCount": 10,
+      "perfect": 85,
+      "great": 10,
+      "good": 3,
+      "miss": 2,
+      "bad": 0,
+      "playedAt": "2024-11-01T10:30:00Z"
+    }
+  },
+  {
+    "model": "game.result",
+    "pk": 2,
+    "fields": {
+      "musicId": "SONG001",
+      "user": 2,
+      "chart": 1,
+      "difficulty": 5,
+      "score": 920000,
+      "accuracy": 92.0,
+      "rank": "A",
+      "combo": "80,60,70",
+      "isFullCombo": false,
+      "isAllPerfect": false,
+      "earlyCount": 20,
+      "lateCount": 15,
+      "perfect": 75,
+      "great": 15,
+      "good": 5,
+      "miss": 5,
+      "bad": 0,
+      "playedAt": "2024-11-01T11:00:00Z"
+    }
+  },
+  {
+    "model": "game.result",
+    "pk": 3,
+    "fields": {
+      "musicId": "SONG002",
+      "user": 1,
+      "chart": 2,
+      "difficulty": 8,
+      "score": 880000,
+      "accuracy": 88.5,
+      "rank": "A",
+      "combo": "90,40,60",
+      "isFullCombo": false,
+      "isAllPerfect": false,
+      "earlyCount": 25,
+      "lateCount": 20,
+      "perfect": 70,
+      "great": 18,
+      "good": 7,
+      "miss": 5,
+      "bad": 0,
+      "playedAt": "2024-11-01T12:00:00Z"
+    }
+  }
+]

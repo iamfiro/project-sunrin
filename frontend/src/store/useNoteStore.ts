@@ -26,37 +26,48 @@ interface NoteState extends NoteHistory {
 }
 
 export const useNoteStore = create<NoteState>((set, get) => {
-  const createCollisionChecker = () => (
-    targetLane: number,
-    targetTime: number,
-    movingNoteType: NoteType,
-    movingNoteDuration: number | undefined,
-    excludeNoteId: string | null = null,
-  ) => {
-    const { notes } = get();
-    const actualMovingNoteDuration = movingNoteType === "hold" ? movingNoteDuration ?? 0 : 1;
-    const movingNoteEndTime = targetTime + actualMovingNoteDuration;
+  const createCollisionChecker =
+    () =>
+    (
+      targetLane: number,
+      targetTime: number,
+      movingNoteType: NoteType,
+      movingNoteDuration: number | undefined,
+      excludeNoteId: string | null = null,
+    ) => {
+      const { notes } = get();
+      const actualMovingNoteDuration =
+        movingNoteType === "hold" ? (movingNoteDuration ?? 0) : 1;
+      const movingNoteEndTime = targetTime + actualMovingNoteDuration;
 
-    for (const otherNote of notes) {
-      if (otherNote.id === excludeNoteId) continue;
-      if (otherNote.lane !== targetLane) continue;
+      for (const otherNote of notes) {
+        if (otherNote.id === excludeNoteId) continue;
+        if (otherNote.lane !== targetLane) continue;
 
-      const otherNoteActualDuration = otherNote.type === "hold" ? otherNote.duration ?? 0 : 1;
-      const otherNoteEndTime = otherNote.time + otherNoteActualDuration;
+        const otherNoteActualDuration =
+          otherNote.type === "hold" ? (otherNote.duration ?? 0) : 1;
+        const otherNoteEndTime = otherNote.time + otherNoteActualDuration;
 
-      if (targetTime < otherNoteEndTime && movingNoteEndTime > otherNote.time) {
-        return otherNote;
+        if (
+          targetTime < otherNoteEndTime &&
+          movingNoteEndTime > otherNote.time
+        ) {
+          return otherNote;
+        }
       }
-    }
-    return null;
-  };
+      return null;
+    };
 
   const checkCollision = createCollisionChecker();
 
   const recordAndSet = (setter: (state: NoteState) => Partial<NoteHistory>) => {
     set((state) => {
-      const { notes, selectedNoteId, shortNoteColor, longNoteColor, past } = state;
-      const newPast = [...past, { notes, selectedNoteId, shortNoteColor, longNoteColor }];
+      const { notes, selectedNoteId, shortNoteColor, longNoteColor, past } =
+        state;
+      const newPast = [
+        ...past,
+        { notes, selectedNoteId, shortNoteColor, longNoteColor },
+      ];
       const newTrackedValues = setter(state);
       return { ...newTrackedValues, past: newPast, future: [] };
     });
@@ -66,7 +77,7 @@ export const useNoteStore = create<NoteState>((set, get) => {
     notes: [],
     selectedNoteId: null,
     shortNoteColor: "#3b82f6", // tailwind blue-500
-    longNoteColor: "#8b5cf6",  // tailwind violet-500
+    longNoteColor: "#8b5cf6", // tailwind violet-500
     past: [],
     future: [],
 
@@ -80,7 +91,13 @@ export const useNoteStore = create<NoteState>((set, get) => {
 
         while (!foundSpot) {
           for (let i = 1; i <= 4; i++) {
-            const collidingNote = checkCollision(i, targetTime, note.type, note.duration, null);
+            const collidingNote = checkCollision(
+              i,
+              targetTime,
+              note.type,
+              note.duration,
+              null,
+            );
             if (!collidingNote) {
               targetLane = i;
               foundSpot = true;
@@ -95,7 +112,10 @@ export const useNoteStore = create<NoteState>((set, get) => {
           }
         }
         return {
-          notes: [...state.notes, { ...note, id: newNoteId, lane: targetLane, time: targetTime }],
+          notes: [
+            ...state.notes,
+            { ...note, id: newNoteId, lane: targetLane, time: targetTime },
+          ],
           selectedNoteId: newNoteId,
         };
       });
@@ -104,7 +124,8 @@ export const useNoteStore = create<NoteState>((set, get) => {
     removeNote: (noteId) => {
       recordAndSet((state) => ({
         notes: state.notes.filter((note) => note.id !== noteId),
-        selectedNoteId: state.selectedNoteId === noteId ? null : state.selectedNoteId,
+        selectedNoteId:
+          state.selectedNoteId === noteId ? null : state.selectedNoteId,
       }));
     },
 
@@ -119,7 +140,13 @@ export const useNoteStore = create<NoteState>((set, get) => {
       if (updates.lane !== undefined || updates.time !== undefined) {
         const originalLane = noteToUpdate.lane;
         const originalTime = noteToUpdate.time;
-        let collidingNote = checkCollision(newLane, newTime, noteToUpdate.type, noteToUpdate.duration, noteId);
+        let collidingNote = checkCollision(
+          newLane,
+          newTime,
+          noteToUpdate.type,
+          noteToUpdate.duration,
+          noteId,
+        );
         if (collidingNote) {
           if (updates.lane !== undefined) {
             const laneStep = Math.sign(newLane - originalLane);
@@ -127,7 +154,13 @@ export const useNoteStore = create<NoteState>((set, get) => {
             while (collidingNote) {
               newLane += laneStep;
               if (newLane < 1 || newLane > 4) return;
-              collidingNote = checkCollision(newLane, newTime, noteToUpdate.type, noteToUpdate.duration, noteId);
+              collidingNote = checkCollision(
+                newLane,
+                newTime,
+                noteToUpdate.type,
+                noteToUpdate.duration,
+                noteId,
+              );
             }
           } else if (updates.time !== undefined) {
             const measureDuration = 500;
@@ -136,7 +169,13 @@ export const useNoteStore = create<NoteState>((set, get) => {
             while (collidingNote) {
               newTime += timeDirection * measureDuration;
               if (newTime < 0) return;
-              collidingNote = checkCollision(newLane, newTime, noteToUpdate.type, noteToUpdate.duration, noteId);
+              collidingNote = checkCollision(
+                newLane,
+                newTime,
+                noteToUpdate.type,
+                noteToUpdate.duration,
+                noteId,
+              );
             }
           }
         }
@@ -145,19 +184,19 @@ export const useNoteStore = create<NoteState>((set, get) => {
       const finalUpdates = { ...updates, lane: newLane, time: newTime };
 
       recordAndSet(() => ({
-          notes: notes.map((note) =>
-            note.id === noteId ? { ...note, ...finalUpdates } : note,
-          ),
-          selectedNoteId,
+        notes: notes.map((note) =>
+          note.id === noteId ? { ...note, ...finalUpdates } : note,
+        ),
+        selectedNoteId,
       }));
     },
 
     selectNote: (noteId) => {
-        recordAndSet(() => ({
-            selectedNoteId: noteId,
-        }));
+      recordAndSet(() => ({
+        selectedNoteId: noteId,
+      }));
     },
-    
+
     setShortNoteColor: (color: string) => {
       recordAndSet(() => ({
         shortNoteColor: color,
@@ -177,12 +216,22 @@ export const useNoteStore = create<NoteState>((set, get) => {
 
     undo: () => {
       set((state) => {
-        const { past, future, notes, selectedNoteId, shortNoteColor, longNoteColor } = state;
+        const {
+          past,
+          future,
+          notes,
+          selectedNoteId,
+          shortNoteColor,
+          longNoteColor,
+        } = state;
         if (past.length === 0) return {};
         const previousState = past[past.length - 1];
         return {
           past: past.slice(0, past.length - 1),
-          future: [{ notes, selectedNoteId, shortNoteColor, longNoteColor }, ...future],
+          future: [
+            { notes, selectedNoteId, shortNoteColor, longNoteColor },
+            ...future,
+          ],
           notes: previousState.notes,
           selectedNoteId: previousState.selectedNoteId,
           shortNoteColor: previousState.shortNoteColor,
@@ -193,11 +242,21 @@ export const useNoteStore = create<NoteState>((set, get) => {
 
     redo: () => {
       set((state) => {
-        const { past, future, notes, selectedNoteId, shortNoteColor, longNoteColor } = state;
+        const {
+          past,
+          future,
+          notes,
+          selectedNoteId,
+          shortNoteColor,
+          longNoteColor,
+        } = state;
         if (future.length === 0) return {};
         const nextState = future[0];
         return {
-          past: [...past, { notes, selectedNoteId, shortNoteColor, longNoteColor }],
+          past: [
+            ...past,
+            { notes, selectedNoteId, shortNoteColor, longNoteColor },
+          ],
           future: future.slice(1),
           notes: nextState.notes,
           selectedNoteId: nextState.selectedNoteId,
