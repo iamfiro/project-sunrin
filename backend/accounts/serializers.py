@@ -1,14 +1,37 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
+from django.db.models import Sum, Max
 
 User = get_user_model()
 
+class UserStatsSerializer(serializers.Serializer):
+    """사용자 게임 통계 직렬화"""
+    perfectCount = serializers.IntegerField()
+    highestScore = serializers.IntegerField()
+
+
 class UserSerializer(serializers.ModelSerializer):
     """사용자 정보 직렬화"""
+    stats = serializers.SerializerMethodField()
+
     class Meta:
         model = User
-        fields = ('id', 'nickname', 'email')
-        read_only_fields = ('id', 'email')
+        fields = ('id', 'nickname', 'email', 'stats')
+        read_only_fields = ('id', 'email', 'stats')
+
+    def get_stats(self, obj):
+        from game.models import Result
+        
+        # 해당 유저의 모든 Result에서 perfect 합계와 최고 점수 집계
+        stats = Result.objects.filter(user=obj).aggregate(
+            perfectCount=Sum('perfect'),
+            highestScore=Max('score')
+        )
+        
+        return {
+            'perfectCount': stats['perfectCount'] or 0,
+            'highestScore': stats['highestScore'] or 0,
+        }
 
 
 class RegisterSerializer(serializers.ModelSerializer):

@@ -19,7 +19,7 @@ class ChartSerializer(serializers.ModelSerializer):
 
     def get_ranks(self, obj):
         ranks = obj.ranks.order_by('-score')[:10]  # 상위 10개 랭킹
-        return RankSerializer(ranks, many=True).data
+        return RankSerializer(ranks, many=True, context=self.context).data
     
     def get_userBestRecord(self, obj):
         """현재 로그인한 사용자의 베스트 기록"""
@@ -59,13 +59,27 @@ class ChartSerializer(serializers.ModelSerializer):
             Note.objects.create(chart=instance, **note_data)
         return instance
 
+class RankUserSerializer(serializers.Serializer):
+    """랭킹에 포함될 유저 정보 시리얼라이저"""
+    id = serializers.IntegerField(source='user.id', read_only=True)
+    username = serializers.CharField(source='user.nickname', read_only=True)
+    profileImage = serializers.SerializerMethodField()
+
+    def get_profileImage(self, obj):
+        if obj.user.profileImage:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.user.profileImage.url)
+            return obj.user.profileImage.url
+        return None
+
 class RankSerializer(serializers.ModelSerializer):
     """랭킹 시리얼라이저"""
-    username = serializers.CharField(source='user.nickname', read_only=True)
+    user = RankUserSerializer(source='*', read_only=True)
 
     class Meta:
         model = Rank
-        fields = ('username', 'score')
+        fields = ('user', 'score')
 
 class ResultSerializer(serializers.ModelSerializer):
     """결과 시리얼라이저"""

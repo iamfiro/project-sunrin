@@ -10,7 +10,6 @@ interface Props {
 }
 
 export default function TrackRank({ rank, me }: Props) {
-  console.log(rank);
   return (
     <HStack
       align={FlexAlign.Center}
@@ -21,13 +20,13 @@ export default function TrackRank({ rank, me }: Props) {
     >
       <HStack align={FlexAlign.Center} gap={12}>
         <img
-          src={rank.user.profileImage}
-          alt={rank.user.name}
+          src={rank.user?.profileImage || "/images/default-profile.png"}
+          alt={rank.username}
           className={s.profileImage}
         />
         <VStack gap={4}>
           <span className={s.name}>
-            {me ? `나 (${rank.user.name})` : rank.user.name}
+            {me ? `나 (${rank.username})` : rank.username}
           </span>
           <span className={s.score}>{rank.score}점</span>
         </VStack>

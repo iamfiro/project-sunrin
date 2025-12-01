@@ -2,8 +2,6 @@ import { Globe } from "lucide-react";
 
 import { HStack } from "@/shared/components";
 import { FlexAlign, FlexJustify, VStack } from "@/shared/components/stack";
-import { mockTrack } from "@/shared/mock/music";
-import { mockUser } from "@/shared/mock/user";
 import { Track } from "@/shared/types/music";
 
 import TrackRank from "../rank";
@@ -11,6 +9,24 @@ import TrackRank from "../rank";
 import s from "./style.module.scss";
 
 const DEFAULT_CD_HOLE = "/images/music/CD Hole.png";
+
+// 랭크에 따른 이미지 매핑
+const RANK_IMAGES: Record<string, string> = {
+  SS: "/images/rank/master.png",
+  S: "/images/rank/master.png",
+  A: "/images/rank/master.png",
+  B: "/images/rank/master.png",
+  C: "/images/rank/master.png",
+  D: "/images/rank/master.png",
+  F: "/images/rank/master.png",
+};
+
+// 콤보 문자열에서 최대 콤보 추출
+const getMaxCombo = (comboStr: string): number => {
+  if (!comboStr) return 0;
+  const combos = comboStr.split(",").map((s) => parseInt(s.trim(), 10));
+  return Math.max(...combos.filter((n) => !isNaN(n)), 0);
+};
 
 export default function MusicAlbumCover({
   title,
@@ -20,7 +36,14 @@ export default function MusicAlbumCover({
   community,
   cdSrc,
   ranks,
+  userBestRecord,
 }: Track) {
+  const hasRecord = userBestRecord != null;
+  const rankImage = hasRecord
+    ? RANK_IMAGES[userBestRecord.rank] || "/images/rank/master.png"
+    : "/images/rank/master.png";
+  const maxCombo = hasRecord ? getMaxCombo(userBestRecord.combo) : 0;
+
   return (
     <div className={s.music}>
       <div className={s.coverContainer}>
@@ -51,20 +74,22 @@ export default function MusicAlbumCover({
         gap={6}
       >
         <HStack align={FlexAlign.Center} gap={6}>
-          <img src="/images/rank/master.png" alt="master" />
+          <img src={rankImage} alt="rank" />
           <VStack gap={4}>
             <span>MASTERY</span>
-            <p className={s.masteryLevel}>102392</p>
+            <p className={s.masteryLevel}>
+              {hasRecord ? userBestRecord.score.toLocaleString() : "-"}
+            </p>
           </VStack>
         </HStack>
         <VStack gap={6}>
           <HStack align={FlexAlign.Center} gap={6}>
             <span>정확도</span>
-            <p>99.999%</p>
+            <p>{hasRecord ? `${userBestRecord.accuracy.toFixed(2)}%` : "-"}</p>
           </HStack>
           <HStack align={FlexAlign.Center} gap={6}>
             <span>콤보</span>
-            <p>102392</p>
+            <p>{hasRecord ? maxCombo.toLocaleString() : "-"}</p>
           </HStack>
         </VStack>
       </HStack>

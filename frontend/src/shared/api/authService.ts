@@ -12,11 +12,16 @@ export interface SignInPayload {
   password: string;
 }
 
+export interface UserStats {
+  perfectCount: number;
+  highestScore: number;
+}
+
 export interface User {
   id: number;
   email: string;
   nickname: string;
-  // Add other user fields as needed
+  stats: UserStats;
 }
 
 export interface AuthResponse {

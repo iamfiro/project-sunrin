@@ -27,6 +27,7 @@ class Chart(models.Model):
     coverUrl = models.CharField(max_length=500, help_text="커버 이미지 URL")
     isCommunitySong = models.BooleanField(default=False, help_text="커뮤니티 곡 여부")
     artist = models.CharField(max_length=200, help_text="아티스트명")
+    bpm = models.IntegerField(default=120, help_text="BPM (분당 비트 수)")
     difficulty = models.IntegerField(help_text="난이도 (1~15)")
     creator = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='charts', help_text="차트를 만든 사용자")
 

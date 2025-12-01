@@ -1,3 +1,4 @@
+import { UserBestRecord } from "./chart";
 import { TrackRank } from "./rank";
 
 export interface Track {
@@ -18,6 +19,7 @@ export interface Track {
   backgroundVideoSrc: string;
 
   ranks?: TrackRank[];
+  userBestRecord?: UserBestRecord | null;
 }
 
 export enum TrackDifficultyEnum {
