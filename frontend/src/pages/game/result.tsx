@@ -42,7 +42,7 @@ export default function GameResult() {
 
   useEffect(() => {
     if (!hasValidResult()) {
-      navigate("/game", { replace: true });
+      navigate("/game/select", { replace: true });
       return;
     }
 

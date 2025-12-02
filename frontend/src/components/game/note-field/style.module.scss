@@ -6,6 +6,6 @@
   justify-content: flex-start;
   align-items: flex-start;
   position: relative;
-  contain: strict;
+  overflow: hidden; // 위쪽 바깥으로 나가는 것만 숨김
   transform: translate3d(0, 0, 0);
 }

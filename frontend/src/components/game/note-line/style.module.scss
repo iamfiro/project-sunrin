@@ -6,7 +6,7 @@
   box-sizing: border-box;
   position: relative;
   background-color: rgba(0, 0, 0, 0.3);
-  contain: strict; // 최대 격리
+  overflow: visible; // 롱노트 tail이 위로 보이도록
   transform: translateZ(0);
 
   // 판정선 (노트 위에 표시)

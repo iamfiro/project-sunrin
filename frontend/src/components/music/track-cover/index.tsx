@@ -94,7 +94,7 @@ export default function MusicAlbumCover({
         </VStack>
       </HStack>
       <VStack gap={6} fullWidth>
-        {ranks?.map((rank) => (
+        {ranks?.slice(0, 3).map((rank) => (
           <TrackRank key={rank.rank} rank={rank} />
         ))}
       </VStack>

@@ -5,12 +5,12 @@
   background: linear-gradient(to bottom, #d3e7ff, #acb3bc);
   box-sizing: border-box;
   z-index: 1;
-  contain: strict;
   transform: translate3d(0, 0, 0);
 
   &.hold {
     background: linear-gradient(to bottom, #69faff, #00a5c6);
     z-index: 2;
+    overflow: visible; // tail이 보이도록
 
     .tail {
       position: absolute;
@@ -20,7 +20,6 @@
       border-left: 2px solid rgba(255, 255, 255, 0.3);
       border-right: 2px solid rgba(255, 255, 255, 0.3);
       box-sizing: border-box;
-      contain: strict;
       transform: translate3d(0, 0, 0);
     }
 

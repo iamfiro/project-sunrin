@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { Note } from "@/shared/types/game/note";
@@ -22,7 +22,7 @@ import NoteField from "../note-field";
 import s from "./style.module.scss";
 
 const LANE_POSITIONS = [12.5, 37.5, 62.5, 87.5];
-const NOTE_DISPLAY_TIME = 600;
+const NOTE_DISPLAY_TIME = 1500; // 노트가 화면에 보이는 시간 (1.5초)
 
 interface PlayFieldProps {
   notes: Note[];
@@ -40,20 +40,30 @@ export default function PlayField({
 
   const { scroll, startTimeRef, countdown, isGameStarted } = useGameTimer();
   const [notes, setNotes] = useState<Note[]>([]);
+  const [allNotes, setAllNotes] = useState<Note[]>([]); // 원본 노트 배열 (롱노트용)
 
   useEffect(() => {
     onGameStarted?.(isGameStarted);
   }, [isGameStarted, onGameStarted]);
 
+  // 노트 초기화는 한 번만 수행 (게임 시작 시)
+  const notesInitializedRef = useRef(false);
+
   useEffect(() => {
-    if (isGameStarted && initialNotes.length > 0 && notes.length === 0) {
+    if (
+      isGameStarted &&
+      initialNotes.length > 0 &&
+      !notesInitializedRef.current
+    ) {
+      notesInitializedRef.current = true;
       const adjustedNotes = initialNotes.map((note) => ({
         ...note,
         time: note.time + NOTE_DISPLAY_TIME,
       }));
       setNotes(adjustedNotes);
+      setAllNotes(adjustedNotes); // 원본도 저장
     }
-  }, [isGameStarted, initialNotes, notes.length]);
+  }, [isGameStarted, initialNotes]);
 
   const { judgement, judgementId, showJudgement } = useJudgement();
 
@@ -90,10 +100,18 @@ export default function PlayField({
         <ComboDisplay />
         <Judgement judgement={judgement} judgementId={judgementId} />
         <NoteField
-          notes={notes}
+          notes={allNotes}
           scroll={scroll}
           noteDisplayTime={NOTE_DISPLAY_TIME}
           pressedKeys={pressedKeys}
+          allNotes={allNotes}
+          processedNoteIds={
+            new Set(
+              allNotes
+                .filter((n) => !notes.some((pn) => pn.id === n.id))
+                .map((n) => n.id),
+            )
+          }
         />
 
         {effects.map((effect) => (

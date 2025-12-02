@@ -81,41 +81,6 @@ export const useNoteJudgement = (
   const { startHold, endHold, getActiveHold } = useHoldNoteStore();
   const { pressedKeys } = useInputStore();
 
-  // 롱노트 키 릴리즈 감지
-  useEffect(() => {
-    const checkHoldNotes = () => {
-      const currentTime = performance.now() - (startTimeRef.current || 0);
-
-      // 각 레인의 활성 롱노트 체크
-      for (let lane = 0; lane < 4; lane++) {
-        const activeHold = getActiveHold(lane);
-        if (!activeHold) continue;
-
-        const isKeyPressed = pressedKeys.has(lane);
-
-        // 롱노트 끝 시점에 도달했는지 체크
-        if (currentTime >= activeHold.endTime) {
-          if (isKeyPressed) {
-            // 성공적으로 롱노트 완료
-            completeHoldNote(lane, activeHold.noteId);
-          } else {
-            // 이미 키를 뗀 상태 (MISS는 keyRelease에서 처리됨)
-            endHold(lane);
-            setNotes((notes) =>
-              notes.filter((n) => n.id !== activeHold.noteId),
-            );
-          }
-        } else if (!isKeyPressed) {
-          // 아직 끝나지 않았는데 키를 뗌 -> MISS
-          failHoldNote(lane, activeHold.noteId);
-        }
-      }
-    };
-
-    const interval = setInterval(checkHoldNotes, 16); // ~60fps
-    return () => clearInterval(interval);
-  }, [pressedKeys, startTimeRef, getActiveHold, endHold, setNotes]);
-
   const completeHoldNote = useCallback(
     (lane: number, noteId: string) => {
       const currentTime = performance.now() - startTimeRef.current!;
@@ -196,6 +161,45 @@ export const useNoteJudgement = (
     [startTimeRef, getResult, setResult, showJudgement, endHold, setNotes],
   );
 
+  // 롱노트 키 릴리즈 감지
+  useEffect(() => {
+    const checkHoldNotes = () => {
+      const currentTime = performance.now() - (startTimeRef.current || 0);
+
+      // 각 레인의 활성 롱노트 체크
+      for (let lane = 0; lane < 4; lane++) {
+        const activeHold = getActiveHold(lane);
+        if (!activeHold) continue;
+
+        const isKeyPressed = pressedKeys.has(lane);
+
+        // 롱노트 끝 시점에 도달했는지 체크
+        if (currentTime >= activeHold.endTime) {
+          if (isKeyPressed) {
+            // 성공적으로 롱노트 완료
+            completeHoldNote(lane, activeHold.noteId);
+          } else {
+            // 이미 키를 뗀 상태 (MISS는 keyRelease에서 처리됨)
+            endHold(lane);
+          }
+        } else if (!isKeyPressed) {
+          // 아직 끝나지 않았는데 키를 뗌 -> MISS
+          failHoldNote(lane, activeHold.noteId);
+        }
+      }
+    };
+
+    const interval = setInterval(checkHoldNotes, 16); // ~60fps
+    return () => clearInterval(interval);
+  }, [
+    pressedKeys,
+    startTimeRef,
+    getActiveHold,
+    endHold,
+    completeHoldNote,
+    failHoldNote,
+  ]);
+
   const handleKeyPress = useCallback(
     (keyIndex: number) => {
       const currentTime = performance.now() - startTimeRef.current!;
@@ -207,7 +211,8 @@ export const useNoteJudgement = (
       for (const note of notes) {
         if (note.lane === targetLane) {
           const timeDiff = Math.abs(note.time - currentTime);
-          if (timeDiff < minTimeDiff) {
+          // 판정 범위 내의 가장 가까운 노트 찾기
+          if (timeDiff < minTimeDiff && timeDiff <= JUDGEMENT_WINDOWS.miss) {
             minTimeDiff = timeDiff;
             closestNote = note;
           }
@@ -216,20 +221,8 @@ export const useNoteJudgement = (
 
       const current = getResult();
 
-      // 노트가 없거나 판정 범위 밖에서 키를 누르면 MISS
-      if (!closestNote || minTimeDiff > JUDGEMENT_WINDOWS.miss) {
-        // 노트가 하나도 없으면 (게임 시작 전/후) 무시
-        if (notes.length === 0) return;
-
-        showJudgement("Miss");
-        const combo = updateCombo([...current.combo], currentTime, true);
-
-        setResult({
-          miss: current.miss + 1,
-          combo,
-          isFullCombo: false,
-          isAllPerfect: false,
-        });
+      // 판정 가능한 노트가 없으면 무시 (빈 타격 MISS 제거)
+      if (!closestNote) {
         return;
       }
 
@@ -264,8 +257,22 @@ export const useNoteJudgement = (
             }
             updateTiming(normalizedTiming, timingType);
 
-            // 시작 시 이펙트만 보여줌
-            triggerEffect(targetLane, "great");
+            // 시작 시 판정 표시 (시간 차이에 따라)
+            let startJudgement: "perfect" | "great" | "good";
+            if (timeDiff <= JUDGEMENT_WINDOWS.perfect) {
+              startJudgement = "perfect";
+              showJudgement("Perfect");
+            } else if (timeDiff <= JUDGEMENT_WINDOWS.great) {
+              startJudgement = "great";
+              showJudgement("Great");
+            } else {
+              startJudgement = "good";
+              showJudgement("Good");
+            }
+            triggerEffect(targetLane, startJudgement);
+
+            // 롱노트 시작 시 notes 배열에서 제거 (중복 처리 방지)
+            setNotes((notes) => notes.filter((n) => n.id !== closestNote!.id));
           }
           return; // 롱노트는 여기서 종료 (점수는 끝에서)
         }
