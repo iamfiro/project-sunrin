@@ -288,197 +288,445 @@
         }
     }
 }
-.topBar{
+// === After Effects 스타일 에디터 ===
+
+.editWrapper {
     width: 100%;
-    height: 55px;
+    height: 100vh;
     display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    padding: 0 12px;
+    flex-direction: column;
+    background: #1a1a1f;
+    position: relative;
+    overflow: hidden;
+}
+
+// 배경 비디오 (전체 화면 배경)
+.videoBackground {
     position: fixed;
     top: 0;
     left: 0;
-    z-index: 1000;
-    background: linear-gradient(to bottom, #fff, #ccc);
-    img{
-        width: 120px;
-        height: auto;
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+    z-index: 0;
+}
+
+.videoOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(
+        to bottom,
+        rgba(26, 26, 31, 0.4) 0%,
+        rgba(26, 26, 31, 0.2) 30%,
+        rgba(26, 26, 31, 0.2) 70%,
+        rgba(26, 26, 31, 0.6) 100%
+    );
+    z-index: 1;
+    pointer-events: none;
+}
+
+// 상단 바
+.topBar {
+    width: 100%;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    position: relative;
+    z-index: 100;
+    background: rgba(26, 26, 31, 0.85);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+
+    img {
+        height: 28px;
+        width: auto;
     }
+
+    .titleSection {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+
+        h1 {
+            font-size: 15px;
+            font-weight: 600;
+            color: #fdfdfe;
+        }
+
+        span {
+            font-size: 13px;
+            color: rgba(253, 253, 254, 0.5);
+        }
+    }
+
     .saveButton {
-        margin-left: auto;
-        padding: 8px 16px;
-        background-color: #4CAF50;
+        padding: 10px 20px;
+        background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
         color: white;
         border: none;
-        border-radius: 4px;
+        border-radius: 8px;
         cursor: pointer;
-        font-weight: bold;
+        font-weight: 600;
+        font-size: 13px;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+
+        &:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4);
+        }
     }
 }
-.editNote{
-    padding: 20px;
-    background: rgba(0, 0, 0, 0.8);
-    color: #fdfdfe;
-    font-size: 18px;
+
+// 메인 노트 에디터 영역
+.previewArea {
+    flex: 1;
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+// 하단 패널 (타임라인 + 컨트롤)
+.bottomPanel {
+    position: relative;
+    z-index: 100;
+    background: rgba(26, 26, 31, 0.92);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+// 컨트롤 바
+.controlBar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+
+    .leftControls {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .centerControls {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .rightControls {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+}
+
+.bpmContainer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+
+    p {
+        font-size: 12px;
+        font-weight: 600;
+        color: rgba(253, 253, 254, 0.6);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .bpm {
+        width: 60px;
+        padding: 4px 8px;
+        background: transparent;
+        border: none;
+        outline: none;
+        font-size: 14px;
+        font-weight: 600;
+        color: #fdfdfe;
+        text-align: center;
+
+        &:focus {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+    }
+}
+
+.timeDisplay {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: rgba(253, 253, 254, 0.7);
+    background: rgba(255, 255, 255, 0.05);
+    padding: 6px 12px;
+    border-radius: 6px;
+    min-width: 80px;
     text-align: center;
 }
-.waveform{
-    width: 100%;
-    height: 250px;
-    background: #FDFDFE66;
-    padding: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    border-top: 2px solid #8e8e8e;
+
+.control {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    button {
+        width: 36px;
+        height: 36px;
+        border: none;
+        outline: none;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: rgba(253, 253, 254, 0.7);
+
+        &:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fdfdfe;
+        }
+
+        &.playButton {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: #fdfdfe;
+
+            &:hover {
+                transform: scale(1.05);
+                box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
+            }
+        }
+    }
 }
-.editContainer{
-    width: 100%;
-    height: calc(100vh - 55px);
-    margin-top: 55px;
+
+.musicInfoContainer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    h1 {
+        font-size: 12px;
+        font-weight: 600;
+        color: rgba(253, 253, 254, 0.5);
+        text-transform: uppercase;
+    }
+
+    .musicTitle {
+        font-size: 14px;
+        color: #fdfdfe;
+        font-weight: 500;
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+}
+
+// 노트 액션 바
+.noteContainer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    background: rgba(0, 0, 0, 0.3);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+
+    .helpText {
+        font-size: 12px;
+        color: rgba(253, 253, 254, 0.6);
+        font-style: italic;
+    }
+
+    .noteActions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .noteButton {
+        height: 32px;
+        padding: 0 14px;
+        background: rgba(99, 102, 241, 0.15);
+        border: 1px solid rgba(99, 102, 241, 0.3);
+        border-radius: 6px;
+        color: #a5b4fc;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+
+        &:hover {
+            background: rgba(99, 102, 241, 0.25);
+            border-color: rgba(99, 102, 241, 0.5);
+        }
+    }
+
+    .editButton {
+        height: 32px;
+        padding: 0 14px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 6px;
+        color: rgba(253, 253, 254, 0.7);
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+
+        &:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fdfdfe;
+        }
+    }
+
+    .deleteButton {
+        height: 32px;
+        padding: 0 14px;
+        background: rgba(239, 68, 68, 0.15);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        border-radius: 6px;
+        color: #fca5a5;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+
+        &:hover {
+            background: rgba(239, 68, 68, 0.25);
+            border-color: rgba(239, 68, 68, 0.5);
+        }
+    }
+}
+
+// 타임라인 에디터
+.timelineSection {
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    padding: 20px;
-    box-sizing: border-box;
+    height: 180px;
 }
-.editor{
-    padding: 20px;
+
+.editor {
+    padding: 12px 20px;
     color: #fdfdfe;
     display: flex;
     flex-direction: row;
     align-items: flex-start;
-    justify-self: flex-start;
     width: 100%;
-    height: 100%;
+    height: 100px;
     overflow-x: scroll;
     scrollbar-width: none;
     scroll-behavior: smooth;
-    ::-webkit-scrollbar{
+    background: rgba(0, 0, 0, 0.3);
+
+    &::-webkit-scrollbar {
         display: none;
     }
 }
-.musicInfo{
-    border-bottom: solid 2px #8e8e8e;
+
+// 메인 에디터 영역 (노트 찍는 부분)
+.mainEditor {
+    width: calc(100% - 40px);
+    height: calc(100% - 40px);
+    position: relative;
+    z-index: 10;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    margin: 20px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px;
-    background:#FDFDFE66;
-    height: 75px;
-    width: 100%;
-    .bpm{
-        width: 100px;
-        padding: 8px;
-        background: none;
-        outline: none;
-        border : 1px solid #8e8e8e;
-        font-size: 16px;
-        color: #111;
-        font-weight: bold;
+    flex-direction: row;
+    align-items: stretch;
+
+    &::-webkit-scrollbar {
+        height: 12px;
     }
-    .musicTitle{
-        text-align: end;    
-        font-size: 16px;
-        color: #111;
-        font-weight: medium !important;
+
+    &::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.4);
+        border-radius: 6px;
     }
-    .control{
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 16px;
-        button{
-            border: none;
-            outline: none;
-            background: none;
-            cursor: pointer;
-            transition: all 0.2s ease-in-out;
-        }
-        button:hover{
-            scale: 1.1;
-            color: $surface-brand;
+
+    &::-webkit-scrollbar-thumb {
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        border-radius: 6px;
+        border: 2px solid rgba(0, 0, 0, 0.4);
+
+        &:hover {
+            background: linear-gradient(135deg, #818cf8, #a78bfa);
         }
     }
 }
-.noteContainer{
-    background: #FDFDFE66;
-    padding: 20px;
-    display: flex;
-    align-items: flex-start;
-    justify-content: flex-start;
-    color: #fdfdfe;
-    font-size: 16px;
-    width: 100%;
-    gap: 16px;
-.noteButton{
-    height: 40px;
-    background: none;
-    border: none;
-    outline: none;
-    cursor: pointer;
-    color: #111;
-    background-color: rgba(255, 255, 255, 0.8);
-    padding: 12px;
-    font-size: 12px;
-    border-radius: 8px;
-}
-.deleteButton{
-    height: 40px;
-    background: none;
-    border: none;
-    outline: none;
-    cursor: pointer;
-    color: #fdfdfe;
-    background-color: rgba(181, 39, 39, 0.8);
-    padding: 12px;
-    font-size: 12px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
-.noteActions{
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 8px;
-}
-}
 
-.bpmContainer{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    p{
-        font-size: 16px;
-        color: #111;
-        font-weight: bold;
-    }
-    input{
-        border-radius: 8px;
-    }
-}
-
-.musicInfoContainer{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    h1{
-        font-size: 16px;
-        color: #111;
-        font-weight: bold;
-    }
-}
-
-.video{
-    width: 300px;
-    height: auto;
-    object-fit: cover;
-    border-radius: 8px;
+// 현재 재생 위치 표시선
+.playhead {
     position: absolute;
-    top: 30px;
-    right: 30px;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: #ef4444;
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.6);
+    z-index: 100;
+    pointer-events: none;
+    top: 0;
+
+    &::before {
+        content: '';
+        position: absolute;
+        left: -5px;
+        top: -6px;
+        width: 0;
+        height: 0;
+        border-top: 7px solid transparent;
+        border-bottom: 7px solid transparent;
+        border-left: 10px solid #ef4444;
+    }
+}
+
+// 웨이브폼
+.waveform {
+    width: 100%;
+    height: 80px;
+    background: linear-gradient(to top, rgba(99, 102, 241, 0.1), transparent);
+    padding: 0 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+// 기존 editContainer 삭제하고 새로운 레이아웃 적용
+.editContainer {
+    display: none;
 }

@@ -19,6 +19,7 @@ class ChartSerializer(serializers.ModelSerializer):
     ranks = serializers.SerializerMethodField()
     userBestRecord = serializers.SerializerMethodField()
     musicFile = serializers.FileField(write_only=True)
+    coverFile = serializers.ImageField(write_only=True, required=False, allow_null=True)
     notes_data = serializers.CharField(write_only=True)
 
     class Meta:
@@ -26,7 +27,7 @@ class ChartSerializer(serializers.ModelSerializer):
         fields = (
             'musicId', 'title', 'song', 'backgroundVideo', 'coverUrl', 
             'isCommunitySong', 'artist', 'bpm', 'difficulty', 'creator',
-            'notes', 'ranks', 'userBestRecord', 'musicFile', 'notes_data'
+            'notes', 'ranks', 'userBestRecord', 'musicFile', 'coverFile', 'notes_data'
         )
         read_only_fields = ('musicId', 'song', 'backgroundVideo', 'coverUrl', 'creator', 'isCommunitySong')
 
@@ -59,6 +60,7 @@ class ChartSerializer(serializers.ModelSerializer):
         import posixpath
         request = self.context['request']
         music_file = validated_data.pop('musicFile')
+        cover_file = validated_data.pop('coverFile', None)
         notes_data_str = validated_data.pop('notes_data')
         
         music_id = str(ULID())
@@ -85,29 +87,45 @@ class ChartSerializer(serializers.ModelSerializer):
                 f.write(chunk)
 
         # --- Cover Image ---
-        temp_dir = os.path.join(settings.MEDIA_ROOT, 'temp')
-        os.makedirs(temp_dir, exist_ok=True)
-        temp_video_path = os.path.join(temp_dir, file_name)
-        
-        music_file.seek(0)
-        with open(temp_video_path, 'wb+') as f:
-            for chunk in music_file.chunks():
-                f.write(chunk)
-        
-        cap = cv2.VideoCapture(temp_video_path)
-        ret, frame = cap.read()
         cover_db_path = ''
-        if ret:
-            cover_filename = f'{music_id}.jpg'
+        
+        # 커버 파일이 업로드된 경우 사용
+        if cover_file:
+            # 파일 확장자 추출
+            original_ext = os.path.splitext(cover_file.name)[1].lower()
+            if original_ext not in ['.jpg', '.jpeg', '.png', '.gif', '.webp']:
+                original_ext = '.jpg'
+            cover_filename = f'{music_id}{original_ext}'
             cover_os_path = os.path.join(settings.MEDIA_ROOT, 'covers', cover_filename)
             cover_db_path = posixpath.join(settings.MEDIA_URL, 'covers', cover_filename)
             os.makedirs(os.path.dirname(cover_os_path), exist_ok=True)
-            cv2.imwrite(cover_os_path, frame)
+            with open(cover_os_path, 'wb+') as f:
+                for chunk in cover_file.chunks():
+                    f.write(chunk)
         else:
-            # If frame extraction fails, use a default cover
-            cover_db_path = posixpath.join(settings.MEDIA_URL, 'covers', 'bochi.jpg')
-        cap.release()
-        os.remove(temp_video_path)
+            # 커버 파일이 없으면 비디오에서 첫 프레임 추출
+            temp_dir = os.path.join(settings.MEDIA_ROOT, 'temp')
+            os.makedirs(temp_dir, exist_ok=True)
+            temp_video_path = os.path.join(temp_dir, file_name)
+            
+            music_file.seek(0)
+            with open(temp_video_path, 'wb+') as f:
+                for chunk in music_file.chunks():
+                    f.write(chunk)
+            
+            cap = cv2.VideoCapture(temp_video_path)
+            ret, frame = cap.read()
+            if ret:
+                cover_filename = f'{music_id}.jpg'
+                cover_os_path = os.path.join(settings.MEDIA_ROOT, 'covers', cover_filename)
+                cover_db_path = posixpath.join(settings.MEDIA_URL, 'covers', cover_filename)
+                os.makedirs(os.path.dirname(cover_os_path), exist_ok=True)
+                cv2.imwrite(cover_os_path, frame)
+            else:
+                # If frame extraction fails, use a default cover
+                cover_db_path = posixpath.join(settings.MEDIA_URL, 'covers', 'bochi.jpg')
+            cap.release()
+            os.remove(temp_video_path)
 
         chart = Chart.objects.create(
             musicId=music_id,

@@ -84,37 +84,16 @@ export const useNoteStore = create<NoteState>((set, get) => {
     addNote: (note) => {
       recordAndSet((state) => {
         const newNoteId = `note_${Date.now()}_${Math.random()}`;
-        let targetLane = note.lane;
-        let targetTime = note.time;
-        const measureDuration = 500;
-        let foundSpot = false;
-
-        while (!foundSpot) {
-          for (let i = 1; i <= 4; i++) {
-            const collidingNote = checkCollision(
-              i,
-              targetTime,
-              note.type,
-              note.duration,
-              null,
-            );
-            if (!collidingNote) {
-              targetLane = i;
-              foundSpot = true;
-              break;
-            }
-          }
-
-          if (!foundSpot) {
-            const relativeTime = targetTime % measureDuration;
-            const currentMeasureStart = targetTime - relativeTime;
-            targetTime = currentMeasureStart + measureDuration + relativeTime;
-          }
-        }
+        // 클릭한 위치에 정확히 노트 추가 (겹침 허용)
         return {
           notes: [
             ...state.notes,
-            { ...note, id: newNoteId, lane: targetLane, time: targetTime },
+            {
+              ...note,
+              id: newNoteId,
+              lane: note.lane,
+              time: Math.round(note.time),
+            },
           ],
           selectedNoteId: newNoteId,
         };

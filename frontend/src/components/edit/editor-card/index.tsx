@@ -37,17 +37,10 @@ export default function EditorCard({ title, onNext }: Props) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [totalSections, setTotalSections] = useState(16);
   const [, setIsColorModalOpen] = useState(false);
-  const [musicUrl, setMusicUrl] = useState<string | undefined>(undefined);
+  const [currentTime, setCurrentTime] = useState(0);
 
-  const {
-    notes,
-    addNote,
-    removeNote,
-    getSelectedNote,
-    updateNote,
-    undo,
-    redo,
-  } = useNoteStore();
+  const { notes, removeNote, getSelectedNote, updateNote, undo, redo } =
+    useNoteStore();
   const selectedNote = getSelectedNote();
 
   const {
@@ -58,6 +51,7 @@ export default function EditorCard({ title, onNext }: Props) {
     coverImage,
     setCoverImage,
     coverPreviewUrl,
+    editVideoUrl,
     bpm,
     setBpm,
     artist,
@@ -65,17 +59,6 @@ export default function EditorCard({ title, onNext }: Props) {
     difficulty,
     setDifficulty,
   } = useEditorStore();
-
-  useEffect(() => {
-    if (editMusic) {
-      const url = URL.createObjectURL(editMusic);
-      setMusicUrl(url);
-
-      return () => {
-        URL.revokeObjectURL(url);
-      };
-    }
-  }, [editMusic]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -190,25 +173,47 @@ export default function EditorCard({ title, onNext }: Props) {
         }
       });
 
-      const handleTimeUpdate = (currentTime: number) => {
-        if (editorRef.current) {
-          const pixelsPerSecond = 400 / 0.5; // 400px per 500ms section
-          editorRef.current.scrollLeft = currentTime * pixelsPerSecond;
-        }
-        if (videoRef.current) {
-          videoRef.current.currentTime = currentTime;
-        }
-      };
-
-      wavesurferRef.current.on("timeupdate", handleTimeUpdate);
+      // wavesurfer seeking 이벤트 (웨이브폼 클릭 시)
       wavesurferRef.current.on("seeking", (progress: number) => {
-        if (wavesurferRef.current) {
-          const currentTime = wavesurferRef.current.getDuration() * progress;
-          handleTimeUpdate(currentTime);
+        if (wavesurferRef.current && !isPlaying) {
+          const time = wavesurferRef.current.getDuration() * progress;
+          setCurrentTime(time);
+
+          // 비디오 동기화
+          if (videoRef.current) {
+            videoRef.current.currentTime = time;
+          }
+
+          // 에디터 스크롤 동기화
+          if (editorRef.current) {
+            const pixelsPerSecond = 400;
+            const targetScroll = time * pixelsPerSecond;
+            const editorWidth = editorRef.current.clientWidth;
+            editorRef.current.scrollLeft = targetScroll - editorWidth / 3;
+          }
         }
       });
     }
   }, [title, editMusic, setBpm, setTotalSections]);
+
+  // requestAnimationFrame을 사용한 부드러운 스크롤 동기화
+  const animationFrameRef = useRef<number | null>(null);
+  const isUserScrollingRef = useRef(false);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // 정지 시 현재 위치에 고정하는 함수
+  const syncScrollToCurrentTime = useCallback(() => {
+    const video = videoRef.current;
+    const editor = editorRef.current;
+
+    if (video && editor) {
+      const time = video.currentTime;
+      const pixelsPerSecond = 400;
+      const targetScroll = time * pixelsPerSecond;
+      const editorWidth = editor.clientWidth;
+      editor.scrollLeft = targetScroll - editorWidth / 3;
+    }
+  }, []);
 
   useEffect(() => {
     if (videoRef.current) {
@@ -216,14 +221,73 @@ export default function EditorCard({ title, onNext }: Props) {
         videoRef.current.play();
       } else {
         videoRef.current.pause();
+        // 정지 시 현재 위치에 고정
+        syncScrollToCurrentTime();
       }
     }
-  }, [isPlaying]);
+  }, [isPlaying, syncScrollToCurrentTime]);
+
+  useEffect(() => {
+    const animate = () => {
+      const video = videoRef.current;
+      const editor = editorRef.current;
+
+      // 재생 중일 때만 스크롤 업데이트
+      if (
+        video &&
+        !video.paused &&
+        editor &&
+        !isUserScrollingRef.current &&
+        isPlaying
+      ) {
+        const time = video.currentTime;
+        setCurrentTime(time);
+
+        // 200px per 500ms = 400px per second
+        const pixelsPerSecond = 400;
+        const targetScroll = time * pixelsPerSecond;
+        const editorWidth = editor.clientWidth;
+
+        // 부드러운 스크롤 (현재 위치와 목표 위치 사이를 보간)
+        const currentScroll = editor.scrollLeft;
+        const targetPosition = targetScroll - editorWidth / 3;
+        const diff = targetPosition - currentScroll;
+
+        // 차이가 크면 즉시 이동, 작으면 부드럽게
+        if (Math.abs(diff) > 500) {
+          editor.scrollLeft = targetPosition;
+        } else {
+          editor.scrollLeft = currentScroll + diff * 0.15;
+        }
+      }
+
+      // 재생 중일 때만 다음 프레임 요청
+      if (isPlaying) {
+        animationFrameRef.current = requestAnimationFrame(animate);
+      }
+    };
+
+    if (isPlaying) {
+      animationFrameRef.current = requestAnimationFrame(animate);
+    } else {
+      // 정지 시 현재 위치에 고정
+      syncScrollToCurrentTime();
+    }
+
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
+      }
+    };
+  }, [isPlaying, syncScrollToCurrentTime]);
 
   const handlePlayPause = () => {
     if (wavesurferRef.current) {
       if (isPlaying) {
         wavesurferRef.current.pause();
+        // 정지 시 현재 위치에 고정
+        syncScrollToCurrentTime();
       } else {
         wavesurferRef.current.play();
       }
@@ -288,39 +352,47 @@ export default function EditorCard({ title, onNext }: Props) {
   };
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    if (isPlaying || !wavesurferRef.current) {
+    // 재생 중일 때는 자동 스크롤이 처리하므로 무시
+    if (isPlaying) {
       return;
+    }
+
+    // 사용자가 스크롤 중임을 표시
+    isUserScrollingRef.current = true;
+
+    // 이전 타임아웃 클리어
+    if (scrollTimeoutRef.current) {
+      clearTimeout(scrollTimeoutRef.current);
     }
 
     const currentScroll = e.currentTarget.scrollLeft;
-    const pixelsPerSecond = 800; // 400px per 0.5s
-    const expectedScroll =
-      wavesurferRef.current.getCurrentTime() * pixelsPerSecond;
-
-    if (Math.abs(currentScroll - expectedScroll) < 5) {
-      return;
-    }
-
+    // 200px per 500ms = 400px per second
+    const pixelsPerSecond = 400;
     const newTime = currentScroll / pixelsPerSecond;
-    const duration = wavesurferRef.current.getDuration();
-    if (duration > 0) {
-      wavesurferRef.current.seekTo(newTime / duration);
+
+    // 시간 업데이트
+    setCurrentTime(newTime);
+
+    // wavesurfer와 video 동기화
+    if (wavesurferRef.current) {
+      const duration = wavesurferRef.current.getDuration();
+      if (duration > 0) {
+        const clampedTime = Math.max(0, Math.min(newTime, duration));
+        wavesurferRef.current.seekTo(clampedTime / duration);
+      }
     }
+
+    if (videoRef.current) {
+      videoRef.current.currentTime = Math.max(0, newTime);
+    }
+
+    // 스크롤이 끝나면 플래그 해제
+    scrollTimeoutRef.current = setTimeout(() => {
+      isUserScrollingRef.current = false;
+    }, 150);
   };
 
   // --- Note Manipulation Handlers ---
-  const handleAddNote = (type: "tap" | "hold") => {
-    if (!wavesurferRef.current) return;
-    const currentTime = wavesurferRef.current.getCurrentTime() * 1000; // Convert to ms
-    const newNote = {
-      time: Math.round(currentTime),
-      lane: 1,
-      type: type,
-      duration: type === "hold" ? 200 : undefined,
-    };
-    addNote(newNote);
-  };
-
   const handleDeleteNote = () => {
     if (selectedNote) {
       removeNote(selectedNote.id);
@@ -525,15 +597,40 @@ export default function EditorCard({ title, onNext }: Props) {
     );
   } else if (title === "edit") {
     return (
-      <div className={s.contents}>
+      <div className={s.editWrapper}>
+        {/* 배경 비디오 */}
+        <video
+          ref={videoRef}
+          src={editVideoUrl || undefined}
+          className={s.videoBackground}
+          muted
+          playsInline
+        />
+        <div className={s.videoOverlay} />
+
+        {/* 상단 바 */}
         <div className={s.topBar}>
           <img src="/logo_brand.svg" alt="logo" />
+          <div className={s.titleSection}>
+            <h1>{editTitle}</h1>
+            <span>•</span>
+            <span>{artist || "Unknown Artist"}</span>
+          </div>
           <button onClick={handleSave} className={s.saveButton}>
             저장
           </button>
         </div>
-        <div className={s.editContainer}>
-          <div className={s.editor} ref={editorRef} onScroll={handleScroll}>
+
+        {/* 메인 노트 에디터 영역 */}
+        <div className={s.previewArea}>
+          <div className={s.mainEditor} ref={editorRef} onScroll={handleScroll}>
+            {/* 재생 위치 표시선 */}
+            <div
+              className={s.playhead}
+              style={{
+                left: `${currentTime * 400}px`,
+              }}
+            />
             {Array.from({ length: totalSections }, (_, i) => {
               const msPerMeasure = 500;
               const startTime = i * msPerMeasure;
@@ -552,65 +649,77 @@ export default function EditorCard({ title, onNext }: Props) {
             })}
           </div>
         </div>
-        <div className={s.musicInfo}>
-          <div className={s.bpmContainer}>
-            <p>BPM</p>
-            <input
-              className={s.bpm}
-              type="number"
-              value={bpm}
-              onChange={(e) => setBpm(Number(e.target.value))}
-            />
+
+        {/* 하단 패널 */}
+        <div className={s.bottomPanel}>
+          {/* 컨트롤 바 */}
+          <div className={s.controlBar}>
+            <div className={s.leftControls}>
+              <div className={s.bpmContainer}>
+                <p>BPM</p>
+                <input
+                  className={s.bpm}
+                  type="number"
+                  value={bpm}
+                  onChange={(e) => setBpm(Number(e.target.value))}
+                />
+              </div>
+              <div className={s.timeDisplay}>
+                {`${Math.floor(currentTime / 60)}:${String(Math.floor(currentTime % 60)).padStart(2, "0")}`}
+              </div>
+            </div>
+
+            <div className={s.centerControls}>
+              <div className={s.control}>
+                <button onClick={() => handleSeek(-5)}>
+                  <ChevronFirst size={18} />
+                </button>
+                <button className={s.playButton} onClick={handlePlayPause}>
+                  {isPlaying ? <Pause size={20} /> : <Play size={20} />}
+                </button>
+                <button onClick={() => handleSeek(5)}>
+                  <ChevronLast size={18} />
+                </button>
+              </div>
+            </div>
+
+            <div className={s.rightControls}>
+              <div className={s.musicInfoContainer}>
+                <h1>곡명</h1>
+                <p className={s.musicTitle}>{editTitle}</p>
+              </div>
+            </div>
           </div>
-          <div className={s.control}>
-            <button onClick={() => handleSeek(-5)}>
-              <ChevronFirst scale={24} />
-            </button>
-            <button className={s.startButton} onClick={handlePlayPause}>
-              {isPlaying ? <Pause scale={24} /> : <Play scale={24} />}
-            </button>
-            <button onClick={() => handleSeek(5)}>
-              <ChevronLast scale={24} />
-            </button>
-          </div>
-          <div className={s.musicInfoContainer}>
-            <h1>제목</h1>
-            <p className={s.musicTitle}>{editTitle}</p>
-          </div>
-        </div>
-        <div className={s.noteContainer}>
-          <div className={s.noteActions}>
-            <button
-              onClick={() => handleAddNote("tap")}
-              className={s.noteButton}
-            >
-              숏노트 추가
-            </button>
-            <button
-              onClick={() => handleAddNote("hold")}
-              className={s.noteButton}
-            >
-              롱노트 추가
-            </button>
-            <button
-              onClick={() => setIsColorModalOpen(true)}
-              className={s.editButton}
-            >
-              <Palette size={16} />
-              색상 변경
-            </button>
-            {selectedNote && (
-              <>
+
+          {/* 노트 액션 바 */}
+          <div className={s.noteContainer}>
+            <div className={s.noteActions}>
+              <span className={s.helpText}>
+                💡 그리드에 마우스를 올리면 반투명 노트가 보이고, 클릭하면
+                숏노트, 드래그하면 롱노트가 추가됩니다
+              </span>
+              <button
+                onClick={() => setIsColorModalOpen(true)}
+                className={s.editButton}
+              >
+                <Palette size={14} />
+                색상
+              </button>
+              {selectedNote && (
                 <button className={s.deleteButton} onClick={handleDeleteNote}>
-                  <Trash2 size={16} />
+                  <Trash2 size={14} />
                   삭제
                 </button>
-              </>
-            )}
+              )}
+            </div>
+          </div>
+
+          {/* 타임라인 섹션 */}
+          <div className={s.timelineSection}>
+            {/* 웨이브폼 */}
+            <div className={s.waveform} ref={waveformRef}></div>
           </div>
         </div>
-        <div className={s.waveform} ref={waveformRef}></div>
-        <video ref={videoRef} src={musicUrl} className={s.video} muted />
       </div>
     );
   }
