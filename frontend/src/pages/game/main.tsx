@@ -37,7 +37,7 @@ export default function GameMain() {
           const convertedNotes: Note[] = chartData.notes.map((note) => ({
             id: String(note.id),
             time: note.time,
-            lane: note.lane,
+            lane: Math.max(0, note.lane - 1), // 서버의 1-based lane을 0-based로 변환
             type: note.type,
             duration: note.duration ?? undefined,
           }));
