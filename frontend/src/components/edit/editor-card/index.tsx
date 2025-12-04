@@ -1,14 +1,17 @@
 import {
   ChevronFirst,
   ChevronLast,
+  Image,
+  Music,
   Palette,
   Pause,
   Play,
   Trash2,
+  Upload,
   X,
 } from "lucide-react";
 import MusicTempo from "music-tempo";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import WaveSurfer from "wavesurfer.js";
@@ -33,7 +36,7 @@ export default function EditorCard({ title, onNext }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [totalSections, setTotalSections] = useState(16);
-  const [isColorModalOpen, setIsColorModalOpen] = useState(false);
+  const [, setIsColorModalOpen] = useState(false);
   const [musicUrl, setMusicUrl] = useState<string | undefined>(undefined);
 
   const {
@@ -52,6 +55,9 @@ export default function EditorCard({ title, onNext }: Props) {
     setEditTitle,
     editMusic,
     setEditMusic,
+    coverImage,
+    setCoverImage,
+    coverPreviewUrl,
     bpm,
     setBpm,
     artist,
@@ -239,6 +245,48 @@ export default function EditorCard({ title, onNext }: Props) {
     setEditMusic(file);
   };
 
+  const onCoverSave = (file: File) => {
+    setCoverImage(file);
+  };
+
+  const [isDraggingMusic, setIsDraggingMusic] = useState(false);
+  const [isDraggingCover, setIsDraggingCover] = useState(false);
+
+  const handleMusicDrop = useCallback(
+    (e: React.DragEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      setIsDraggingMusic(false);
+      const file = e.dataTransfer.files[0];
+      if (
+        file &&
+        (file.type.startsWith("audio/") || file.type.startsWith("video/"))
+      ) {
+        onMusicSave(file);
+      } else {
+        toast.error("오디오 또는 비디오 파일만 업로드 가능합니다.");
+      }
+    },
+    [onMusicSave],
+  );
+
+  const handleCoverDrop = useCallback(
+    (e: React.DragEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      setIsDraggingCover(false);
+      const file = e.dataTransfer.files[0];
+      if (file && file.type.startsWith("image/")) {
+        onCoverSave(file);
+      } else {
+        toast.error("이미지 파일만 업로드 가능합니다.");
+      }
+    },
+    [onCoverSave],
+  );
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+  };
+
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     if (isPlaying || !wavesurferRef.current) {
       return;
@@ -287,7 +335,7 @@ export default function EditorCard({ title, onNext }: Props) {
 
     try {
       // Omit the 'id' from each note, as the backend will assign it.
-      const notes_data = notes.map(({ id, ...rest }) => rest);
+      const notes_data = notes.map(({ id: _id, ...rest }) => rest);
 
       const chartData = {
         title: editTitle,
@@ -296,6 +344,7 @@ export default function EditorCard({ title, onNext }: Props) {
         notes_data: notes_data,
         musicFile: editMusic,
         difficulty: difficulty,
+        coverFile: coverImage || undefined,
       };
 
       await saveChart(chartData);
@@ -327,12 +376,18 @@ export default function EditorCard({ title, onNext }: Props) {
           <X scale={24} color="#8E8E8E" />
         </div>
         <div className={s.body}>
-          <input
-            type="text"
-            placeholder="제목을 입력하세요"
-            onChange={(e) => onTitleSave(e.target.value)}
-          />
-          <button onClick={onNext}>다음으로</button>
+          <div className={s.inputGroup}>
+            <label>곡 제목</label>
+            <input
+              type="text"
+              placeholder="제목을 입력하세요"
+              value={editTitle}
+              onChange={(e) => onTitleSave(e.target.value)}
+            />
+          </div>
+          <button onClick={onNext} disabled={!editTitle.trim()}>
+            다음으로
+          </button>
         </div>
       </div>
     );
@@ -341,33 +396,130 @@ export default function EditorCard({ title, onNext }: Props) {
       <div className={s.contents}>
         <div className={s.header}>
           <div className={s.spacer}></div>
-          <h2>음악 선택하기</h2>
+          <h2>음악 & 커버 설정</h2>
           <X scale={24} color="#8E8E8E" />
         </div>
         <div className={s.body}>
-          <input
-            type="file"
-            accept="audio/*,video/*"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) {
-                onMusicSave(file);
-              }
-            }}
-          />
-          <input
-            type="text"
-            placeholder="아티스트"
-            onChange={(e) => setArtist(e.target.value)}
-          />
-          <input
-            type="number"
-            placeholder="난이도 (1-15)"
-            min="1"
-            max="15"
-            onChange={(e) => setDifficulty(Number(e.target.value))}
-          />
-          <button onClick={onNext}>다음으로</button>
+          <div className={s.uploadSection}>
+            {/* 음악 파일 업로드 영역 */}
+            <div
+              className={`${s.uploadArea} ${isDraggingMusic ? s.dragging : ""} ${editMusic ? s.hasFile : ""}`}
+              onDrop={handleMusicDrop}
+              onDragOver={handleDragOver}
+              onDragEnter={() => setIsDraggingMusic(true)}
+              onDragLeave={() => setIsDraggingMusic(false)}
+              onClick={() => document.getElementById("music-input")?.click()}
+            >
+              <input
+                id="music-input"
+                type="file"
+                accept="video/*"
+                hidden
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    onMusicSave(file);
+                  }
+                }}
+              />
+              <div className={s.uploadIcon}>
+                {editMusic ? (
+                  <Music size={48} strokeWidth={1.5} />
+                ) : (
+                  <Upload size={48} strokeWidth={1.5} />
+                )}
+              </div>
+              <div className={s.uploadText}>
+                {editMusic ? (
+                  <>
+                    <span className={s.fileName}>{editMusic.name}</span>
+                    <span className={s.fileSize}>
+                      {(editMusic.size / 1024 / 1024).toFixed(2)} MB
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <span className={s.uploadTitle}>음악 파일 업로드</span>
+                    <span className={s.uploadHint}>
+                      드래그하거나 클릭하여 업로드
+                    </span>
+                    <span className={s.uploadFormats}>
+                      MP4 지원 (영상이 있어야 됨)
+                    </span>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* 앨범 커버 업로드 영역 */}
+            <div
+              className={`${s.uploadArea} ${s.coverArea} ${isDraggingCover ? s.dragging : ""} ${coverImage ? s.hasFile : ""}`}
+              onDrop={handleCoverDrop}
+              onDragOver={handleDragOver}
+              onDragEnter={() => setIsDraggingCover(true)}
+              onDragLeave={() => setIsDraggingCover(false)}
+              onClick={() => document.getElementById("cover-input")?.click()}
+            >
+              <input
+                id="cover-input"
+                type="file"
+                accept="image/*"
+                hidden
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    onCoverSave(file);
+                  }
+                }}
+              />
+              {coverPreviewUrl ? (
+                <div className={s.coverPreview}>
+                  <img src={coverPreviewUrl} alt="앨범 커버 미리보기" />
+                  <div className={s.coverOverlay}>
+                    <Image size={24} />
+                    <span>변경하기</span>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div className={s.uploadIcon}>
+                    <Image size={48} strokeWidth={1.5} />
+                  </div>
+                  <div className={s.uploadText}>
+                    <span className={s.uploadTitle}>앨범 커버</span>
+                    <span className={s.uploadHint}>이미지 업로드</span>
+                    <span className={s.uploadFormats}>PNG, JPG 권장</span>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+
+          <div className={s.inputGroup}>
+            <label>아티스트</label>
+            <input
+              type="text"
+              placeholder="아티스트 이름을 입력하세요"
+              value={artist}
+              onChange={(e) => setArtist(e.target.value)}
+            />
+          </div>
+
+          <div className={s.inputGroup}>
+            <label>난이도</label>
+            <input
+              type="number"
+              placeholder="1 ~ 15"
+              min="1"
+              max="15"
+              value={difficulty || ""}
+              onChange={(e) => setDifficulty(Number(e.target.value))}
+            />
+          </div>
+
+          <button onClick={onNext} disabled={!editMusic}>
+            다음으로
+          </button>
         </div>
       </div>
     );

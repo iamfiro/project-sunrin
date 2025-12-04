@@ -5,6 +5,9 @@ interface EditorStore {
   setEditTitle: (title: string) => void;
   editMusic: File | null;
   setEditMusic: (music: File | null) => void;
+  coverImage: File | null;
+  setCoverImage: (cover: File | null) => void;
+  coverPreviewUrl: string | null;
   bpm: number;
   setBpm: (bpm: number) => void;
   artist: string;
@@ -31,6 +34,21 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       set({ editMusic: music, editVideoUrl: null });
     }
   },
+  coverImage: null,
+  setCoverImage: (cover: File | null) => {
+    const { coverPreviewUrl } = get();
+    if (coverPreviewUrl) {
+      URL.revokeObjectURL(coverPreviewUrl);
+    }
+
+    if (cover) {
+      const url = URL.createObjectURL(cover);
+      set({ coverImage: cover, coverPreviewUrl: url });
+    } else {
+      set({ coverImage: null, coverPreviewUrl: null });
+    }
+  },
+  coverPreviewUrl: null,
   bpm: 0,
   setBpm: (bpm: number) => set({ bpm }),
   artist: "",

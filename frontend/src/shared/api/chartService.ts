@@ -21,6 +21,7 @@ export interface SaveChartParams {
   notes_data: SaveChartNote[];
   musicFile: File;
   difficulty: number;
+  coverFile?: File;
 }
 
 export async function saveChart(data: SaveChartParams) {
@@ -31,6 +32,9 @@ export async function saveChart(data: SaveChartParams) {
   formData.append("difficulty", data.difficulty.toString());
   formData.append("musicFile", data.musicFile);
   formData.append("notes_data", JSON.stringify(data.notes_data));
+  if (data.coverFile) {
+    formData.append("coverFile", data.coverFile);
+  }
 
   return request<Chart>("/charts/", {
     method: "POST",

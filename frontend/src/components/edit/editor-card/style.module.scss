@@ -6,20 +6,30 @@
     justify-content: center;
     flex-direction: column;
     .header{
-        width: 400px;
+        width: 500px;
         display: flex;
         align-items: center;
         justify-content: space-between;
         flex-direction: row;
-        padding: 12px;
+        padding: 16px 12px;
         .spacer{
             width: 24px;
             height: 24px;
         }
         h2{
-            font-size: 24px;
-            font-weight: semibold;
+            font-size: 22px;
+            font-weight: 600;
             color: #fdfdfe;
+            letter-spacing: -0.3px;
+        }
+        svg {
+            cursor: pointer;
+            opacity: 0.6;
+            transition: opacity 0.2s ease;
+            
+            &:hover {
+                opacity: 1;
+            }
         }
     }
     .body{
@@ -27,32 +37,254 @@
         align-items: flex-start;
         justify-content: flex-start;
         flex-direction: column;
-        padding: 12px;
-        border: 1px solid #fdfdfe;
-        border-radius: 12px;
-        gap: 16px;
-        width: 400px;
-        padding: 12px;
-        input{
+        padding: 20px;
+        border: 1px solid rgba(253, 253, 254, 0.3);
+        border-radius: 16px;
+        gap: 20px;
+        width: 500px;
+        background: rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(10px);
+
+        .uploadSection {
+            display: flex;
+            gap: 16px;
             width: 100%;
-            padding: 8px;
-            border: none;
-            border-bottom: 1px solid #b0b0b0;
-            background: none;
-            outline: none;
+        }
+
+        .uploadArea {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 28px 16px;
+            border: 2px dashed rgba(253, 253, 254, 0.2);
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            min-height: 170px;
+            background: rgba(253, 253, 254, 0.02);
+            position: relative;
+            overflow: hidden;
+
+            &::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: radial-gradient(circle at center, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
+
+            &:hover {
+                border-color: rgba(253, 253, 254, 0.5);
+                background: rgba(253, 253, 254, 0.06);
+
+                &::before {
+                    opacity: 1;
+                }
+            }
+
+            &.dragging {
+                border-color: #6366f1;
+                border-style: solid;
+                background: rgba(99, 102, 241, 0.12);
+                transform: scale(1.02);
+
+                .uploadIcon {
+                    color: #6366f1;
+                    transform: scale(1.1);
+                }
+            }
+
+            &.hasFile {
+                border-style: solid;
+                border-color: #22c55e;
+                background: rgba(34, 197, 94, 0.08);
+
+                .uploadIcon {
+                    color: #22c55e;
+                }
+
+                &:hover {
+                    background: rgba(34, 197, 94, 0.12);
+                }
+            }
+
+            &.coverArea {
+                flex: 0 0 150px;
+                min-height: 150px;
+                padding: 12px;
+            }
+        }
+
+        .uploadIcon {
+            color: rgba(253, 253, 254, 0.45);
+            margin-bottom: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .uploadText {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            text-align: center;
+        }
+
+        .uploadTitle {
+            font-size: 15px;
+            font-weight: 600;
             color: #fdfdfe;
+        }
+
+        .uploadHint {
+            font-size: 13px;
+            color: rgba(253, 253, 254, 0.5);
+        }
+
+        .uploadFormats {
+            font-size: 11px;
+            color: rgba(253, 253, 254, 0.35);
+            margin-top: 6px;
+            padding: 4px 10px;
+            background: rgba(253, 253, 254, 0.05);
+            border-radius: 6px;
+        }
+
+        .fileName {
+            font-size: 14px;
+            font-weight: 600;
+            color: #22c55e;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .fileSize {
+            font-size: 12px;
+            color: rgba(253, 253, 254, 0.5);
+        }
+
+        .coverPreview {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            border-radius: 10px;
+            overflow: hidden;
+
+            img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                transition: transform 0.3s ease;
+            }
+
+            .coverOverlay {
+                position: absolute;
+                inset: 0;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 6px;
+                background: rgba(0, 0, 0, 0.7);
+                backdrop-filter: blur(4px);
+                opacity: 0;
+                transition: opacity 0.3s ease;
+                color: #fdfdfe;
+
+                span {
+                    font-size: 13px;
+                    font-weight: 500;
+                }
+            }
+
+            &:hover {
+                img {
+                    transform: scale(1.05);
+                }
+                
+                .coverOverlay {
+                    opacity: 1;
+                }
+            }
+        }
+
+        .inputGroup {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+
+            label {
+                font-size: 13px;
+                font-weight: 600;
+                color: rgba(253, 253, 254, 0.8);
+                letter-spacing: 0.3px;
+            }
+
+            input {
+                width: 100%;
+                padding: 14px 16px;
+                border: 1px solid rgba(253, 253, 254, 0.15);
+                border-radius: 10px;
+                background: rgba(253, 253, 254, 0.05);
+                outline: none;
+                color: #fdfdfe;
+                font-size: 15px;
+                transition: all 0.2s ease;
+
+                &::placeholder {
+                    color: rgba(253, 253, 254, 0.35);
+                }
+
+                &:hover {
+                    border-color: rgba(253, 253, 254, 0.3);
+                    background: rgba(253, 253, 254, 0.07);
+                }
+
+                &:focus {
+                    border-color: #6366f1;
+                    background: rgba(99, 102, 241, 0.08);
+                    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+                }
+            }
         }
         button{
             width: 100%;
-            padding: 12px;
-            background-color: #fdfdfe;
-            font-weight: semibold;
+            padding: 16px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            font-weight: 600;
             outline: none;
             border: none;
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
+            color: #fdfdfe;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 8px;
+
+            &:hover:not(:disabled) {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 24px rgba(99, 102, 241, 0.45);
+            }
+
+            &:active:not(:disabled) {
+                transform: translateY(0);
+                box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+            }
+
+            &:disabled {
+                opacity: 0.4;
+                cursor: not-allowed;
+                background: rgba(253, 253, 254, 0.15);
+                box-shadow: none;
+            }
         }
     }
 }
