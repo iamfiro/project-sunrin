@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Note, Chart, Rank, Result
+from .video_processor import process_video
 from ulid import ULID
 import cv2
 from django.core.files.base import ContentFile
@@ -76,16 +77,16 @@ class ChartSerializer(serializers.ModelSerializer):
                 f.write(chunk)
 
         # --- Video File ---
-        # Using the same file for song and video, just different DB path based on model
-        video_os_path = os.path.join(settings.MEDIA_ROOT, 'video', file_name)
-        video_db_path = posixpath.join(settings.MEDIA_URL, 'video', file_name)
+        # 임시 파일에 원본 비디오 저장
+        temp_dir = os.path.join(settings.MEDIA_ROOT, 'temp')
+        os.makedirs(temp_dir, exist_ok=True)
+        temp_video_path = os.path.join(temp_dir, file_name)
         
-        os.makedirs(os.path.dirname(video_os_path), exist_ok=True)
-        with open(video_os_path, 'wb+') as f:
+        with open(temp_video_path, 'wb+') as f:
             music_file.seek(0)
             for chunk in music_file.chunks():
                 f.write(chunk)
-
+        
         # --- Cover Image ---
         cover_db_path = ''
         
@@ -103,16 +104,7 @@ class ChartSerializer(serializers.ModelSerializer):
                 for chunk in cover_file.chunks():
                     f.write(chunk)
         else:
-            # 커버 파일이 없으면 비디오에서 첫 프레임 추출
-            temp_dir = os.path.join(settings.MEDIA_ROOT, 'temp')
-            os.makedirs(temp_dir, exist_ok=True)
-            temp_video_path = os.path.join(temp_dir, file_name)
-            
-            music_file.seek(0)
-            with open(temp_video_path, 'wb+') as f:
-                for chunk in music_file.chunks():
-                    f.write(chunk)
-            
+            # 커버 파일이 없으면 원본 비디오에서 첫 프레임 추출 (비디오 처리 전)
             cap = cv2.VideoCapture(temp_video_path)
             ret, frame = cap.read()
             if ret:
@@ -125,7 +117,32 @@ class ChartSerializer(serializers.ModelSerializer):
                 # If frame extraction fails, use a default cover
                 cover_db_path = posixpath.join(settings.MEDIA_URL, 'covers', 'bochi.jpg')
             cap.release()
-            os.remove(temp_video_path)
+        
+        # 비디오 처리: 다운스케일링 및 블러 적용
+        video_os_path = os.path.join(settings.MEDIA_ROOT, 'video', file_name)
+        video_db_path = posixpath.join(settings.MEDIA_URL, 'video', file_name)
+        
+        try:
+            # ffmpeg로 비디오 처리 (다운스케일링 + 블러)
+            process_video(
+                input_path=temp_video_path,
+                output_path=video_os_path,
+                width=1280,
+                height=720,
+                quality=26,
+                blur_sigma=5.0
+            )
+        except Exception as e:
+            # 비디오 처리 실패 시 원본 파일 사용
+            print(f"비디오 처리 실패, 원본 파일 사용: {e}")
+            os.makedirs(os.path.dirname(video_os_path), exist_ok=True)
+            with open(video_os_path, 'wb+') as f:
+                with open(temp_video_path, 'rb') as temp_f:
+                    f.write(temp_f.read())
+        finally:
+            # 임시 파일 정리
+            if os.path.exists(temp_video_path):
+                os.remove(temp_video_path)
 
         chart = Chart.objects.create(
             musicId=music_id,
