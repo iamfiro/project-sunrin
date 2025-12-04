@@ -34,10 +34,14 @@ export default function GameMain() {
         .then((chartData) => {
           setChart(chartData);
           setResult({ difficulty: chartData.difficulty });
+          // 특정 musicId는 lane 변환을 하지 않음 (이미 올바른 형식)
+          const isSpecialMusicId = musicId === "01KBKCTRA3BAYWPMDQXA460YFP";
           const convertedNotes: Note[] = chartData.notes.map((note) => ({
             id: String(note.id),
             time: note.time,
-            lane: Math.max(0, note.lane - 1), // 서버의 1-based lane을 0-based로 변환
+            lane: isSpecialMusicId
+              ? Math.max(0, note.lane) // 변환 없이 그대로 사용
+              : Math.max(0, note.lane - 1), // 서버의 1-based lane을 0-based로 변환
             type: note.type,
             duration: note.duration ?? undefined,
           }));
