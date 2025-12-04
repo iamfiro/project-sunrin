@@ -206,9 +206,7 @@ export default function SongSelect() {
                   user: {
                     id: String(rank.user.id),
                     name: rank.user.username,
-                    profileImage: rank.user.profileImage
-                      ? `${API_BASE}${rank.user.profileImage}`
-                      : "/images/default-profile.png",
+                    profileImage: rank.user.profileImage || "",
                     stats: { perfectCount: 0, highestScore: 0 },
                   },
                   username: rank.user.username,
