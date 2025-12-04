@@ -22,7 +22,7 @@ import NoteField from "../note-field";
 import s from "./style.module.scss";
 
 const LANE_POSITIONS = [12.5, 37.5, 62.5, 87.5];
-const NOTE_DISPLAY_TIME = 1500; // 노트가 화면에 보이는 시간 (1.5초)
+const NOTE_DISPLAY_TIME = 500; // 노트가 화면에 보이는 시간 (0.5초) - 초고속
 
 interface PlayFieldProps {
   notes: Note[];
