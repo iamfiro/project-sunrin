@@ -23,18 +23,7 @@
     background-color: $color-black;
 }
 
-.blackContainer {
-    @include fullScreen;
-    gap: $spacing-12;
-    z-index: 1001;
-
-    background-color: $color-black;
-}
 
 .logo {
     height: 150px;
-}
-
-.creditText {
-    font-size: 16px;
 }

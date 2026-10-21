@@ -6,17 +6,15 @@ import {
   GameMain,
   GameResult,
   Intro,
-  Loading,
   SignIn,
   SignUp,
   SongSelect,
-  Start,
 } from "../pages";
 
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <Start />,
+    element: <Intro />,
   },
   {
     path: "/auth",
@@ -29,14 +27,6 @@ export const router = createBrowserRouter([
   {
     path: "/auth/signup",
     element: <SignUp />,
-  },
-  {
-    path: "/game/intro",
-    element: <Intro />,
-  },
-  {
-    path: "/game/loading",
-    element: <Loading />,
   },
   {
     path: "/game/select",
