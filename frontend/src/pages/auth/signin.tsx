@@ -1,13 +1,18 @@
+import { CheckCircle2, ChevronRight, Lock, User } from "lucide-react";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
+import { AuthField, AuthLayout } from "@/shared/components";
 import { useAuth } from "@/shared/providers";
 
-import s from "@/shared/styles/pages/auth/signin.module.scss";
+import s from "@/shared/styles/pages/auth/form.module.scss";
 
 export default function SignIn() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { signin } = useAuth();
+  const notice = (location.state as { message?: string } | null)?.message;
+
   const [formData, setFormData] = useState({
     nickname: "",
     password: "",
@@ -16,6 +21,7 @@ export default function SignIn() {
     nickname: "",
     password: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -37,7 +43,6 @@ export default function SignIn() {
       password: "",
     };
 
-    // Email validation
     if (!formData.nickname) {
       newErrors.nickname = "닉네임을 입력해주세요";
       isValid = false;
@@ -46,7 +51,6 @@ export default function SignIn() {
       isValid = false;
     }
 
-    // Password validation
     if (!formData.password) {
       newErrors.password = "비밀번호를 입력해주세요";
       isValid = false;
@@ -55,7 +59,7 @@ export default function SignIn() {
       isValid = false;
     }
 
-    setErrors(newErrors as any);
+    setErrors(newErrors);
     return isValid;
   };
 
@@ -65,6 +69,8 @@ export default function SignIn() {
     if (!validateForm()) {
       return;
     }
+
+    setIsSubmitting(true);
 
     try {
       await signin({
@@ -78,67 +84,60 @@ export default function SignIn() {
         ...prev,
         password: "로그인에 실패했습니다. 다시 시도해주세요.",
       }));
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <div className={s.container}>
-      <div className={s.formWrapper}>
-        <div className={s.formLogo}>
-          <img src="/logo.svg" alt="logo" />
-        </div>
-
-        <form className={s.form} onSubmit={handleSubmit}>
-          <div className={s.inputGroup}>
-            <label htmlFor="nickname" className={s.label}>
-              닉네임
-            </label>
-            <input
-              type="text"
-              id="nickname"
-              name="nickname"
-              className={s.input}
-              placeholder="NICKNAME"
-              value={formData.nickname}
-              onChange={handleChange}
-              autoComplete="nickname"
-            />
-            {errors.nickname && <p className={s.error}>{errors.nickname}</p>}
-          </div>
-
-          <div className={s.inputGroup}>
-            <label htmlFor="password" className={s.label}>
-              비밀번호
-            </label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              className={s.input}
-              placeholder="PASSWORD"
-              value={formData.password}
-              onChange={handleChange}
-              autoComplete="current-password"
-            />
-            {errors.password && (
-              <span className={s.error}>{errors.password}</span>
-            )}
-          </div>
-
-          <button type="submit" className={s.submitButton}>
-            로그인
-          </button>
-        </form>
-
-        <div className={s.footer}>
-          <p className={s.footerText}>
-            계정이 없으신가요?{" "}
-            <a href="/auth/signup" className={s.link}>
-              회원가입
-            </a>
+    <AuthLayout
+      title="로그인"
+      description="닉네임으로 로그인하고 기록을 이어가세요"
+      hints={[
+        { icon: "tab", label: "Next" },
+        { icon: "enter", label: "Login" },
+      ]}
+    >
+      <form className={s.form} onSubmit={handleSubmit} noValidate>
+        {notice && (
+          <p className={s.notice}>
+            <CheckCircle2 size={20} aria-hidden />
+            {notice}
           </p>
-        </div>
-      </div>
-    </div>
+        )}
+
+        <AuthField
+          name="nickname"
+          label="닉네임"
+          icon={User}
+          placeholder="닉네임을 입력하세요"
+          value={formData.nickname}
+          onChange={handleChange}
+          autoComplete="nickname"
+          error={errors.nickname}
+        />
+
+        <AuthField
+          name="password"
+          type="password"
+          label="비밀번호"
+          icon={Lock}
+          placeholder="비밀번호를 입력하세요"
+          value={formData.password}
+          onChange={handleChange}
+          autoComplete="current-password"
+          error={errors.password}
+        />
+
+        <button
+          type="submit"
+          className={s.submitButton}
+          disabled={isSubmitting}
+        >
+          <span>{isSubmitting ? "로그인 중..." : "로그인"}</span>
+          <ChevronRight size={28} aria-hidden />
+        </button>
+      </form>
+    </AuthLayout>
   );
 }

@@ -1,0 +1,194 @@
+// 곡 선택 화면(select.module.scss)과 같은 구조: 헤더 / 좌측 정보 / 우측 리스트 / 좌하단 키 안내
+.container {
+    position: relative;
+
+    width: 100%;
+    min-height: 100vh;
+
+    background-color: #141414;
+    overflow: hidden;
+}
+
+// 곡 선택 화면의 배경 영상과 같은 처리
+.background {
+    position: fixed;
+    inset: 0;
+
+    background-image: url('/images/auth/background.jpg');
+    background-size: cover;
+    background-position: center;
+
+    filter: blur(30px) brightness(0.8);
+    transform: scale(1.2);
+}
+
+.main {
+    position: relative;
+    z-index: 1;
+
+    min-height: 100vh;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.content {
+    flex: 1;
+
+    display: flex;
+    flex-direction: row;
+}
+
+.left,
+.right {
+    width: 50%;
+}
+
+.left {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: $spacing-64;
+
+    padding: $spacing-48 $spacing-64;
+}
+
+.logo {
+    width: min(100%, 380px);
+
+    filter: drop-shadow(1px 1px 20px rgba(0, 0, 0, 0.3));
+}
+
+.info {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-16;
+}
+
+.title {
+    font-size: 42px;
+    font-weight: bold;
+    color: $text;
+
+    text-shadow: 1px 1px 20px rgba(0, 0, 0, 0.3);
+}
+
+.description {
+    font-size: 24px;
+    color: $text;
+
+    text-shadow: 1px 1px 20px rgba(0, 0, 0, 0.3);
+}
+
+.right {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-end;
+    gap: $spacing-32;
+
+    padding: $spacing-48 0 $spacing-100;
+}
+
+.tabs {
+    padding-inline: $spacing-32;
+}
+
+.tab,
+.tabActive {
+    height: 50px;
+    width: 170px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-size: 16px;
+    color: $color-white;
+    background-color: #ffffff20;
+
+    transition: all 0.3s ease-in-out;
+
+    &:hover {
+        background-color: #ffffff40;
+    }
+}
+
+.tabActive {
+    font-weight: bold;
+    color: $text-brand;
+    background-color: $surface;
+
+    &:hover {
+        background-color: $surface;
+    }
+}
+
+.footer {
+    width: fit-content;
+    height: 55px;
+
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    z-index: 2;
+
+    padding: 0 $padding;
+
+    background-color: $surface;
+
+    border-radius: 0 10px 0 0;
+}
+
+@media (max-width: 960px) {
+    .content {
+        flex-direction: column;
+    }
+
+    .left,
+    .right {
+        width: 100%;
+    }
+
+    .left {
+        align-items: center;
+        gap: $spacing-32;
+
+        padding: $spacing-48 $spacing-24 0;
+
+        text-align: center;
+    }
+
+    .logo {
+        width: min(60%, 240px);
+    }
+
+    .title {
+        font-size: 32px;
+    }
+
+    .description {
+        font-size: 18px;
+    }
+
+    .right {
+        padding-top: $spacing-24;
+    }
+
+    .tabs {
+        width: 100%;
+
+        > * {
+            flex: 1;
+        }
+    }
+
+    .footer {
+        display: none;
+    }
+}

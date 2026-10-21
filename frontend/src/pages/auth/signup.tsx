@@ -1,25 +1,33 @@
-import { useState } from "react";
+import { ChevronRight, Lock, Mail, ShieldCheck, User } from "lucide-react";
+import { CSSProperties, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { signup as signupService } from "@/shared/api/authService";
+import { AuthField, AuthLayout } from "@/shared/components";
 
-import s from "@/shared/styles/pages/auth/signup.module.scss";
+import { getPasswordRank, PASSWORD_RANKS } from "./passwordRank";
+
+import s from "@/shared/styles/pages/auth/form.module.scss";
+
+const EMPTY_FORM = {
+  email: "",
+  password: "",
+  password_confirm: "",
+  nickname: "",
+};
+
+type FormFields = typeof EMPTY_FORM;
+
+const pickMessage = (value: unknown) =>
+  Array.isArray(value) ? String(value[0]) : String(value);
 
 export default function SignUp() {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-    password_confirm: "",
-    nickname: "",
-  });
-  const [errors, setErrors] = useState({
-    email: "",
-    password: "",
-    password_confirm: "",
-    nickname: "",
-  });
+  const [formData, setFormData] = useState<FormFields>(EMPTY_FORM);
+  const [errors, setErrors] = useState<FormFields>(EMPTY_FORM);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const rank = getPasswordRank(formData.password);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -36,14 +44,8 @@ export default function SignUp() {
 
   const validateForm = () => {
     let isValid = true;
-    const newErrors = {
-      email: "",
-      password: "",
-      password2: "",
-      nickname: "",
-    };
+    const newErrors = { ...EMPTY_FORM };
 
-    // Nickname validation
     if (!formData.nickname) {
       newErrors.nickname = "닉네임을 입력해주세요";
       isValid = false;
@@ -52,7 +54,6 @@ export default function SignUp() {
       isValid = false;
     }
 
-    // Email validation
     if (!formData.email) {
       newErrors.email = "이메일을 입력해주세요";
       isValid = false;
@@ -61,7 +62,6 @@ export default function SignUp() {
       isValid = false;
     }
 
-    // Password validation
     if (!formData.password) {
       newErrors.password = "비밀번호를 입력해주세요";
       isValid = false;
@@ -70,7 +70,6 @@ export default function SignUp() {
       isValid = false;
     }
 
-    // Confirm password validation
     if (!formData.password_confirm) {
       newErrors.password_confirm = "비밀번호 확인을 입력해주세요";
       isValid = false;
@@ -93,8 +92,7 @@ export default function SignUp() {
     setIsSubmitting(true);
 
     try {
-      const { password2, ...signupData } = formData;
-      const response = await signupService(signupData);
+      const response = await signupService(formData);
 
       if (response.message) {
         // Redirect to login page with success message
@@ -105,33 +103,22 @@ export default function SignUp() {
           },
         });
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error("회원가입 실패:", error);
 
       // Handle different error cases
-      if (error.response?.data) {
-        const errorData = error.response.data;
-        const newErrors = { ...errors };
-
-        if (errorData.email) {
-          newErrors.email = Array.isArray(errorData.email)
-            ? errorData.email[0]
-            : errorData.email;
-        }
-
-        if (errorData.nickname) {
-          newErrors.nickname = Array.isArray(errorData.nickname)
-            ? errorData.nickname[0]
-            : errorData.nickname;
-        }
-
-        if (errorData.password) {
-          newErrors.password = Array.isArray(errorData.password)
-            ? errorData.password[0]
-            : errorData.password;
-        }
-
-        setErrors(newErrors);
+      const errorData = (
+        error as { response?: { data?: Record<string, unknown> } }
+      ).response?.data;
+      if (errorData) {
+        // 서버가 돌려준 필드별 메시지만 덮어쓴다
+        const serverErrors: Partial<FormFields> = {};
+        (["email", "nickname", "password"] as const).forEach((field) => {
+          if (errorData[field]) {
+            serverErrors[field] = pickMessage(errorData[field]);
+          }
+        });
+        setErrors((prev) => ({ ...prev, ...serverErrors }));
       } else {
         setErrors((prev) => ({
           ...prev,
@@ -143,106 +130,101 @@ export default function SignUp() {
     }
   };
 
+  const passwordsMatch =
+    !!formData.password_confirm &&
+    formData.password === formData.password_confirm;
+
   return (
-    <div className={s.container}>
-      <div className={s.formWrapper}>
-        <div className={s.formLogo}>
-          <img src="/logo.svg" alt="logo" />
-        </div>
+    <AuthLayout
+      title="회원가입"
+      description="새 플레이어로 등록하고 첫 곡을 시작하세요"
+      hints={[
+        { icon: "tab", label: "Next" },
+        { icon: "enter", label: "Sign Up" },
+      ]}
+    >
+      <form className={s.form} onSubmit={handleSubmit} noValidate>
+        <AuthField
+          name="nickname"
+          label="닉네임"
+          icon={User}
+          placeholder="2자 이상"
+          value={formData.nickname}
+          onChange={handleChange}
+          autoComplete="nickname"
+          error={errors.nickname}
+        />
 
-        <form className={s.form} onSubmit={handleSubmit}>
-          <div className={s.inputGroup}>
-            <label htmlFor="nickname" className={s.label}>
-              닉네임
-            </label>
-            <input
-              type="text"
-              id="nickname"
-              name="nickname"
-              className={s.input}
-              placeholder="닉네임을 입력하세요"
-              value={formData.nickname}
-              onChange={handleChange}
-              autoComplete="nickname"
-            />
-            {errors.nickname && (
-              <span className={s.error}>{errors.nickname}</span>
-            )}
-          </div>
+        <AuthField
+          name="email"
+          type="email"
+          label="이메일"
+          icon={Mail}
+          placeholder="example@gmail.com"
+          value={formData.email}
+          onChange={handleChange}
+          autoComplete="email"
+          error={errors.email}
+        />
 
-          <div className={s.inputGroup}>
-            <label htmlFor="email" className={s.label}>
-              이메일
-            </label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              className={s.input}
-              placeholder="example@gmail.com"
-              value={formData.email}
-              onChange={handleChange}
-              autoComplete="email"
-            />
-            {errors.email && <span className={s.error}>{errors.email}</span>}
-          </div>
+        <AuthField
+          name="password"
+          type="password"
+          label="비밀번호"
+          icon={Lock}
+          placeholder="6자 이상"
+          value={formData.password}
+          onChange={handleChange}
+          autoComplete="new-password"
+          error={errors.password}
+        >
+          {rank && (
+            <div className={s.rankMeter} aria-live="polite">
+              <div className={s.rankBars}>
+                {PASSWORD_RANKS.map(({ level }) => (
+                  <span
+                    key={level}
+                    style={
+                      level <= rank.level
+                        ? ({ background: rank.color } as CSSProperties)
+                        : undefined
+                    }
+                  />
+                ))}
+              </div>
+              <span
+                className={s.rankLabel}
+                style={{ backgroundColor: rank.color }}
+              >
+                RANK {rank.grade}
+              </span>
+            </div>
+          )}
+        </AuthField>
 
-          <div className={s.inputGroup}>
-            <label htmlFor="password" className={s.label}>
-              비밀번호
-            </label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              className={s.input}
-              placeholder="비밀번호를 입력하세요"
-              value={formData.password}
-              onChange={handleChange}
-              autoComplete="new-password"
-            />
-            {errors.password && (
-              <span className={s.error}>{errors.password}</span>
-            )}
-          </div>
+        <AuthField
+          name="password_confirm"
+          type="password"
+          label="비밀번호 확인"
+          icon={ShieldCheck}
+          placeholder="비밀번호를 다시 입력하세요"
+          value={formData.password_confirm}
+          onChange={handleChange}
+          autoComplete="new-password"
+          error={errors.password_confirm}
+        >
+          {passwordsMatch && <p className={s.success}>비밀번호가 일치합니다</p>}
+        </AuthField>
 
-          <div className={s.inputGroup}>
-            <label htmlFor="confirmPassword" className={s.label}>
-              비밀번호 확인
-            </label>
-            <input
-              type="password"
-              id="password_confirm"
-              name="password_confirm"
-              className={s.input}
-              placeholder="비밀번호를 다시 입력하세요"
-              value={formData.password_confirm}
-              onChange={handleChange}
-              autoComplete="new-password"
-            />
-            {errors.password_confirm && (
-              <span className={s.error}>{errors.password_confirm}</span>
-            )}
-          </div>
-
-          <button
-            type="submit"
-            className={s.submitButton}
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? "처리 중..." : "회원가입"}
-          </button>
-        </form>
-
-        <div className={s.footer}>
-          <p className={s.footerText}>
-            이미 계정이 있으신가요?{" "}
-            <a href="/auth/signin" className={s.link}>
-              로그인
-            </a>
-          </p>
-        </div>
-      </div>
-    </div>
+        <button
+          type="submit"
+          className={s.submitButton}
+          disabled={isSubmitting}
+        >
+          <span>{isSubmitting ? "가입 중..." : "회원가입"}</span>
+          <ChevronRight size={28} aria-hidden />
+        </button>
+      </form>
+    </AuthLayout>
   );
 }

@@ -1,0 +1,348 @@
+// 입력칸·버튼은 곡 선택 화면의 트랙 카드(components/music/card)를 그대로 따른다:
+// 기본은 반투명 행, 포커스(=선택)되면 흰 배경으로 바뀌며 왼쪽으로 늘어난다.
+@mixin trackRow {
+    width: 90%;
+
+    display: flex;
+    align-items: center;
+
+    border-radius: $radius-8 0 0 $radius-8;
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 2% 100%);
+
+    transition: all 0.3s ease-in-out;
+}
+
+.form {
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: $spacing-14;
+}
+
+.notice {
+    @include trackRow;
+
+    gap: $spacing-12;
+
+    padding: $spacing-16 $spacing-24;
+
+    font-size: 16px;
+    color: $text;
+    background: linear-gradient(to bottom, $surface-blue, $surface-blue-heavy);
+}
+
+.inputGroup {
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: $spacing-8;
+}
+
+.field {
+    @include trackRow;
+
+    height: 84px;
+
+    background-color: #ffffff20;
+
+    &:hover {
+        width: 95%;
+    }
+
+    &:focus-within {
+        width: 95%;
+
+        background-color: $surface;
+
+        .fieldIcon {
+            color: $text;
+            background-color: $surface-brand;
+        }
+
+        .label {
+            color: $text-subtle;
+        }
+
+        .input {
+            color: $text-brand;
+
+            &::placeholder {
+                color: $surface-subtle;
+            }
+        }
+
+        .iconButton {
+            color: $text-subtle;
+        }
+    }
+}
+
+.field.fieldError {
+    .fieldIcon {
+        background-color: $surface-danger;
+    }
+}
+
+// 트랙 카드의 커버 이미지 자리
+.fieldIcon {
+    height: 100%;
+    aspect-ratio: 1 / 1;
+
+    @include Center;
+
+    color: $color-white;
+    background-color: #00000030;
+
+    border-radius: $radius-8 0 0 $radius-8;
+
+    transition: all 0.3s ease-in-out;
+}
+
+.fieldBody {
+    flex: 1;
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-4;
+
+    padding-left: $spacing-24;
+}
+
+.label {
+    font-size: 14px;
+    color: $color-white;
+
+    transition: color 0.3s ease-in-out;
+}
+
+.input {
+    width: 100%;
+
+    font-size: 22px;
+    color: $text;
+
+    background: transparent;
+    border: none;
+    outline: none;
+
+    user-select: text;
+    transition: color 0.3s ease-in-out;
+
+    &::placeholder {
+        color: #ffffff80;
+    }
+
+    // 크롬 자동완성의 배경색을 덮는다
+    &:-webkit-autofill {
+        -webkit-text-fill-color: currentColor;
+        transition: background-color 9999s ease-in-out 0s;
+    }
+}
+
+.iconButton {
+    display: flex;
+
+    padding: $spacing-8;
+    margin-right: $spacing-24;
+
+    color: $color-white;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+// 트랙 정보 카드의 회색 알약 라벨을 빨간색으로
+.error {
+    margin-right: $spacing-24;
+
+    padding: $spacing-4 $spacing-12;
+
+    font-size: 13px;
+    color: $text;
+    background-color: $surface-danger;
+
+    border-radius: $radius-14;
+}
+
+.success {
+    margin-right: $spacing-24;
+
+    padding: $spacing-4 $spacing-12;
+
+    font-size: 13px;
+    color: $text-brand;
+    background-color: $surface;
+
+    border-radius: $radius-14;
+}
+
+// ----- 비밀번호 랭크 -----
+
+.rankMeter {
+    width: 90%;
+
+    display: flex;
+    align-items: center;
+    gap: $spacing-12;
+
+    padding-right: $spacing-24;
+}
+
+.rankBars {
+    flex: 1;
+
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: $spacing-4;
+
+    span {
+        height: 6px;
+
+        background-color: #ffffff30;
+        border-radius: $radius-full;
+
+        transition: background-color 0.3s ease-in-out;
+    }
+}
+
+.rankLabel {
+    padding: $spacing-4 $spacing-12;
+
+    font-size: 13px;
+    font-weight: bold;
+    color: $text;
+
+    border-radius: $radius-14;
+}
+
+// ----- 제출 버튼: 브랜드색 트랙 행 -----
+
+.submitButton {
+    @include trackRow;
+
+    height: 72px;
+    margin-top: $spacing-8;
+
+    justify-content: space-between;
+
+    padding: 0 $spacing-32 0 $spacing-48;
+
+    font-size: 24px;
+    font-weight: bold;
+    color: $text;
+
+    background-color: $surface-brand;
+    border: none;
+    cursor: pointer;
+
+    span {
+        color: inherit;
+    }
+
+    &:hover:not(:disabled),
+    &:focus-visible {
+        width: 95%;
+        outline: none;
+    }
+
+    &:disabled {
+        cursor: wait;
+        opacity: 0.7;
+    }
+}
+
+// ----- /auth 모드 선택: 트랙 리스트 -----
+
+.modeList {
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: $spacing-14;
+}
+
+.modeCard {
+    @include trackRow;
+
+    height: 100px;
+
+    background-color: #ffffff20;
+
+    &:hover {
+        width: 95%;
+    }
+}
+
+.modeCard.selected {
+    width: 95%;
+    height: 130px;
+
+    background-color: $surface;
+
+    .modeIcon {
+        background-color: $surface-brand;
+    }
+
+    .modeTitle {
+        font-size: 32px;
+        color: $text-brand;
+    }
+
+    .modeDescription {
+        font-size: 20px;
+        color: $text-subtle;
+    }
+}
+
+.modeIcon {
+    height: 100%;
+    aspect-ratio: 1 / 1;
+
+    @include Center;
+
+    color: $color-white;
+    background-color: #00000030;
+
+    border-radius: $radius-8 0 0 $radius-8;
+
+    transition: all 0.3s ease-in-out;
+}
+
+.modeText {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-6;
+
+    padding-left: $spacing-24;
+}
+
+.modeTitle {
+    font-size: 24px;
+    color: $text;
+
+    transition: all 0.3s ease-in-out;
+}
+
+.modeDescription {
+    font-size: 18px;
+    color: $color-white;
+
+    transition: all 0.3s ease-in-out;
+}
+
+@media (max-width: 960px) {
+    .field,
+    .notice,
+    .submitButton,
+    .modeCard,
+    .rankMeter {
+        width: 95%;
+    }
+}
